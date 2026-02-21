@@ -1,0 +1,6 @@
+@MDRNJ.Api_HostAddress = http://localhost:5215
+
+GET {{MDRNJ.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
