@@ -1,9 +1,19 @@
-namespace MDRNJfitness.Views;
+using MDRNJfitness.ViewModels;
 
-public partial class ChallengePage : ContentPage
+namespace MDRNJfitness.Views
 {
-	public ChallengePage()
-	{
-		InitializeComponent();
-	}
+    public partial class ChallengePage : ContentPage
+    {
+        public ChallengePage()
+        {
+            InitializeComponent();
+            BindingContext = new ChallengeViewModel();
+
+            Title = "Weekly Quests";
+            Shell.SetBackButtonBehavior(this, new BackButtonBehavior
+            {
+                IsVisible = true
+            });
+        }
+    }
 }
