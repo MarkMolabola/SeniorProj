@@ -2,11 +2,101 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MDRNJfitness.Views.ChallengePage"
-             Title="ChallengePage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             Title="Weekly Quests"
+             BackgroundColor="#F4FFF7">
+
+	<ScrollView>
+		<VerticalStackLayout Padding="20" Spacing="15">
+
+			<Label Text="Weekly Quests"
+                   FontSize="30"
+                   FontAttributes="Bold"
+                   TextColor="#1F2937"
+                   HorizontalOptions="Center" />
+
+			<Label Text="Select a difficulty once per week. Your quests will stay locked until next week."
+                   FontSize="15"
+                   TextColor="#4B5563"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center" />
+
+			<Frame BackgroundColor="#E8F5E9"
+                   BorderColor="#CDECCD"
+                   CornerRadius="12"
+                   Padding="12">
+				<Label Text="{Binding WeeklyResetTimer}"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       TextColor="#2E7D32"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center" />
+			</Frame>
+
+			<Picker Title="Select Difficulty"
+                    TitleColor="#4B5563"
+                    BackgroundColor="White"
+                    TextColor="#1F2937"
+                    ItemsSource="{Binding Difficulties}"
+                    SelectedItem="{Binding SelectedDifficulty}"
+                    IsEnabled="{Binding CanSelectDifficulty}" />
+
+			<Label Text="Once generated, your quests stay the same for the rest of the week."
+                   FontSize="13"
+                   TextColor="#4B5563"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center" />
+
+			<Button Text="DEBUG RESET WEEKLY QUESTS"
+                    Command="{Binding ResetWeeklyChallengesCommand}"
+                    IsVisible="{Binding IsDebugModeVisible}"
+                    BackgroundColor="#FF7043"
+                    TextColor="White"
+                    CornerRadius="10" />
+
+			<CollectionView ItemsSource="{Binding WeeklyChallenges}">
+				<CollectionView.ItemTemplate>
+					<DataTemplate>
+						<Frame Margin="0,8"
+                               Padding="14"
+                               BackgroundColor="White"
+                               BorderColor="#CDECCD"
+                               CornerRadius="14"
+                               HasShadow="True">
+							<VerticalStackLayout Spacing="8">
+								<Label Text="{Binding Title}"
+                                       FontSize="20"
+                                       FontAttributes="Bold"
+                                       TextColor="#1565C0" />
+
+								<Label Text="{Binding Description}"
+                                       FontSize="15"
+                                       TextColor="#1F2937" />
+
+								<Label FontSize="14"
+                                       TextColor="#4B5563">
+									<Label.FormattedText>
+										<FormattedString>
+											<Span Text="Progress: " />
+											<Span Text="{Binding CurrentProgress}" />
+											<Span Text="/" />
+											<Span Text="{Binding TargetValue}" />
+										</FormattedString>
+									</Label.FormattedText>
+								</Label>
+
+								<Label Text="{Binding XpReward, StringFormat='XP Reward: {0}'}"
+                                       FontSize="14"
+                                       TextColor="#2E7D32" />
+
+								<Label Text="{Binding IsCompleted, StringFormat='Completed: {0}'}"
+                                       FontSize="14"
+                                       TextColor="#8E24AA" />
+							</VerticalStackLayout>
+						</Frame>
+					</DataTemplate>
+				</CollectionView.ItemTemplate>
+			</CollectionView>
+
+		</VerticalStackLayout>
+	</ScrollView>
 </ContentPage>
