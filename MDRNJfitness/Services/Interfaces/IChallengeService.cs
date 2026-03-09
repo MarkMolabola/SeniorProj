@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using MDRNJfitness.Models.Social;
 
 namespace MDRNJfitness.Services.Interfaces
 {
-    internal interface IChallengeService
+    public interface IChallengeService
     {
+        List<Challenge> GetOrCreateWeeklyChallenges(string difficulty);
+        void ResetWeeklyChallengesForTesting();
     }
 }
