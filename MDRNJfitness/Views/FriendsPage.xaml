@@ -2,11 +2,86 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MDRNJfitness.Views.FriendsPage"
-             Title="FriendsPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             Title="{Binding Title}">
+
+    <RefreshView Command="{Binding LoadCommand}"
+                 IsRefreshing="{Binding IsBusy}">
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="16">
+
+                <!-- Add friend -->
+                <Border StrokeShape="RoundRectangle 12" Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Add Friend" FontAttributes="Bold" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Entry Grid.Column="0"
+                                   Placeholder="Username"
+                                   Text="{Binding SearchUsername}" />
+                            <Button Grid.Column="1"
+                                    Text="Send"
+                                    Command="{Binding SendRequestCommand}"
+                                    IsEnabled="{Binding IsNotBusy}"
+                                    Padding="16,0" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Pending requests -->
+                <Label Text="Pending Requests" FontAttributes="Bold" FontSize="16" />
+
+                <CollectionView ItemsSource="{Binding PendingRequests}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border StrokeShape="RoundRectangle 10" Padding="12" Margin="0,0,0,8">
+                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                                    <Label Grid.Column="0"
+                                           Text="{Binding Username}"
+                                           FontAttributes="Bold"
+                                           VerticalOptions="Center" />
+                                    <Button Grid.Column="1"
+                                            Text="Accept"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AcceptCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#22C55E"
+                                            Padding="12,4" HeightRequest="36" />
+                                    <Button Grid.Column="2"
+                                            Text="Decline"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeclineCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#EF4444"
+                                            Padding="12,4" HeightRequest="36" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Friends list -->
+                <Label Text="Friends" FontAttributes="Bold" FontSize="16" />
+
+                <CollectionView ItemsSource="{Binding Friends}"
+                                EmptyView="No friends yet. Send a request above!">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border StrokeShape="RoundRectangle 10" Padding="12" Margin="0,0,0,8">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                                        <Label Text="{Binding Username}" FontAttributes="Bold" />
+                                        <Label Text="{Binding Status}" FontSize="11"
+                                               TextColor="{StaticResource Gray400}" />
+                                    </VerticalStackLayout>
+                                    <Button Grid.Column="1"
+                                            Text="View"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ViewProfileCommand}"
+                                            CommandParameter="{Binding .}"
+                                            Padding="12,4" HeightRequest="36" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
 </ContentPage>

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:conv="clr-namespace:MDRNJfitness.Helpers.Converters"
+             xmlns:helpers="clr-namespace:MDRNJfitness.Helpers"
+             x:Class="MDRNJfitness.Views.CalendarPage"
+             Title="{Binding Title}">
+
+    <ContentPage.Resources>
+        <conv:UtcToLocalConverter x:Key="UtcToLocal" />
+
+        <!-- Day cell style: faded when outside current month -->
+        <Style x:Key="DayLabelStyle" TargetType="Label">
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="VerticalOptions" Value="Center" />
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+
+        <DataTemplate x:Key="DayTemplate" x:DataType="helpers:CalendarDayItem">
+            <Border Margin="2"
+                    StrokeShape="RoundRectangle 6"
+                    BackgroundColor="{AppThemeBinding
+                        Light={StaticResource White},
+                        Dark={StaticResource Gray900}}"
+                    Padding="0"
+                    HeightRequest="44">
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border"
+                                 Binding="{Binding IsSelected}" Value="True">
+                        <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Border"
+                                 Binding="{Binding IsToday}" Value="True">
+                        <Setter Property="Stroke" Value="{StaticResource Primary}" />
+                        <Setter Property="StrokeThickness" Value="2" />
+                    </DataTrigger>
+                </Border.Triggers>
+
+                <Grid>
+                    <Label Text="{Binding Day}" Style="{StaticResource DayLabelStyle}">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label"
+                                         Binding="{Binding IsCurrentMonth}" Value="False">
+                                <Setter Property="Opacity" Value="0.3" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Label"
+                                         Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="TextColor" Value="White" />
+                                <Setter Property="FontAttributes" Value="Bold" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+
+                    <!-- Dot indicator when day has a workout -->
+                    <Ellipse WidthRequest="5" HeightRequest="5"
+                             Fill="{StaticResource Primary}"
+                             VerticalOptions="End"
+                             HorizontalOptions="Center"
+                             Margin="0,0,0,4"
+                             IsVisible="{Binding HasWorkout}">
+                        <Ellipse.Triggers>
+                            <DataTrigger TargetType="Ellipse"
+                                         Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="Fill" Value="White" />
+                            </DataTrigger>
+                        </Ellipse.Triggers>
+                    </Ellipse>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+
+            <!-- Month navigation header -->
+            <Grid ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
+                <Button Grid.Column="0"
+                        Text="&#8249;"
+                        FontSize="24"
+                        Command="{Binding PreviousMonthCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource Primary}"
+                        Padding="8,0" />
+                <Label Grid.Column="1"
+                       Text="{Binding MonthLabel}"
+                       FontAttributes="Bold"
+                       FontSize="18"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+                <Button Grid.Column="2"
+                        Text="&#8250;"
+                        FontSize="24"
+                        Command="{Binding NextMonthCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource Primary}"
+                        Padding="8,0" />
+            </Grid>
+
+            <!-- Badge banners -->
+            <Border StrokeShape="RoundRectangle 14"
+                    BackgroundColor="#CD7F32"
+                    Padding="12,8"
+                    IsVisible="{Binding HasFiveDayStreakBadge}">
+                <HorizontalStackLayout Spacing="8">
+                    <Label Text="🥉" FontSize="20" VerticalOptions="Center" />
+                    <Label Text="5-Day Streak Badge Earned!"
+                           FontAttributes="Bold"
+                           TextColor="White"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Border>
+
+            <Border StrokeShape="RoundRectangle 14"
+                    BackgroundColor="#9E9E9E"
+                    Padding="12,8"
+                    IsVisible="{Binding HasTenDayBadge}">
+                <HorizontalStackLayout Spacing="8">
+                    <Label Text="🥈" FontSize="20" VerticalOptions="Center" />
+                    <Label Text="10-Day Workout Badge Earned!"
+                           FontAttributes="Bold"
+                           TextColor="White"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Border>
+
+            <Border StrokeShape="RoundRectangle 14"
+                    BackgroundColor="#FFD700"
+                    Padding="12,8"
+                    IsVisible="{Binding HasTwentyDayBadge}">
+                <HorizontalStackLayout Spacing="8">
+                    <Label Text="🥇" FontSize="20" VerticalOptions="Center" />
+                    <Label Text="20-Day Workout Badge Earned!"
+                           FontAttributes="Bold"
+                           TextColor="#5D4037"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Border>
+
+            <!-- Day-of-week header row -->
+            <Grid ColumnDefinitions="*,*,*,*,*,*,*">
+                <Label Grid.Column="0" Text="Su" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource Gray400}" />
+                <Label Grid.Column="1" Text="Mo" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource Gray400}" />
+                <Label Grid.Column="2" Text="Tu" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource Gray400}" />
+                <Label Grid.Column="3" Text="We" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource Gray400}" />
+                <Label Grid.Column="4" Text="Th" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource Gray400}" />
+                <Label Grid.Column="5" Text="Fr" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource Gray400}" />
+                <Label Grid.Column="6" Text="Sa" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource Gray400}" />
+            </Grid>
+
+            <!-- Calendar grid (42 cells, 7 columns) -->
+            <CollectionView x:Name="DaysGrid"
+                            ItemsSource="{Binding Days}"
+                            ItemTemplate="{StaticResource DayTemplate}"
+                            SelectionMode="Single"
+                            SelectionChanged="OnDaySelected">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="7" />
+                </CollectionView.ItemsLayout>
+            </CollectionView>
+
+            <!-- Selected day workouts -->
+            <Label Text="{Binding SelectedDay.Date,
+                                  StringFormat='Workouts on {0:MMM d}'}"
+                   FontAttributes="Bold"
+                   FontSize="16"
+                   IsVisible="{Binding HasSelectedDay}" />
+
+            <CollectionView ItemsSource="{Binding SelectedWorkouts}"
+                            EmptyView="Tap a day to see workouts">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border StrokeShape="RoundRectangle 10" Padding="12" Margin="0,0,0,8">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                    <Label Text="{Binding WorkoutType}" FontAttributes="Bold" />
+                                    <Label Text="{Binding StartTime,
+                                                          Converter={StaticResource UtcToLocal},
+                                                          StringFormat='{0:h:mm tt}'}"
+                                           FontSize="12"
+                                           TextColor="{StaticResource Gray400}" />
+                                    <Label Text="{Binding DurationMins, StringFormat='{0} mins'}"
+                                           FontSize="12"
+                                           TextColor="{StaticResource Gray400}" />
+                                </VerticalStackLayout>
+                                <Label Grid.Column="1"
+                                       Text="{Binding XPAwarded, StringFormat='+{0} XP'}"
+                                       TextColor="{StaticResource Primary}"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

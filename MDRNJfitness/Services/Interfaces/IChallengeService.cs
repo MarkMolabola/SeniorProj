@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using MDRNJ.Shared.DTOs.Challenge;
 
 namespace MDRNJfitness.Services.Interfaces
 {
-    internal interface IChallengeService
+    public interface IChallengeService
     {
+        Task<List<ChallengeDto>> GetActiveChallengesAsync();
+        Task<List<ChallengeDto>> GetMyChallengesAsync();
+        Task<ChallengeDto> CreateAsync(CreateChallengeDto dto);
+        Task<ChallengeDto> JoinAsync(Guid challengeId);
     }
 }

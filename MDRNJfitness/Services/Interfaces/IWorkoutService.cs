@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using MDRNJ.Shared.DTOs.Workout;
 
 namespace MDRNJfitness.Services.Interfaces
 {
     public interface IWorkoutService
     {
-        //Task<WorkoutDto> GetWorkoutAsync(Guid sessionId);
-        //Task<List<WorkoutDto>> GetUserWorkoutsAsync(Guid userId);
-        //Task<WorkoutDto> CreateWorkoutAsync(Guid userId, CreateWorkoutDto dto);
-        //Task<WorkoutDto> AddExerciseAsync(Guid sessionId, ExerciseDto dto);
-        //Task<WorkoutDto> CompleteWorkoutAsync(Guid sessionId);
-        //Task DeleteWorkoutAsync(Guid sessionId);
-        //Task<List<WorkoutDto>> GetRecentWorkoutsAsync(Guid userId, int count = 10);
+        Task<WorkoutDto> StartAsync(CreateWorkoutDto dto);
+        Task<WorkoutDto> AddExerciseAsync(Guid sessionId, AddExerciseDto dto);
+        Task<WorkoutDto> CompleteAsync(Guid sessionId);
+        Task<List<WorkoutDto>> GetHistoryAsync(int page = 1, int count = 10);
+        Task<List<WorkoutDto>> GetMonthlyAsync(int year, int month);
     }
 }

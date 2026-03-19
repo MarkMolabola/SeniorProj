@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"C:\\\\Users\\\\markg\\\\OneDrive\\\\Desktop\\\\CSULB\\\\SeniorProj\\\\SeniorProj\\\\MDRNJ.Api\" && dotnet build 2>&1 | tail -30)",
+      "Bash(cd \"C:\\\\Users\\\\markg\\\\OneDrive\\\\Desktop\\\\CSULB\\\\SeniorProj\\\\SeniorProj\\\\MDRNJ.Api\" && dotnet ef migrations add Initial 2>&1)"
+    ]
+  }
+}

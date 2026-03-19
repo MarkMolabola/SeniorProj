@@ -1,10 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MDRNJfitness.ViewModels
 {
-    internal class BaseViewModel
+    public partial class BaseViewModel : ObservableObject
     {
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsNotBusy))]
+        private bool _isBusy;
+
+        [ObservableProperty]
+        private string _title = string.Empty;
+
+        public bool IsNotBusy => !IsBusy;
+
+        protected async Task RunSafeAsync(Func<Task> action)
+        {
+            if (IsBusy) return;
+            IsBusy = true;
+            try
+            {
+                await action();
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
     }
 }

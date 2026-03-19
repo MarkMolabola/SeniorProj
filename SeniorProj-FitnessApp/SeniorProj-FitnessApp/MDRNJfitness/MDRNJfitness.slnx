@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="../MDRNJ.Api/MDRNJ.Api.csproj" />
+  <Project Path="../MDRNJ.Shared/MDRNJ.Shared.csproj" />
+  <Project Path="MDRNJfitness.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
+</Solution>

@@ -2,11 +2,100 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MDRNJfitness.Views.DashboardPage"
-             Title="DashboardPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             Title="{Binding Title}">
+
+    <RefreshView Command="{Binding LoadCommand}"
+                 IsRefreshing="{Binding IsBusy}">
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="16">
+
+                <!-- Stats row -->
+                <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="8">
+                    <Border Grid.Column="0" StrokeShape="RoundRectangle 10" Padding="8">
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="{Binding Stats.CurrentLevel}"
+                                   FontSize="22" FontAttributes="Bold"
+                                   HorizontalOptions="Center" />
+                            <Label Text="Level" FontSize="11"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="1" StrokeShape="RoundRectangle 10" Padding="8">
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="{Binding Stats.TotalXP}"
+                                   FontSize="22" FontAttributes="Bold"
+                                   HorizontalOptions="Center" />
+                            <Label Text="XP" FontSize="11"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="2" StrokeShape="RoundRectangle 10" Padding="8">
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="{Binding Stats.CurrentStreak}"
+                                   FontSize="22" FontAttributes="Bold"
+                                   HorizontalOptions="Center" />
+                            <Label Text="Streak" FontSize="11"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="3" StrokeShape="RoundRectangle 10" Padding="8">
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="{Binding Stats.TotalWorkouts}"
+                                   FontSize="22" FontAttributes="Bold"
+                                   HorizontalOptions="Center" />
+                            <Label Text="Workouts" FontSize="11"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- XP Progress -->
+                <Border StrokeShape="RoundRectangle 12" Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="XP to Next Level" FontAttributes="Bold" />
+                        <Label Text="{Binding Stats.XPToNextLevel, StringFormat='{0} XP remaining'}"
+                               TextColor="{StaticResource Primary}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Character card -->
+                <Border StrokeShape="RoundRectangle 12" Padding="16">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Character" FontAttributes="Bold" />
+                        <Label Text="{Binding Character2.OutfitSlot, StringFormat='Outfit: {0}'}" />
+                        <Label Text="{Binding Character2.EquipmentSlot, StringFormat='Equipment: {0}'}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Recent Workouts -->
+                <Label Text="Recent Workouts" FontAttributes="Bold" FontSize="16" />
+
+                <CollectionView ItemsSource="{Binding RecentWorkouts}"
+                                EmptyView="No recent workouts.">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border StrokeShape="RoundRectangle 10" Padding="12" Margin="0,0,0,8">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                        <Label Text="{Binding WorkoutType}"
+                                               FontAttributes="Bold" />
+                                        <Label Text="{Binding StartTime, StringFormat='{0:MMM d, yyyy}'}"
+                                               FontSize="12" />
+                                        <Label Text="{Binding DurationMins, StringFormat='{0} mins'}"
+                                               FontSize="12" />
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1"
+                                           Text="{Binding XPAwarded, StringFormat='+{0} XP'}"
+                                           TextColor="{StaticResource Primary}"
+                                           FontAttributes="Bold"
+                                           VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
 </ContentPage>

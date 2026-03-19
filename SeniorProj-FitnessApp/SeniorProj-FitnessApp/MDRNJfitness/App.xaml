@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<Application
+    x:Class="FitnessApp.App"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:FitnessApp">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <local:NullToBoolConverter x:Key="NullToBoolConverter"/>
+            <local:HeightMultiplierConverter x:Key="HeightMultiplierConverter"/>
+            <local:StepsToBoolConverter x:Key="StepsToBoolConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
