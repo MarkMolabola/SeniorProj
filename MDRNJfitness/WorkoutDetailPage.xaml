@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="SelectWorkoutRoutine.Views.WorkoutDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Workout Details">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <Label
+                x:Name="WorkoutTitle"
+                FontSize="24"
+                FontAttributes="Bold"
+                HorizontalOptions="Center" />
+
+            <Label
+                x:Name="WorkoutDescription"
+                FontSize="16" />
+
+            <Label
+                Text="Tasks:"
+                FontSize="18"
+                FontAttributes="Bold" />
+
+            <VerticalStackLayout x:Name="TasksLayout" Spacing="8"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
