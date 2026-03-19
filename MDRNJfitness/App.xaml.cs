@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace MDRNJfitness
+namespace SelectWorkoutRoutine
 {
     public partial class App : Application
     {
