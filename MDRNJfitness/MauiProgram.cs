@@ -1,7 +1,6 @@
-﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 
-namespace MDRNJfitness
+namespace SelectWorkoutRoutine
 {
     public static class MauiProgram
     {
@@ -10,7 +9,6 @@ namespace MDRNJfitness
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
-                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
