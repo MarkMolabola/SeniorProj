@@ -1,36 +1,142 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MDRNJfitness.MainPage">
+<ContentPage
+    x:Class="FitnessApp.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="#F3F6FA">
 
-    <ScrollView>
-        <VerticalStackLayout
-            Padding="30,0"
-            Spacing="25">
-            <Image
-                Source="dotnet_bot.png"
-                HeightRequest="185"
-                Aspect="AspectFit"
-                SemanticProperties.Description="dot net bot in a submarine number ten" />
+    <VerticalStackLayout Padding="20" Spacing="20">
 
-            <Label
-                Text="Hello, World!"
-                Style="{StaticResource Headline}"
-                SemanticProperties.HeadingLevel="Level1" />
+        <!-- Page Title -->
+        <Label Text="Fitness Calendar"
+               FontSize="28"
+               FontAttributes="Bold"
+               TextColor="Black"/>
 
-            <Label
-                Text="Welcome to &#10;.NET Multi-platform App UI"
-                Style="{StaticResource SubHeadline}"
-                SemanticProperties.HeadingLevel="Level2"
-                SemanticProperties.Description="Welcome to dot net Multi platform App U I" />
+        <Label Text="{Binding CurrentMonth}"
+               FontSize="18"
+               FontAttributes="Bold"
+               HorizontalOptions="Center"
+               TextColor="Black"/>
 
-            <Button
-                x:Name="CounterBtn"
-                Text="Click me" 
-                SemanticProperties.Hint="Counts the number of times you click"
-                Clicked="OnCounterClicked"
-                HorizontalOptions="Fill" />
+        <!-- Badges Section -->
+        <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+
+            <!-- 🥉 5-Day Streak Badge -->
+            <Frame BackgroundColor="#CD7F32"
+                   CornerRadius="20"
+                   Padding="10"
+                   HasShadow="True"
+                   IsVisible="{Binding HasFiveDayStreakBadge}">
+                <HorizontalStackLayout Spacing="6">
+                    <Label Text="🥉" FontSize="20"/>
+                    <Label Text="5-Day Streak Badge Earned!"
+                           FontAttributes="Bold"
+                           TextColor="Black" />
+                </HorizontalStackLayout>
+            </Frame>
+
+            <!-- 🥈 10-Day Total Badge -->
+            <Frame BackgroundColor="#C0C0C0"
+                   CornerRadius="20"
+                   Padding="10"
+                   HasShadow="True"
+                   IsVisible="{Binding HasTenDayTotalBadge}">
+                <HorizontalStackLayout Spacing="6">
+                    <Label Text="🥈" FontSize="20"/>
+                    <Label Text="10-Day Fitness Badge Earned!"
+                           FontAttributes="Bold"
+                           TextColor="Black" />
+                </HorizontalStackLayout>
+            </Frame>
+
+            <!-- 🥇 20-Day Total Badge -->
+            <Frame BackgroundColor="#FFD700"
+                   CornerRadius="20"
+                   Padding="10"
+                   HasShadow="True"
+                   IsVisible="{Binding HasTwentyDayTotalBadge}">
+                <HorizontalStackLayout Spacing="6">
+                    <Label Text="🥇" FontSize="20"/>
+                    <Label Text="20-Day Fitness Badge Earned!"
+                           FontAttributes="Bold"
+                           TextColor="Black" />
+                </HorizontalStackLayout>
+            </Frame>
+
         </VerticalStackLayout>
-    </ScrollView>
 
+        <!-- Weekday Headers -->
+        <Grid ColumnSpacing="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Label Text="Sun" Grid.Column="0" HorizontalOptions="Center" TextColor="Black"/>
+            <Label Text="Mon" Grid.Column="1" HorizontalOptions="Center" TextColor="Black"/>
+            <Label Text="Tue" Grid.Column="2" HorizontalOptions="Center" TextColor="Black"/>
+            <Label Text="Wed" Grid.Column="3" HorizontalOptions="Center" TextColor="Black"/>
+            <Label Text="Thu" Grid.Column="4" HorizontalOptions="Center" TextColor="Black"/>
+            <Label Text="Fri" Grid.Column="5" HorizontalOptions="Center" TextColor="Black"/>
+            <Label Text="Sat" Grid.Column="6" HorizontalOptions="Center" TextColor="Black"/>
+        </Grid>
+
+        <!-- Calendar Grid -->
+        <CollectionView ItemsSource="{Binding CalendarDays}"
+                        SelectionMode="None">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Span="7" Orientation="Vertical"/>
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Padding="8"
+                           HeightRequest="100"
+                           WidthRequest="200"
+                           Margin="4"
+                           CornerRadius="12"
+                           HasShadow="False"
+                           BackgroundColor="{Binding BackgroundColor}">
+
+                        <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="EndAndExpand" Spacing="4">
+
+                            <Label Text="{Binding DayNumber}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"
+                                   TextColor="Black"
+                                   FontSize="16"
+                                   IsVisible="{Binding Date, Converter={StaticResource NullToBoolConverter}}">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleDayCommand}"
+                                        CommandParameter="{Binding .}" />
+                                </Label.GestureRecognizers>
+                            </Label>
+
+                            <Grid HeightRequest="30" WidthRequest="12" BackgroundColor="#EEE" HorizontalOptions="Center"
+                                  IsVisible="{Binding Steps, Converter={StaticResource StepsToBoolConverter}}">
+                                <BoxView Color="#7B68EE" VerticalOptions="End"
+                                         HeightRequest="{Binding StepsBarHeight, Converter={StaticResource HeightMultiplierConverter}, ConverterParameter=30}" 
+                                         WidthRequest="12" />
+                            </Grid>
+
+                            <Label Text="{Binding StepsDisplay}"
+                                   FontSize="10"
+                                   TextColor="Black"
+                                   HorizontalOptions="Center"
+                                   IsVisible="{Binding Steps, Converter={StaticResource StepsToBoolConverter}}" />
+
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </VerticalStackLayout>
 </ContentPage>
