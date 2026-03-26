@@ -9,6 +9,7 @@ namespace MDRNJ.Api.Services.Interfaces
     {
         Task<WorkoutDto> StartWorkoutAsync(Guid userId, CreateWorkoutDto dto);
         Task<WorkoutDto> EndWorkoutAsync(Guid userId, Guid sessionId);
+        Task<WorkoutDto> BacklogWorkoutAsync(Guid userId, BacklogWorkoutDto dto);
         Task<ExerciseDto> AddExerciseAsync(Guid userId, Guid sessionId, AddExerciseDto dto);
         Task<List<WorkoutDto>> GetHistoryAsync(Guid userId, int page, int pageSize);
         Task<List<WorkoutDto>> GetMonthlyAsync(Guid userId, int year, int month);

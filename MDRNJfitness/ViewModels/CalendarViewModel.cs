@@ -4,6 +4,7 @@ using MDRNJ.Shared.DTOs.Workout;
 using MDRNJfitness.Helpers;
 using MDRNJfitness.Services.Interfaces;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
 
 namespace MDRNJfitness.ViewModels
 {
@@ -18,6 +19,17 @@ namespace MDRNJfitness.ViewModels
         private CalendarDayItem? _selectedDay;
 
         public bool HasSelectedDay => SelectedDay is not null;
+
+        // Backlog form fields
+        [ObservableProperty] private string _backlogWorkoutType = "Running";
+        [ObservableProperty] private TimeSpan _backlogTime = TimeSpan.FromHours(8);
+        [ObservableProperty] private int _backlogDuration = 30;
+
+        public List<string> WorkoutTypes { get; } = new()
+        {
+            "Running", "Weightlifting", "Cycling", "Swimming",
+            "HIIT", "Yoga", "Boxing", "Hiking", "Rowing", "Basketball", "Other"
+        };
 
         // Badge state — recalculated after every load
         [ObservableProperty]
@@ -81,6 +93,33 @@ namespace MDRNJfitness.ViewModels
             foreach (var w in _monthWorkouts
                 .Where(w => w.StartTime.ToLocalTime().Date == day.Date.Date))
                 SelectedWorkouts.Add(w);
+        }
+
+        [RelayCommand]
+        public async Task LogBacklogAsync()
+        {
+            if (SelectedDay is null) return;
+
+            await RunSafeAsync(async () =>
+            {
+                var startLocal = SelectedDay.Date.Date + BacklogTime;
+                var startUtc = DateTime.SpecifyKind(startLocal, DateTimeKind.Local).ToUniversalTime();
+
+                var added = await _workout.BacklogAsync(new BacklogWorkoutDto
+                {
+                    WorkoutType = BacklogWorkoutType,
+                    StartTime = startUtc,
+                    DurationMins = BacklogDuration
+                });
+
+                _monthWorkouts.Add(added);
+                SelectedWorkouts.Add(added);
+
+                // Update dot indicator on the calendar cell
+                var cell = Days.FirstOrDefault(d => d.Date.Date == SelectedDay.Date.Date);
+                if (cell is not null)
+                    cell.HasWorkout = true;
+            });
         }
 
         private void BuildGrid()

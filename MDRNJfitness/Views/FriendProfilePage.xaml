@@ -3,119 +3,124 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MDRNJfitness.Views"
              x:Class="MDRNJfitness.Views.FriendProfilePage"
-             Title="{Binding Title}">
+             Title="{Binding Title}"
+             BackgroundColor="#F4FFF7">
 
-    <RefreshView Command="{Binding LoadCommand}"
-                 IsRefreshing="{Binding IsBusy}">
-        <ScrollView>
-            <VerticalStackLayout Padding="16" Spacing="16">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="18">
 
-                <!-- Avatar + name + sport -->
-                <Border StrokeShape="RoundRectangle 12" Padding="24">
-                    <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
-                        <local:PixelAvatarView AvatarType="{Binding Profile.SpriteState}"
-                                               HorizontalOptions="Center" />
-                        <Label Text="{Binding Profile.Username}"
-                               FontSize="22" FontAttributes="Bold"
-                               HorizontalOptions="Center" />
-                        <Label Text="{Binding Profile.DominantSport, StringFormat='Dominant: {0}'}"
-                               FontSize="13" TextColor="{StaticResource Gray400}"
-                               HorizontalOptions="Center" />
+            <!-- Avatar + name + sport -->
+            <Frame BackgroundColor="White"
+                   BorderColor="#D9EAD3"
+                   CornerRadius="18"
+                   Padding="24">
+                <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                    <local:PixelAvatarView AvatarType="{Binding Profile.SpriteState}"
+                                           HorizontalOptions="Center" />
+                    <Label Text="{Binding Profile.Username}"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           TextColor="#1F2937"
+                           HorizontalOptions="Center" />
+                    <Label Text="{Binding Profile.DominantSport, StringFormat='Dominant: {0}'}"
+                           FontSize="13"
+                           TextColor="#6B7280"
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Stats row -->
+            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
+                <Frame Grid.Column="0" BackgroundColor="White" BorderColor="#D9EAD3" CornerRadius="14" Padding="10">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding Profile.CurrentLevel}"
+                               FontSize="20" FontAttributes="Bold" TextColor="#2563EB" HorizontalOptions="Center" />
+                        <Label Text="Level" FontSize="11" TextColor="#6B7280" HorizontalOptions="Center" />
                     </VerticalStackLayout>
-                </Border>
-
-                <!-- Stats grid -->
-                <Border StrokeShape="RoundRectangle 12" Padding="16">
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Stats" FontAttributes="Bold" FontSize="16" />
-                        <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto" RowSpacing="4" ColumnSpacing="8">
-
-                            <Label Grid.Row="0" Grid.Column="0"
-                                   Text="{Binding Profile.CurrentLevel}"
-                                   FontSize="22" FontAttributes="Bold"
-                                   TextColor="{StaticResource Primary}"
-                                   HorizontalOptions="Center" />
-                            <Label Grid.Row="1" Grid.Column="0"
-                                   Text="Level" FontSize="11"
-                                   TextColor="{StaticResource Gray400}"
-                                   HorizontalOptions="Center" />
-
-                            <Label Grid.Row="0" Grid.Column="1"
-                                   Text="{Binding Profile.TotalXP}"
-                                   FontSize="22" FontAttributes="Bold"
-                                   TextColor="{StaticResource Primary}"
-                                   HorizontalOptions="Center" />
-                            <Label Grid.Row="1" Grid.Column="1"
-                                   Text="XP" FontSize="11"
-                                   TextColor="{StaticResource Gray400}"
-                                   HorizontalOptions="Center" />
-
-                            <Label Grid.Row="0" Grid.Column="2"
-                                   Text="{Binding Profile.TotalWorkouts}"
-                                   FontSize="22" FontAttributes="Bold"
-                                   TextColor="{StaticResource Primary}"
-                                   HorizontalOptions="Center" />
-                            <Label Grid.Row="1" Grid.Column="2"
-                                   Text="Workouts" FontSize="11"
-                                   TextColor="{StaticResource Gray400}"
-                                   HorizontalOptions="Center" />
-
-                            <Label Grid.Row="0" Grid.Column="3"
-                                   Text="{Binding Profile.CurrentStreak}"
-                                   FontSize="22" FontAttributes="Bold"
-                                   TextColor="{StaticResource Primary}"
-                                   HorizontalOptions="Center" />
-                            <Label Grid.Row="1" Grid.Column="3"
-                                   Text="Streak" FontSize="11"
-                                   TextColor="{StaticResource Gray400}"
-                                   HorizontalOptions="Center" />
-
-                        </Grid>
+                </Frame>
+                <Frame Grid.Column="1" BackgroundColor="White" BorderColor="#D9EAD3" CornerRadius="14" Padding="10">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding Profile.TotalXP}"
+                               FontSize="20" FontAttributes="Bold" TextColor="#F97316" HorizontalOptions="Center" />
+                        <Label Text="XP" FontSize="11" TextColor="#6B7280" HorizontalOptions="Center" />
                     </VerticalStackLayout>
-                </Border>
+                </Frame>
+                <Frame Grid.Column="2" BackgroundColor="White" BorderColor="#D9EAD3" CornerRadius="14" Padding="10">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding Profile.TotalWorkouts}"
+                               FontSize="20" FontAttributes="Bold" TextColor="#2563EB" HorizontalOptions="Center" />
+                        <Label Text="Workouts" FontSize="11" TextColor="#6B7280" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+                <Frame Grid.Column="3" BackgroundColor="White" BorderColor="#D9EAD3" CornerRadius="14" Padding="10">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding Profile.CurrentStreak}"
+                               FontSize="20" FontAttributes="Bold" TextColor="#16A34A" HorizontalOptions="Center" />
+                        <Label Text="Streak" FontSize="11" TextColor="#6B7280" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
 
-                <!-- Recent workouts -->
-                <Border StrokeShape="RoundRectangle 12" Padding="16">
-                    <VerticalStackLayout Spacing="10">
-                        <Label Text="Recent Workouts" FontAttributes="Bold" FontSize="16" />
+            <!-- Recent workouts -->
+            <Frame BackgroundColor="White"
+                   BorderColor="#D9EAD3"
+                   CornerRadius="16"
+                   Padding="14">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Recent Workouts"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="#1F2937" />
 
-                        <CollectionView ItemsSource="{Binding RecentWorkouts}"
-                                        EmptyView="No workouts recorded yet.">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid ColumnDefinitions="*,Auto" Padding="0,6,0,6">
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding RecentWorkouts}">
+                        <BindableLayout.EmptyView>
+                            <Label Text="No workouts recorded yet."
+                                   FontSize="13"
+                                   TextColor="#6B7280" />
+                        </BindableLayout.EmptyView>
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Frame BackgroundColor="#F9FAFB"
+                                       BorderColor="#E5E7EB"
+                                       CornerRadius="12"
+                                       Padding="12"
+                                       Margin="0,0,0,8">
+                                    <Grid ColumnDefinitions="*,Auto">
                                         <VerticalStackLayout Grid.Column="0" Spacing="2">
                                             <Label Text="{Binding WorkoutType}"
-                                                   FontAttributes="Bold" />
+                                                   FontAttributes="Bold"
+                                                   FontSize="15"
+                                                   TextColor="#2563EB" />
                                             <Label Text="{Binding StartTime, StringFormat='{0:MMM d, yyyy}'}"
-                                                   FontSize="12" TextColor="{StaticResource Gray400}" />
+                                                   FontSize="12"
+                                                   TextColor="#6B7280" />
                                             <Label Text="{Binding DurationMins, StringFormat='{0} mins'}"
-                                                   FontSize="12" TextColor="{StaticResource Gray400}" />
+                                                   FontSize="12"
+                                                   TextColor="#6B7280" />
                                         </VerticalStackLayout>
                                         <Label Grid.Column="1"
                                                Text="{Binding XPAwarded, StringFormat='+{0} XP'}"
-                                               TextColor="{StaticResource Primary}"
                                                FontAttributes="Bold"
+                                               FontSize="14"
+                                               TextColor="#16A34A"
                                                VerticalOptions="Center" />
                                     </Grid>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-
+                                </Frame>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
                     </VerticalStackLayout>
-                </Border>
+                </VerticalStackLayout>
+            </Frame>
 
-                <!-- Remove friend -->
-                <Button Text="Remove Friend"
-                        Command="{Binding RemoveFriendCommand}"
-                        IsEnabled="{Binding IsNotBusy}"
-                        BackgroundColor="#EF4444"
-                        TextColor="White"
-                        CornerRadius="8"
-                        HeightRequest="44" />
+            <!-- Remove friend -->
+            <Button Text="Remove Friend"
+                    Command="{Binding RemoveFriendCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    BackgroundColor="#EF4444"
+                    TextColor="White"
+                    CornerRadius="12"
+                    HeightRequest="50" />
 
-            </VerticalStackLayout>
-        </ScrollView>
-    </RefreshView>
-
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

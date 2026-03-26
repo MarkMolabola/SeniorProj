@@ -25,6 +25,9 @@ namespace MDRNJfitness.Services
         public Task<WorkoutDto> CompleteAsync(Guid sessionId) =>
             _http.PutAsync<WorkoutDto>($"api/workouts/{sessionId}/end", new { })!;
 
+        public Task<WorkoutDto> BacklogAsync(BacklogWorkoutDto dto) =>
+            _http.PostAsync<WorkoutDto>("api/workouts/backlog", dto)!;
+
         public Task<List<WorkoutDto>> GetHistoryAsync(int page = 1, int count = 10) =>
             _http.GetAsync<List<WorkoutDto>>($"api/workouts/history?page={page}&pageSize={count}")!;
 

@@ -39,6 +39,10 @@ namespace MDRNJ.Api.Controllers
         public async Task<IActionResult> GetSession(Guid sessionId) =>
             Ok(await _workouts.GetSessionAsync(UserId, sessionId));
 
+        [HttpPost("backlog")]
+        public async Task<IActionResult> Backlog([FromBody] BacklogWorkoutDto dto) =>
+            Ok(await _workouts.BacklogWorkoutAsync(UserId, dto));
+
         [HttpGet("month")]
         public async Task<IActionResult> Monthly([FromQuery] int year, [FromQuery] int month) =>
             Ok(await _workouts.GetMonthlyAsync(UserId, year, month));

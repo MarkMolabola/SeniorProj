@@ -35,6 +35,16 @@ namespace MDRNJ.Api.Services
 
             var dto = _mapper.Map<GameStatsDto>(stats);
             dto.XPToNextLevel = XPForNextLevel(stats.CurrentLevel) - stats.TotalXP;
+
+            // Streak is stale if the last workout was 2+ days ago (missed yesterday)
+            var today = DateTime.UtcNow.Date;
+            if (stats.LastWorkoutDate.HasValue && stats.LastWorkoutDate.Value.Date < today.AddDays(-1))
+            {
+                dto.CurrentStreak = 0;
+                stats.CurrentStreak = 0;
+                await _db.SaveChangesAsync();
+            }
+
             return dto;
         }
 

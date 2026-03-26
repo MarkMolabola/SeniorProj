@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo \"\" >> \"C:/Users/markg/OneDrive/Desktop/CSULB/SeniorProj/SeniorProj/.gitignore\" && echo \"# SQLite database\" >> \"C:/Users/markg/OneDrive/Desktop/CSULB/SeniorProj/SeniorProj/.gitignore\" && echo \"*.db\" >> \"C:/Users/markg/OneDrive/Desktop/CSULB/SeniorProj/SeniorProj/.gitignore\" && echo \"*.db-shm\" >> \"C:/Users/markg/OneDrive/Desktop/CSULB/SeniorProj/SeniorProj/.gitignore\" && echo \"*.db-wal\" >> \"C:/Users/markg/OneDrive/Desktop/CSULB/SeniorProj/SeniorProj/.gitignore\")",
+      "Bash(python -c \"import docx\")",
+      "Bash(pip install:*)"
+    ]
+  }
+}

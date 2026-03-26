@@ -3,69 +3,97 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MDRNJfitness.Views"
              x:Class="MDRNJfitness.Views.CharacterPage"
-             Title="{Binding Title}">
+             Title="{Binding Title}"
+             BackgroundColor="#F4FFF7">
 
-    <RefreshView Command="{Binding LoadCommand}"
-                 IsRefreshing="{Binding IsBusy}">
-        <ScrollView>
-            <VerticalStackLayout Padding="16" Spacing="16">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="18">
 
-                <!-- Character card -->
-                <Border StrokeShape="RoundRectangle 12" Padding="24">
-                    <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
-                        <local:PixelAvatarView AvatarType="{Binding SpriteState}"
-                                               HorizontalOptions="Center" />
-                        <Label Text="{Binding SpriteState}"
-                               FontSize="14" FontAttributes="Bold"
-                               TextTransform="Uppercase"
-                               HorizontalOptions="Center" />
-                    </VerticalStackLayout>
-                </Border>
+            <Label Text="Character"
+                   FontSize="30"
+                   FontAttributes="Bold"
+                   TextColor="#1F2937" />
 
-                <!-- Character details -->
-                <Border StrokeShape="RoundRectangle 12" Padding="16">
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Character Details" FontAttributes="Bold" FontSize="16" />
-                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="6">
-                            <Label Grid.Row="0" Grid.Column="0" Text="Body Type" FontSize="12" TextColor="{StaticResource Gray400}" />
-                            <Label Grid.Row="0" Grid.Column="1" Text="{Binding CharacterState.BodyType}" FontAttributes="Bold" />
-                            <Label Grid.Row="1" Grid.Column="0" Text="Outfit" FontSize="12" TextColor="{StaticResource Gray400}" />
-                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding CharacterState.OutfitSlot}" FontAttributes="Bold" />
-                            <Label Grid.Row="2" Grid.Column="0" Text="Equipment" FontSize="12" TextColor="{StaticResource Gray400}" />
-                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding CharacterState.EquipmentSlot}" FontAttributes="Bold" />
-                        </Grid>
-                    </VerticalStackLayout>
-                </Border>
+            <!-- Character avatar card -->
+            <Frame BackgroundColor="White"
+                   BorderColor="#D9EAD3"
+                   CornerRadius="18"
+                   Padding="24">
+                <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
+                    <local:PixelAvatarView AvatarType="{Binding SpriteState}"
+                                           HorizontalOptions="Center" />
+                    <Label Text="{Binding SpriteState}"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextTransform="Uppercase"
+                           TextColor="#2563EB"
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
 
-                <!-- Activity scores -->
-                <Border StrokeShape="RoundRectangle 12" Padding="16">
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Activity Scores" FontAttributes="Bold" FontSize="16" />
-                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
-                            <Label Grid.Row="0" Grid.Column="0" Text="Strength" />
-                            <Label Grid.Row="0" Grid.Column="1"
-                                   Text="{Binding ActivityScore.StrengthScore, StringFormat='{0:F1}'}"
-                                   FontAttributes="Bold" TextColor="{StaticResource Primary}" />
-                            <Label Grid.Row="1" Grid.Column="0" Text="Cardio" />
-                            <Label Grid.Row="1" Grid.Column="1"
-                                   Text="{Binding ActivityScore.CardioScore, StringFormat='{0:F1}'}"
-                                   FontAttributes="Bold" TextColor="{StaticResource Primary}" />
-                            <Label Grid.Row="2" Grid.Column="0" Text="Flexibility" />
-                            <Label Grid.Row="2" Grid.Column="1"
-                                   Text="{Binding ActivityScore.FlexibilityScore, StringFormat='{0:F1}'}"
-                                   FontAttributes="Bold" TextColor="{StaticResource Primary}" />
-                        </Grid>
-                        <Label Text="{Binding ActivityScore.DominantSport, StringFormat='Dominant: {0}'}"
-                               FontSize="12" TextColor="{StaticResource Gray400}" />
-                    </VerticalStackLayout>
-                </Border>
+            <!-- Character details -->
+            <Frame BackgroundColor="White"
+                   BorderColor="#D9EAD3"
+                   CornerRadius="16"
+                   Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Character Details"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="#1F2937" />
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Body Type" FontSize="13" TextColor="#6B7280" />
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding CharacterState.BodyType}" FontAttributes="Bold" TextColor="#1F2937" />
+                        <Label Grid.Row="1" Grid.Column="0" Text="Outfit" FontSize="13" TextColor="#6B7280" />
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding CharacterState.OutfitSlot}" FontAttributes="Bold" TextColor="#1F2937" />
+                        <Label Grid.Row="2" Grid.Column="0" Text="Equipment" FontSize="13" TextColor="#6B7280" />
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding CharacterState.EquipmentSlot}" FontAttributes="Bold" TextColor="#1F2937" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
 
-                <!-- Evolve -->
-                <Button Text="Evolve Character"
-                        Command="{Binding EvolveCommand}"
-                        IsEnabled="{Binding IsNotBusy}" />
+            <!-- Activity scores -->
+            <Frame BackgroundColor="White"
+                   BorderColor="#D9EAD3"
+                   CornerRadius="16"
+                   Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Activity Scores"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="#1F2937" />
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Strength" TextColor="#4B5563" />
+                        <Label Grid.Row="0" Grid.Column="1"
+                               Text="{Binding ActivityScore.StrengthScore, StringFormat='{0:F1}'}"
+                               FontAttributes="Bold"
+                               TextColor="#F97316" />
+                        <Label Grid.Row="1" Grid.Column="0" Text="Cardio" TextColor="#4B5563" />
+                        <Label Grid.Row="1" Grid.Column="1"
+                               Text="{Binding ActivityScore.CardioScore, StringFormat='{0:F1}'}"
+                               FontAttributes="Bold"
+                               TextColor="#F97316" />
+                        <Label Grid.Row="2" Grid.Column="0" Text="Flexibility" TextColor="#4B5563" />
+                        <Label Grid.Row="2" Grid.Column="1"
+                               Text="{Binding ActivityScore.FlexibilityScore, StringFormat='{0:F1}'}"
+                               FontAttributes="Bold"
+                               TextColor="#F97316" />
+                    </Grid>
+                    <Label Text="{Binding ActivityScore.DominantSport, StringFormat='Dominant: {0}'}"
+                           FontSize="13"
+                           TextColor="#6B7280" />
+                </VerticalStackLayout>
+            </Frame>
 
-            </VerticalStackLayout>
-        </ScrollView>
-    </RefreshView>
+            <!-- Evolve -->
+            <Button Text="Evolve Character"
+                    Command="{Binding EvolveCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    BackgroundColor="#2563EB"
+                    TextColor="White"
+                    CornerRadius="12"
+                    HeightRequest="50" />
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

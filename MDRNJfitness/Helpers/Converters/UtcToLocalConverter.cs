@@ -10,7 +10,9 @@ namespace MDRNJfitness.Helpers.Converters
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is DateTime dt)
-                return dt.Kind == DateTimeKind.Utc ? dt.ToLocalTime() : dt;
+                return dt.Kind == DateTimeKind.Local
+                    ? dt
+                    : DateTime.SpecifyKind(dt, DateTimeKind.Utc).ToLocalTime();
             return value;
         }
 

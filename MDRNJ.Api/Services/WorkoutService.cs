@@ -16,11 +16,13 @@ namespace MDRNJ.Api.Services
     {
         private readonly AppDbContext _db;
         private readonly IMapper _mapper;
+        private readonly IAchievementService _achievements;
 
-        public WorkoutService(AppDbContext db, IMapper mapper)
+        public WorkoutService(AppDbContext db, IMapper mapper, IAchievementService achievements)
         {
             _db = db;
             _mapper = mapper;
+            _achievements = achievements;
         }
 
         public async Task<WorkoutDto> StartWorkoutAsync(Guid userId, CreateWorkoutDto dto)
@@ -91,6 +93,7 @@ namespace MDRNJ.Api.Services
             });
 
             await _db.SaveChangesAsync();
+            await _achievements.CheckAndUnlockAsync(userId);
 
             return _mapper.Map<WorkoutDto>(session);
         }
@@ -100,6 +103,63 @@ namespace MDRNJ.Api.Services
             int level = 1;
             while (xp >= level * level * 100) level++;
             return level;
+        }
+
+        public async Task<WorkoutDto> BacklogWorkoutAsync(Guid userId, BacklogWorkoutDto dto)
+        {
+            if (!Enum.TryParse<WorkoutType>(dto.WorkoutType, true, out var workoutType))
+                throw new ArgumentException($"Unknown workout type: {dto.WorkoutType}");
+
+            var startUtc = dto.StartTime.Kind == DateTimeKind.Utc
+                ? dto.StartTime
+                : dto.StartTime.ToUniversalTime();
+
+            var session = new WorkoutSessionEntity
+            {
+                UserId = userId,
+                WorkoutType = workoutType,
+                StartTime = startUtc,
+                EndTime = startUtc.AddMinutes(dto.DurationMins),
+                DurationMins = dto.DurationMins,
+                XPAwarded = Math.Max(10, dto.DurationMins * 2)
+            };
+
+            _db.WorkoutSessions.Add(session);
+
+            var stats = await _db.GameStats.FirstOrDefaultAsync(g => g.UserId == userId);
+            if (stats is null)
+            {
+                stats = new GameStatsEntity { UserId = userId };
+                _db.GameStats.Add(stats);
+            }
+
+            stats.TotalXP += session.XPAwarded;
+            stats.CurrentLevel = LevelFromXP(stats.TotalXP);
+            stats.TotalWorkouts++;
+
+            var today = DateTime.UtcNow.Date;
+            if (stats.LastWorkoutDate?.Date == today.AddDays(-1))
+            {
+                stats.CurrentStreak++;
+                if (stats.CurrentStreak > stats.LongestStreak)
+                    stats.LongestStreak = stats.CurrentStreak;
+            }
+            else if (stats.LastWorkoutDate?.Date != today)
+            {
+                stats.CurrentStreak = 1;
+            }
+            stats.LastWorkoutDate = DateTime.UtcNow;
+
+            _db.XPTransactions.Add(new XPTransactionEntity
+            {
+                UserId = userId,
+                Amount = session.XPAwarded,
+                Reason = XPReason.WorkoutCompleted
+            });
+
+            await _db.SaveChangesAsync();
+            await _achievements.CheckAndUnlockAsync(userId);
+            return _mapper.Map<WorkoutDto>(session);
         }
 
         public async Task<List<WorkoutDto>> GetMonthlyAsync(Guid userId, int year, int month)

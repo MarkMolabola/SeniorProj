@@ -2,48 +2,86 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MDRNJfitness.Views.LeaderboardPage"
-             Title="{Binding Title}">
+             Title="{Binding Title}"
+             BackgroundColor="#F4FFF7">
 
-    <RefreshView Command="{Binding LoadCommand}"
-                 IsRefreshing="{Binding IsBusy}">
-        <CollectionView ItemsSource="{Binding Entries}"
-                        EmptyView="No leaderboard data yet.">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Border StrokeShape="RoundRectangle 10" Padding="12" Margin="16,4,16,4">
-                        <Grid ColumnDefinitions="40,*,Auto,Auto" ColumnSpacing="8">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="18">
 
-                            <!-- Rank -->
-                            <Label Grid.Column="0"
-                                   Text="{Binding Rank}"
-                                   FontSize="20" FontAttributes="Bold"
-                                   TextColor="{StaticResource Primary}"
-                                   VerticalOptions="Center"
-                                   HorizontalOptions="Center" />
+            <Label Text="Leaderboard"
+                   FontSize="30"
+                   FontAttributes="Bold"
+                   TextColor="#1F2937" />
 
-                            <!-- Name + level -->
-                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
-                                <Label Text="{Binding DisplayName}" FontAttributes="Bold" />
-                                <Label Text="{Binding Username, StringFormat='@{0}'}"
-                                       FontSize="11" TextColor="{StaticResource Gray400}" />
-                            </VerticalStackLayout>
+            <Frame BackgroundColor="White"
+                   BorderColor="#D9EAD3"
+                   CornerRadius="16"
+                   Padding="14">
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Entries}">
+                    <BindableLayout.EmptyView>
+                        <Label Text="No leaderboard data yet."
+                               FontSize="13"
+                               TextColor="#6B7280" />
+                    </BindableLayout.EmptyView>
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Frame BackgroundColor="#F9FAFB"
+                                   BorderColor="#E5E7EB"
+                                   CornerRadius="12"
+                                   Padding="12"
+                                   Margin="0,0,0,8">
+                                <Grid ColumnDefinitions="40,*,Auto,Auto" ColumnSpacing="8">
 
-                            <!-- Level -->
-                            <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" VerticalOptions="Center" Spacing="0">
-                                <Label Text="{Binding CurrentLevel}" FontAttributes="Bold" HorizontalOptions="Center" />
-                                <Label Text="LVL" FontSize="10" TextColor="{StaticResource Gray400}" HorizontalOptions="Center" />
-                            </VerticalStackLayout>
+                                    <!-- Rank -->
+                                    <Label Grid.Column="0"
+                                           Text="{Binding Rank}"
+                                           FontSize="20"
+                                           FontAttributes="Bold"
+                                           TextColor="#F97316"
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="Center" />
 
-                            <!-- XP -->
-                            <VerticalStackLayout Grid.Column="3" HorizontalOptions="End" VerticalOptions="Center" Spacing="0">
-                                <Label Text="{Binding TotalXP}" FontAttributes="Bold" HorizontalOptions="End" />
-                                <Label Text="XP" FontSize="10" TextColor="{StaticResource Gray400}" HorizontalOptions="End" />
-                            </VerticalStackLayout>
+                                    <!-- Name + username -->
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                        <Label Text="{Binding DisplayName}"
+                                               FontAttributes="Bold"
+                                               TextColor="#1F2937" />
+                                        <Label Text="{Binding Username, StringFormat='@{0}'}"
+                                               FontSize="12"
+                                               TextColor="#6B7280" />
+                                    </VerticalStackLayout>
 
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-    </RefreshView>
+                                    <!-- Level -->
+                                    <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" VerticalOptions="Center" Spacing="0">
+                                        <Label Text="{Binding CurrentLevel}"
+                                               FontAttributes="Bold"
+                                               TextColor="#2563EB"
+                                               HorizontalOptions="Center" />
+                                        <Label Text="LVL"
+                                               FontSize="10"
+                                               TextColor="#6B7280"
+                                               HorizontalOptions="Center" />
+                                    </VerticalStackLayout>
+
+                                    <!-- XP -->
+                                    <VerticalStackLayout Grid.Column="3" HorizontalOptions="End" VerticalOptions="Center" Spacing="0">
+                                        <Label Text="{Binding TotalXP}"
+                                               FontAttributes="Bold"
+                                               TextColor="#16A34A"
+                                               HorizontalOptions="End" />
+                                        <Label Text="XP"
+                                               FontSize="10"
+                                               TextColor="#6B7280"
+                                               HorizontalOptions="End" />
+                                    </VerticalStackLayout>
+
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
