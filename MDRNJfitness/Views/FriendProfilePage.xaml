@@ -10,10 +10,10 @@
         <VerticalStackLayout Padding="20" Spacing="18">
 
             <!-- Avatar + name + sport -->
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="18"
-                   Padding="24">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 18"
+                    Padding="24">
                 <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
                     <local:PixelAvatarView AvatarType="{Binding Profile.SpriteState}"
                                            HorizontalOptions="Center" />
@@ -27,45 +27,45 @@
                            TextColor="#6B7280"
                            HorizontalOptions="Center" />
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Stats row -->
             <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
-                <Frame Grid.Column="0" BackgroundColor="White" BorderColor="#D9EAD3" CornerRadius="14" Padding="10">
+                <Border Grid.Column="0" BackgroundColor="White" Stroke="#D9EAD3" StrokeShape="RoundRectangle 14" Padding="10">
                     <VerticalStackLayout HorizontalOptions="Center">
                         <Label Text="{Binding Profile.CurrentLevel}"
                                FontSize="20" FontAttributes="Bold" TextColor="#2563EB" HorizontalOptions="Center" />
                         <Label Text="Level" FontSize="11" TextColor="#6B7280" HorizontalOptions="Center" />
                     </VerticalStackLayout>
-                </Frame>
-                <Frame Grid.Column="1" BackgroundColor="White" BorderColor="#D9EAD3" CornerRadius="14" Padding="10">
+                </Border>
+                <Border Grid.Column="1" BackgroundColor="White" Stroke="#D9EAD3" StrokeShape="RoundRectangle 14" Padding="10">
                     <VerticalStackLayout HorizontalOptions="Center">
                         <Label Text="{Binding Profile.TotalXP}"
                                FontSize="20" FontAttributes="Bold" TextColor="#F97316" HorizontalOptions="Center" />
                         <Label Text="XP" FontSize="11" TextColor="#6B7280" HorizontalOptions="Center" />
                     </VerticalStackLayout>
-                </Frame>
-                <Frame Grid.Column="2" BackgroundColor="White" BorderColor="#D9EAD3" CornerRadius="14" Padding="10">
+                </Border>
+                <Border Grid.Column="2" BackgroundColor="White" Stroke="#D9EAD3" StrokeShape="RoundRectangle 14" Padding="10">
                     <VerticalStackLayout HorizontalOptions="Center">
                         <Label Text="{Binding Profile.TotalWorkouts}"
                                FontSize="20" FontAttributes="Bold" TextColor="#2563EB" HorizontalOptions="Center" />
                         <Label Text="Workouts" FontSize="11" TextColor="#6B7280" HorizontalOptions="Center" />
                     </VerticalStackLayout>
-                </Frame>
-                <Frame Grid.Column="3" BackgroundColor="White" BorderColor="#D9EAD3" CornerRadius="14" Padding="10">
+                </Border>
+                <Border Grid.Column="3" BackgroundColor="White" Stroke="#D9EAD3" StrokeShape="RoundRectangle 14" Padding="10">
                     <VerticalStackLayout HorizontalOptions="Center">
                         <Label Text="{Binding Profile.CurrentStreak}"
                                FontSize="20" FontAttributes="Bold" TextColor="#16A34A" HorizontalOptions="Center" />
                         <Label Text="Streak" FontSize="11" TextColor="#6B7280" HorizontalOptions="Center" />
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
             </Grid>
 
             <!-- Recent workouts -->
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="16"
-                   Padding="14">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="14">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Recent Workouts"
                            FontSize="20"
@@ -80,11 +80,11 @@
                         </BindableLayout.EmptyView>
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
-                                <Frame BackgroundColor="#F9FAFB"
-                                       BorderColor="#E5E7EB"
-                                       CornerRadius="12"
-                                       Padding="12"
-                                       Margin="0,0,0,8">
+                                <Border BackgroundColor="#F9FAFB"
+                                        Stroke="#E5E7EB"
+                                        StrokeShape="RoundRectangle 12"
+                                        Padding="12"
+                                        Margin="0,0,0,8">
                                     <Grid ColumnDefinitions="*,Auto">
                                         <VerticalStackLayout Grid.Column="0" Spacing="2">
                                             <Label Text="{Binding WorkoutType}"
@@ -105,12 +105,12 @@
                                                TextColor="#16A34A"
                                                VerticalOptions="Center" />
                                     </Grid>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </VerticalStackLayout>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Remove friend -->
             <Button Text="Remove Friend"

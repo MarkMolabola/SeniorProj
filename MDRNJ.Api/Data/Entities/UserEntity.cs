@@ -11,6 +11,7 @@ namespace MDRNJ.Api.Data.Entities
         public string PasswordHash { get; set; } = null!;
         public string? AvatarUrl { get; set; }
         public DateTime DateJoined { get; set; } = DateTime.UtcNow;
+        public bool IsAdmin { get; set; } = false;
 
         // Navigation
         public UserProfileEntity? Profile { get; set; }
@@ -24,5 +25,6 @@ namespace MDRNJ.Api.Data.Entities
         public ICollection<FriendshipEntity> ReceivedFriendRequests { get; set; } = new List<FriendshipEntity>();
         public ICollection<ChallengeEntity> CreatedChallenges { get; set; } = new List<ChallengeEntity>();
         public ICollection<ChallengeParticipantEntity> ChallengeParticipations { get; set; } = new List<ChallengeParticipantEntity>();
+        public ICollection<UserQuestEntity> UserQuests { get; set; } = new List<UserQuestEntity>();
     }
 }

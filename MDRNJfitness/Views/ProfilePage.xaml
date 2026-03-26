@@ -14,10 +14,10 @@
                    TextColor="#1F2937" />
 
             <!-- Avatar + name -->
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="18"
-                   Padding="24">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 18"
+                    Padding="24">
                 <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
                     <Ellipse Fill="#2563EB"
                              WidthRequest="80" HeightRequest="80"
@@ -37,15 +37,15 @@
                            HorizontalOptions="Center"
                            HorizontalTextAlignment="Center" />
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Stats row -->
             <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
-                <Frame Grid.Column="0"
-                       BackgroundColor="White"
-                       BorderColor="#D9EAD3"
-                       CornerRadius="16"
-                       Padding="12">
+                <Border Grid.Column="0"
+                        BackgroundColor="White"
+                        Stroke="#D9EAD3"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="12">
                     <VerticalStackLayout HorizontalOptions="Center">
                         <Label Text="{Binding Stats.CurrentLevel}"
                                FontSize="22"
@@ -57,12 +57,12 @@
                                TextColor="#6B7280"
                                HorizontalOptions="Center" />
                     </VerticalStackLayout>
-                </Frame>
-                <Frame Grid.Column="1"
-                       BackgroundColor="White"
-                       BorderColor="#D9EAD3"
-                       CornerRadius="16"
-                       Padding="12">
+                </Border>
+                <Border Grid.Column="1"
+                        BackgroundColor="White"
+                        Stroke="#D9EAD3"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="12">
                     <VerticalStackLayout HorizontalOptions="Center">
                         <Label Text="{Binding Stats.TotalXP}"
                                FontSize="22"
@@ -74,12 +74,12 @@
                                TextColor="#6B7280"
                                HorizontalOptions="Center" />
                     </VerticalStackLayout>
-                </Frame>
-                <Frame Grid.Column="2"
-                       BackgroundColor="White"
-                       BorderColor="#D9EAD3"
-                       CornerRadius="16"
-                       Padding="12">
+                </Border>
+                <Border Grid.Column="2"
+                        BackgroundColor="White"
+                        Stroke="#D9EAD3"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="12">
                     <VerticalStackLayout HorizontalOptions="Center">
                         <Label Text="{Binding Stats.CurrentStreak}"
                                FontSize="22"
@@ -91,14 +91,14 @@
                                TextColor="#6B7280"
                                HorizontalOptions="Center" />
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
             </Grid>
 
             <!-- Profile details -->
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="16"
-                   Padding="16">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="16">
                 <VerticalStackLayout Spacing="12">
 
                     <Grid ColumnDefinitions="*,Auto">
@@ -167,7 +167,7 @@
                     </VerticalStackLayout>
 
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Logout -->
             <Button Text="Log Out"

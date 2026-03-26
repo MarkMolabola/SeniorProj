@@ -20,6 +20,8 @@ namespace MDRNJ.Api.Data
         public DbSet<FriendshipEntity> Friendships => Set<FriendshipEntity>();
         public DbSet<ChallengeEntity> Challenges => Set<ChallengeEntity>();
         public DbSet<ChallengeParticipantEntity> ChallengeParticipants => Set<ChallengeParticipantEntity>();
+        public DbSet<QuestEntity> Quests => Set<QuestEntity>();
+        public DbSet<UserQuestEntity> UserQuests => Set<UserQuestEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -171,6 +173,28 @@ namespace MDRNJ.Api.Data
                  .WithMany(u => u.ChallengeParticipations)
                  .HasForeignKey(cp => cp.UserId)
                  .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // QuestEntity
+            modelBuilder.Entity<QuestEntity>(e =>
+            {
+                e.HasKey(q => q.QuestId);
+                e.Property(q => q.Title).HasMaxLength(100).IsRequired();
+                e.Property(q => q.Description).HasMaxLength(500);
+            });
+
+            // UserQuestEntity — composite key
+            modelBuilder.Entity<UserQuestEntity>(e =>
+            {
+                e.HasKey(uq => new { uq.UserId, uq.QuestId });
+                e.HasOne(uq => uq.User)
+                 .WithMany(u => u.UserQuests)
+                 .HasForeignKey(uq => uq.UserId)
+                 .OnDelete(DeleteBehavior.Cascade);
+                e.HasOne(uq => uq.Quest)
+                 .WithMany(q => q.UserQuests)
+                 .HasForeignKey(uq => uq.QuestId)
+                 .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

@@ -21,10 +21,10 @@
                    TextColor="#1F2937" />
 
             <!-- Start / active workout card -->
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="18"
-                   Padding="16">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 18"
+                    Padding="16">
                 <VerticalStackLayout Spacing="12">
                     <Label Text="Start a Workout"
                            FontSize="20"
@@ -67,18 +67,18 @@
                                FontAttributes="Bold"
                                TextColor="#2563EB" />
 
-                        <Frame BackgroundColor="#2563EB"
-                               CornerRadius="12"
-                               BorderColor="#2563EB"
-                               Padding="12,8"
-                               HorizontalOptions="Center">
+                        <Border BackgroundColor="#2563EB"
+                                StrokeShape="RoundRectangle 12"
+                                Stroke="#2563EB"
+                                Padding="12,8"
+                                HorizontalOptions="Center">
                             <Label Text="{Binding ElapsedTime}"
                                    FontSize="36"
                                    FontAttributes="Bold"
                                    TextColor="White"
                                    FontFamily="OpenSansRegular"
                                    HorizontalOptions="Center" />
-                        </Frame>
+                        </Border>
 
                         <Button Text="Complete Workout"
                                 Command="{Binding CompleteWorkoutCommand}"
@@ -90,13 +90,13 @@
                     </VerticalStackLayout>
 
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- History -->
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="16"
-                   Padding="14">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="14">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Workout History"
                            FontSize="20"
@@ -111,11 +111,11 @@
                         </BindableLayout.EmptyView>
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
-                                <Frame BackgroundColor="#F9FAFB"
-                                       BorderColor="#E5E7EB"
-                                       CornerRadius="12"
-                                       Padding="12"
-                                       Margin="0,0,0,8">
+                                <Border BackgroundColor="#F9FAFB"
+                                        Stroke="#E5E7EB"
+                                        StrokeShape="RoundRectangle 12"
+                                        Padding="12"
+                                        Margin="0,0,0,8">
                                     <Grid ColumnDefinitions="*,Auto">
                                         <VerticalStackLayout Grid.Column="0" Spacing="2">
                                             <Label Text="{Binding WorkoutType}"
@@ -136,13 +136,13 @@
                                                TextColor="#16A34A"
                                                VerticalOptions="Center" />
                                     </Grid>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </VerticalStackLayout>
 
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
         </VerticalStackLayout>
     </ScrollView>

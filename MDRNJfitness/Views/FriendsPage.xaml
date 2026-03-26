@@ -14,10 +14,10 @@
                    TextColor="#1F2937" />
 
             <!-- Add friend -->
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="18"
-                   Padding="16">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 18"
+                    Padding="16">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Add Friend"
                            FontSize="20"
@@ -37,13 +37,13 @@
                                 Padding="16,0" />
                     </Grid>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Pending requests -->
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="16"
-                   Padding="14">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="14">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Pending Requests"
                            FontSize="20"
@@ -58,11 +58,11 @@
                         </BindableLayout.EmptyView>
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
-                                <Frame BackgroundColor="#F9FAFB"
-                                       BorderColor="#E5E7EB"
-                                       CornerRadius="12"
-                                       Padding="12"
-                                       Margin="0,0,0,8">
+                                <Border BackgroundColor="#F9FAFB"
+                                        Stroke="#E5E7EB"
+                                        StrokeShape="RoundRectangle 12"
+                                        Padding="12"
+                                        Margin="0,0,0,8">
                                     <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                                         <Label Grid.Column="0"
                                                Text="{Binding Username}"
@@ -86,18 +86,18 @@
                                                 CornerRadius="8"
                                                 Padding="12,4" HeightRequest="36" />
                                     </Grid>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </VerticalStackLayout>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Friends list -->
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="16"
-                   Padding="14">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="14">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Friends"
                            FontSize="20"
@@ -112,11 +112,11 @@
                         </BindableLayout.EmptyView>
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
-                                <Frame BackgroundColor="#F9FAFB"
-                                       BorderColor="#E5E7EB"
-                                       CornerRadius="12"
-                                       Padding="12"
-                                       Margin="0,0,0,8">
+                                <Border BackgroundColor="#F9FAFB"
+                                        Stroke="#E5E7EB"
+                                        StrokeShape="RoundRectangle 12"
+                                        Padding="12"
+                                        Margin="0,0,0,8">
                                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                                         <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
                                             <Label Text="{Binding Username}"
@@ -135,12 +135,12 @@
                                                 CornerRadius="8"
                                                 Padding="12,4" HeightRequest="36" />
                                     </Grid>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </VerticalStackLayout>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
         </VerticalStackLayout>
     </ScrollView>

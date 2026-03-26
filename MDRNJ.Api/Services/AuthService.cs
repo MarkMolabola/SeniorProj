@@ -81,7 +81,8 @@ namespace MDRNJ.Api.Services
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                    new Claim("username", user.Username)
+                    new Claim("username", user.Username),
+                    new Claim(ClaimTypes.Role, user.IsAdmin ? "Admin" : "User")
                 },
                 expires: expires,
                 signingCredentials: creds);
@@ -97,7 +98,8 @@ namespace MDRNJ.Api.Services
                     Username = user.Username,
                     Email = user.Email,
                     AvatarUrl = user.AvatarUrl,
-                    DateJoined = user.DateJoined
+                    DateJoined = user.DateJoined,
+                    IsAdmin = user.IsAdmin
                 }
             };
         }

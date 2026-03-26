@@ -80,10 +80,10 @@
                    TextColor="#1F2937" />
 
             <!-- Month navigation header -->
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="16"
-                   Padding="8,4">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="8,4">
                 <Grid ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
                     <Button Grid.Column="0"
                             Text="&#8249;"
@@ -107,14 +107,14 @@
                             TextColor="#2563EB"
                             Padding="8,0" />
                 </Grid>
-            </Frame>
+            </Border>
 
             <!-- Badge banners -->
-            <Frame BackgroundColor="#CD7F32"
-                   BorderColor="#CD7F32"
-                   CornerRadius="14"
-                   Padding="12,8"
-                   IsVisible="{Binding HasFiveDayStreakBadge}">
+            <Border BackgroundColor="#CD7F32"
+                    Stroke="#CD7F32"
+                    StrokeShape="RoundRectangle 14"
+                    Padding="12,8"
+                    IsVisible="{Binding HasFiveDayStreakBadge}">
                 <HorizontalStackLayout Spacing="8">
                     <Label Text="🥉" FontSize="20" VerticalOptions="Center" />
                     <Label Text="5-Day Streak Badge Earned!"
@@ -122,13 +122,13 @@
                            TextColor="White"
                            VerticalOptions="Center" />
                 </HorizontalStackLayout>
-            </Frame>
+            </Border>
 
-            <Frame BackgroundColor="#6B7280"
-                   BorderColor="#6B7280"
-                   CornerRadius="14"
-                   Padding="12,8"
-                   IsVisible="{Binding HasTenDayBadge}">
+            <Border BackgroundColor="#6B7280"
+                    Stroke="#6B7280"
+                    StrokeShape="RoundRectangle 14"
+                    Padding="12,8"
+                    IsVisible="{Binding HasTenDayBadge}">
                 <HorizontalStackLayout Spacing="8">
                     <Label Text="🥈" FontSize="20" VerticalOptions="Center" />
                     <Label Text="10-Day Workout Badge Earned!"
@@ -136,13 +136,13 @@
                            TextColor="White"
                            VerticalOptions="Center" />
                 </HorizontalStackLayout>
-            </Frame>
+            </Border>
 
-            <Frame BackgroundColor="#F97316"
-                   BorderColor="#F97316"
-                   CornerRadius="14"
-                   Padding="12,8"
-                   IsVisible="{Binding HasTwentyDayBadge}">
+            <Border BackgroundColor="#F97316"
+                    Stroke="#F97316"
+                    StrokeShape="RoundRectangle 14"
+                    Padding="12,8"
+                    IsVisible="{Binding HasTwentyDayBadge}">
                 <HorizontalStackLayout Spacing="8">
                     <Label Text="🥇" FontSize="20" VerticalOptions="Center" />
                     <Label Text="20-Day Workout Badge Earned!"
@@ -150,13 +150,13 @@
                            TextColor="White"
                            VerticalOptions="Center" />
                 </HorizontalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Calendar grid card -->
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="16"
-                   Padding="10">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="10">
                 <VerticalStackLayout Spacing="6">
                     <!-- Day-of-week header row -->
                     <Grid ColumnDefinitions="*,*,*,*,*,*,*">
@@ -180,7 +180,7 @@
                         </CollectionView.ItemsLayout>
                     </CollectionView>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Selected day header -->
             <Label Text="{Binding SelectedDay.Date, StringFormat='Workouts on {0:MMM d}'}"
@@ -190,11 +190,11 @@
                    IsVisible="{Binding HasSelectedDay}" />
 
             <!-- Backlog form -->
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="16"
-                   Padding="16"
-                   IsVisible="{Binding HasSelectedDay}">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="16"
+                    IsVisible="{Binding HasSelectedDay}">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Log a Workout"
                            FontSize="18"
@@ -217,14 +217,14 @@
                             CornerRadius="12"
                             HeightRequest="48" />
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Selected day workouts -->
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="16"
-                   Padding="14"
-                   IsVisible="{Binding HasSelectedDay}">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="14"
+                    IsVisible="{Binding HasSelectedDay}">
                 <VerticalStackLayout Spacing="10">
                     <VerticalStackLayout BindableLayout.ItemsSource="{Binding SelectedWorkouts}">
                         <BindableLayout.EmptyView>
@@ -234,11 +234,11 @@
                         </BindableLayout.EmptyView>
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
-                                <Frame BackgroundColor="#F9FAFB"
-                                       BorderColor="#E5E7EB"
-                                       CornerRadius="12"
-                                       Padding="12"
-                                       Margin="0,0,0,8">
+                                <Border BackgroundColor="#F9FAFB"
+                                        Stroke="#E5E7EB"
+                                        StrokeShape="RoundRectangle 12"
+                                        Padding="12"
+                                        Margin="0,0,0,8">
                                     <Grid ColumnDefinitions="*,Auto">
                                         <VerticalStackLayout Grid.Column="0" Spacing="2">
                                             <Label Text="{Binding WorkoutType}"
@@ -259,12 +259,12 @@
                                                TextColor="#16A34A"
                                                VerticalOptions="Center" />
                                     </Grid>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </VerticalStackLayout>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
         </VerticalStackLayout>
     </ScrollView>

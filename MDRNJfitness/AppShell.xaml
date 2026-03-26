@@ -55,6 +55,11 @@
                 Route="ProfilePage"
                 ContentTemplate="{DataTemplate views:ProfilePage}" />
         </Tab>
+        <Tab Title="Quests">
+            <ShellContent
+                Route="QuestPage"
+                ContentTemplate="{DataTemplate views:QuestPage}" />
+        </Tab>
     </TabBar>
 
 </Shell>

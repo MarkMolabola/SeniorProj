@@ -284,6 +284,47 @@ namespace MDRNJ.Api.Migrations
                     b.ToTable("GameStats");
                 });
 
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.QuestEntity", b =>
+                {
+                    b.Property<Guid>("QuestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("QuestType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<float>("TargetValue")
+                        .HasColumnType("REAL");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("XPReward")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("QuestId");
+
+                    b.ToTable("Quests");
+                });
+
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.UserAchievementEntity", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -318,6 +359,9 @@ namespace MDRNJ.Api.Migrations
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -372,6 +416,33 @@ namespace MDRNJ.Api.Migrations
                         .IsUnique();
 
                     b.ToTable("UserProfiles");
+                });
+
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.UserQuestEntity", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("QuestId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<float>("Progress")
+                        .HasColumnType("REAL");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("UserId", "QuestId");
+
+                    b.HasIndex("QuestId");
+
+                    b.ToTable("UserQuests");
                 });
 
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.WorkoutSessionEntity", b =>
@@ -562,6 +633,25 @@ namespace MDRNJ.Api.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.UserQuestEntity", b =>
+                {
+                    b.HasOne("MDRNJ.Api.Data.Entities.QuestEntity", "Quest")
+                        .WithMany("UserQuests")
+                        .HasForeignKey("QuestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "User")
+                        .WithMany("UserQuests")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Quest");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.WorkoutSessionEntity", b =>
                 {
                     b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "User")
@@ -594,6 +684,11 @@ namespace MDRNJ.Api.Migrations
                     b.Navigation("Participants");
                 });
 
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.QuestEntity", b =>
+                {
+                    b.Navigation("UserQuests");
+                });
+
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.UserEntity", b =>
                 {
                     b.Navigation("ActivityScore");
@@ -613,6 +708,8 @@ namespace MDRNJ.Api.Migrations
                     b.Navigation("SentFriendRequests");
 
                     b.Navigation("UserAchievements");
+
+                    b.Navigation("UserQuests");
 
                     b.Navigation("WorkoutSessions");
 

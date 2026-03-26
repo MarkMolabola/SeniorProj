@@ -70,6 +70,10 @@ namespace MDRNJfitness
                 c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
                 .AddHttpMessageHandler<AuthHeaderHandler>();
 
+            builder.Services.AddHttpClient<IQuestService, QuestService>(
+                c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
+                .AddHttpMessageHandler<AuthHeaderHandler>();
+
             // Sync service
             builder.Services.AddTransient<ISyncService, SyncService>();
 
@@ -87,6 +91,8 @@ namespace MDRNJfitness
             builder.Services.AddTransient<ProfileViewModel>();
             builder.Services.AddTransient<FriendProfileViewModel>();
             builder.Services.AddTransient<CalendarViewModel>();
+            builder.Services.AddTransient<QuestViewModel>();
+            builder.Services.AddTransient<AdminQuestViewModel>();
 
             // Pages
             builder.Services.AddTransient<LoginPage>();
@@ -99,6 +105,8 @@ namespace MDRNJfitness
             builder.Services.AddTransient<ProfilePage>();
             builder.Services.AddTransient<FriendProfilePage>();
             builder.Services.AddTransient<CalendarPage>();
+            builder.Services.AddTransient<QuestPage>();
+            builder.Services.AddTransient<AdminQuestPage>();
 
             return builder.Build();
         }

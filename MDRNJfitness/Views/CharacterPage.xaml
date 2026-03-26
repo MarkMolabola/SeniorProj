@@ -15,10 +15,10 @@
                    TextColor="#1F2937" />
 
             <!-- Character avatar card -->
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="18"
-                   Padding="24">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 18"
+                    Padding="24">
                 <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
                     <local:PixelAvatarView AvatarType="{Binding SpriteState}"
                                            HorizontalOptions="Center" />
@@ -29,13 +29,13 @@
                            TextColor="#2563EB"
                            HorizontalOptions="Center" />
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Character details -->
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="16"
-                   Padding="16">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="16">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Character Details"
                            FontSize="20"
@@ -50,13 +50,13 @@
                         <Label Grid.Row="2" Grid.Column="1" Text="{Binding CharacterState.EquipmentSlot}" FontAttributes="Bold" TextColor="#1F2937" />
                     </Grid>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Activity scores -->
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="16"
-                   Padding="16">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="16">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Activity Scores"
                            FontSize="20"
@@ -83,7 +83,7 @@
                            FontSize="13"
                            TextColor="#6B7280" />
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Evolve -->
             <Button Text="Evolve Character"

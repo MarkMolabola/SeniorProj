@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="MDRNJfitness.Views.AdminQuestPage"
+             Title="{Binding Title}"
+             BackgroundColor="#F4FFF7">
+
+    <ContentPage.Resources>
+        <toolkit:InvertedBoolConverter x:Key="InverseBoolConverter" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="18">
+
+            <Label Text="Quest Admin Panel"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   TextColor="#1F2937" />
+
+            <!-- Create / Edit Form -->
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="16">
+                <VerticalStackLayout Spacing="12">
+
+                    <Label Text="Create Quest"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="#1F2937"
+                           IsVisible="{Binding IsEditing, Converter={x:StaticResource InverseBoolConverter}}" />
+                    <Label Text="Edit Quest"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="#1F2937"
+                           IsVisible="{Binding IsEditing}" />
+
+                    <Entry Placeholder="Title"
+                           Text="{Binding FormTitle}"
+                           BackgroundColor="#F9FAFB" />
+
+                    <Editor Placeholder="Description (optional)"
+                            Text="{Binding FormDescription}"
+                            AutoSize="TextChanges"
+                            BackgroundColor="#F9FAFB"
+                            MinimumHeightRequest="60" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Entry Grid.Column="0"
+                               Placeholder="XP Reward"
+                               Text="{Binding FormXPReward}"
+                               Keyboard="Numeric"
+                               BackgroundColor="#F9FAFB" />
+                        <Entry Grid.Column="1"
+                               Placeholder="Target Value"
+                               Text="{Binding FormTargetValue}"
+                               Keyboard="Numeric"
+                               BackgroundColor="#F9FAFB" />
+                    </Grid>
+
+                    <Picker Title="Quest Type"
+                            ItemsSource="{Binding QuestTypes}"
+                            SelectedItem="{Binding FormQuestType}" />
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" RowDefinitions="Auto,Auto" RowSpacing="8">
+                        <Label Grid.Row="0" Grid.Column="0"
+                               Text="Start:"
+                               VerticalOptions="Center"
+                               TextColor="#6B7280" />
+                        <DatePicker Grid.Row="0" Grid.Column="1"
+                                    Date="{Binding FormStartDate}" />
+                        <Label Grid.Row="1" Grid.Column="0"
+                               Text="End:"
+                               VerticalOptions="Center"
+                               TextColor="#6B7280" />
+                        <DatePicker Grid.Row="1" Grid.Column="1"
+                                    Date="{Binding FormEndDate}" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Button Grid.Column="0"
+                                Text="Cancel"
+                                BackgroundColor="#E5E7EB"
+                                TextColor="#1F2937"
+                                CornerRadius="10"
+                                IsVisible="{Binding IsEditing}"
+                                Command="{Binding CancelEditCommand}" />
+                        <Button Grid.Column="1"
+                                Text="Save Quest"
+                                BackgroundColor="#2563EB"
+                                TextColor="White"
+                                CornerRadius="10"
+                                IsVisible="{Binding IsEditing, Converter={x:StaticResource InverseBoolConverter}}"
+                                Command="{Binding SaveCommand}" />
+                        <Button Grid.Column="1"
+                                Text="Update Quest"
+                                BackgroundColor="#2563EB"
+                                TextColor="White"
+                                CornerRadius="10"
+                                IsVisible="{Binding IsEditing}"
+                                Command="{Binding SaveCommand}" />
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Quest List -->
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="14">
+                <VerticalStackLayout Spacing="10">
+
+                    <Label Text="All Quests"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="#1F2937" />
+
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Quests}">
+                        <BindableLayout.EmptyView>
+                            <Label Text="No quests created yet."
+                                   FontSize="13"
+                                   TextColor="#6B7280" />
+                        </BindableLayout.EmptyView>
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border BackgroundColor="#F9FAFB"
+                                        Stroke="#E5E7EB"
+                                        StrokeShape="RoundRectangle 12"
+                                        Padding="12"
+                                        Margin="0,0,0,8">
+                                    <VerticalStackLayout Spacing="6">
+
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding Title}"
+                                                   FontSize="16"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#1F2937" />
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding XPReward, StringFormat='+{0} XP'}"
+                                                   FontSize="14"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#16A34A"
+                                                   VerticalOptions="Center" />
+                                        </Grid>
+
+                                        <Label Text="{Binding Description}"
+                                               FontSize="13"
+                                               TextColor="#6B7280" />
+
+                                        <Label Text="{Binding QuestType, StringFormat='Type: {0}'}"
+                                               FontSize="12"
+                                               TextColor="#9CA3AF" />
+
+                                        <Label Text="{Binding AssignedCount, StringFormat='Assigned to {0} user(s)'}"
+                                               FontSize="12"
+                                               TextColor="#2563EB" />
+
+                                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                                            <Button Grid.Column="0"
+                                                    Text="Edit"
+                                                    BackgroundColor="#F59E0B"
+                                                    TextColor="White"
+                                                    CornerRadius="8"
+                                                    FontSize="13"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.StartEditCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                            <Button Grid.Column="1"
+                                                    Text="Send All"
+                                                    BackgroundColor="#16A34A"
+                                                    TextColor="White"
+                                                    CornerRadius="8"
+                                                    FontSize="13"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SendToAllCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                            <Button Grid.Column="2"
+                                                    Text="Delete"
+                                                    BackgroundColor="#EF4444"
+                                                    TextColor="White"
+                                                    CornerRadius="8"
+                                                    FontSize="13"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                        </Grid>
+
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

@@ -11,5 +11,6 @@ namespace MDRNJ.Shared.DTOs.User
         public string Email { get; set; }
         public string? AvatarUrl { get; set; }
         public DateTime DateJoined { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }

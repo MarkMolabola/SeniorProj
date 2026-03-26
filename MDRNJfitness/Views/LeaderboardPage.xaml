@@ -13,10 +13,10 @@
                    FontAttributes="Bold"
                    TextColor="#1F2937" />
 
-            <Frame BackgroundColor="White"
-                   BorderColor="#D9EAD3"
-                   CornerRadius="16"
-                   Padding="14">
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="14">
                 <VerticalStackLayout BindableLayout.ItemsSource="{Binding Entries}">
                     <BindableLayout.EmptyView>
                         <Label Text="No leaderboard data yet."
@@ -25,11 +25,11 @@
                     </BindableLayout.EmptyView>
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
-                            <Frame BackgroundColor="#F9FAFB"
-                                   BorderColor="#E5E7EB"
-                                   CornerRadius="12"
-                                   Padding="12"
-                                   Margin="0,0,0,8">
+                            <Border BackgroundColor="#F9FAFB"
+                                    Stroke="#E5E7EB"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="12"
+                                    Margin="0,0,0,8">
                                 <Grid ColumnDefinitions="40,*,Auto,Auto" ColumnSpacing="8">
 
                                     <!-- Rank -->
@@ -76,11 +76,11 @@
                                     </VerticalStackLayout>
 
                                 </Grid>
-                            </Frame>
+                            </Border>
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
         </VerticalStackLayout>
     </ScrollView>
