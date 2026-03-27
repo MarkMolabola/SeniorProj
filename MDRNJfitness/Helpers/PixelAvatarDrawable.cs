@@ -2,208 +2,211 @@ using Microsoft.Maui.Graphics;
 
 namespace MDRNJfitness.Helpers
 {
-    /// <summary>
-    /// Renders a 10×16 pixel-art character sprite scaled to fill the canvas.
+ 
+    /// Renders a 10×16 Kirby-style circular pixel-art character scaled to fill the canvas.
     /// Set AvatarType to "default", "cardio", "strength", or "flexibility".
     /// Set Frame to 0 or 1 to select the animation frame.
-    /// </summary>
+    
     public class PixelAvatarDrawable : IDrawable
     {
         public string AvatarType { get; set; } = "default";
         public int Frame { get; set; } = 0;
 
-        private const int SpriteW = 10;
+        //this is the avatar pixel dimensions : currently 10x16
+        private const int SpriteW = 10; 
         private const int SpriteH = 16;
 
-        // ── Palette ────────────────────────────────────────────────────────────
-        // '.' transparent   'H' hair     'F' flesh/skin   'E' eye
-        // 'B' blue shirt    'R' red shirt  'G' green shirt  'V' violet shirt
-        // 'P' pants         'K' shoes
+        // ── Palette ─────────────────────────────────────────────────────────
+        // '.' transparent   'P' pink body    'E' dark eye     'W' eye shine
+        // 'C' cheek blush   'M' mouth        'R' red          'B' blue
+        // 'G' green         'Y' yellow       'V' violet
         private static readonly Dictionary<char, Color> Palette = new()
         {
             ['.'] = Colors.Transparent,
-            ['H'] = Color.FromArgb("#3D2B1F"),
-            ['F'] = Color.FromArgb("#F5CBA7"),
-            ['E'] = Color.FromArgb("#1A1A1A"),
-            ['B'] = Color.FromArgb("#2980B9"),
-            ['R'] = Color.FromArgb("#E74C3C"),
-            ['G'] = Color.FromArgb("#27AE60"),
-            ['V'] = Color.FromArgb("#9B59B6"),
-            ['P'] = Color.FromArgb("#1A3A5C"),
-            ['K'] = Color.FromArgb("#111111"),
+            ['P'] = Color.FromArgb("#FFB7D5"),  // pink body
+            ['E'] = Color.FromArgb("#1A1A2E"),  // eye dark
+            ['W'] = Color.FromArgb("#FFFFFF"),  // eye shine
+            ['C'] = Color.FromArgb("#FF6BAE"),  // cheek blush
+            ['M'] = Color.FromArgb("#CC3366"),  // mouth
+            ['R'] = Color.FromArgb("#E74C3C"),  // red (headband)
+            ['B'] = Color.FromArgb("#2980B9"),  // blue (gloves)
+            ['G'] = Color.FromArgb("#27AE60"),  // green
+            ['Y'] = Color.FromArgb("#F1C40F"),  // yellow (star)
+            ['V'] = Color.FromArgb("#9B59B6"),  // violet (yoga)
         };
 
-        // ── Sprites  [avatarType][frame][row] ──────────────────────────────────
+        // ── Sprites  [avatarType][frame][row] ──────────────────────────────
         // Each row string is exactly 10 characters wide.
+        // Round body occupies rows 2-10; accessories use rows 0-1; feet use rows 11-13.
         private static readonly Dictionary<string, string[][]> Sprites = new()
         {
-            // ── DEFAULT (standing, static) ─────────────────────────────────────
+            // ── DEFAULT (Kirby idle with star gleam) ────────────────────────
             ["default"] = new[]
             {
-                new[] // frame 0
+                new[] // frame 0 – neutral face
                 {
-                    "...HHHH...",  // 0
-                    "..HFFFFH..",  // 1
-                    "..HFEFFH..",  // 2  E = eye
-                    "..HFFFFH..",  // 3
-                    "...HHHH...",  // 4
-                    "..BBBBB...",  // 5  shirt
-                    ".BBBBBBB..",  // 6  arms at sides
-                    "..BBBBB...",  // 7
-                    "..BBBBB...",  // 8
-                    "..PPPPP...",  // 9  pants
-                    "..PPPPP...",  // 10
-                    "..PP.PP...",  // 11 legs split
-                    "..PP.PP...",  // 12
-                    "..PP.PP...",  // 13
-                    "..KK.KK...",  // 14 shoes
-                    "..KK.KK...",  // 15
+                    "....YY....",  // 0  star glint
+                    "...YYYY...",  // 1  star
+                    "..PPPPPP..",  // 2  body top
+                    ".PPPPPPPP.",  // 3
+                    "PPPPPPPPPP",  // 4
+                    "PP.EE.EE.P",  // 5  eyes
+                    "PP.EW.EW.P",  // 6  eye shine
+                    "PPC.....CP",  // 7  cheeks
+                    "PP..MM..PP",  // 8  mouth
+                    ".PPPPPPPP.",  // 9  body bottom
+                    "..PPPPPP..",  // 10
+                    "..PP..PP..",  // 11 feet
+                    "..PP..PP..",  // 12
+                    "..PP..PP..",  // 13
+                    "..........",  // 14
+                    "..........",  // 15
                 },
-                new[] // frame 1  (same — static character)
+                new[] // frame 1 – happy bounce (wider smile, feet hop)
                 {
-                    "...HHHH...",
-                    "..HFFFFH..",
-                    "..HFEFFH..",
-                    "..HFFFFH..",
-                    "...HHHH...",
-                    "..BBBBB...",
-                    ".BBBBBBB..",
-                    "..BBBBB...",
-                    "..BBBBB...",
-                    "..PPPPP...",
-                    "..PPPPP...",
-                    "..PP.PP...",
-                    "..PP.PP...",
-                    "..PP.PP...",
-                    "..KK.KK...",
-                    "..KK.KK...",
-                },
-            },
-
-            // ── CARDIO / RUNNER ────────────────────────────────────────────────
-            ["cardio"] = new[]
-            {
-                new[] // frame 0  left arm out, right leg forward
-                {
-                    "...HHHH...",  // 0
-                    "..HFFFFH..",  // 1
-                    "..HFEFFH..",  // 2
-                    "..HFFFFH..",  // 3
-                    "...HHHH...",  // 4
-                    "R..RRRR...",  // 5  left arm extends to col 0
-                    "...RRRR...",  // 6
-                    "...RRRR..R",  // 7  right arm trails to col 9
-                    "...RRRR...",  // 8
-                    "....PP....",  // 9  hip
-                    "..PP......",  // 10 left leg stepping back-left
-                    ".PP.......",  // 11
-                    "KK........",  // 12 left shoe at far left
-                    "......PP..",  // 13 right leg stepping forward-right
-                    ".......PP.",  // 14
-                    ".......KK.",  // 15 right shoe
-                },
-                new[] // frame 1  right arm out, left leg forward
-                {
-                    "...HHHH...",  // 0
-                    "..HFFFFH..",  // 1
-                    "..HFEFFH..",  // 2
-                    "..HFFFFH..",  // 3
-                    "...HHHH...",  // 4
-                    "...RRRR..R",  // 5  right arm forward
-                    "...RRRR...",  // 6
-                    "R..RRRR...",  // 7  left arm trails
-                    "...RRRR...",  // 8
-                    "....PP....",  // 9  hip
-                    "......PP..",  // 10 right leg stepping back-right
-                    ".......PP.",  // 11
-                    ".......KK.",  // 12 right shoe at far right
-                    "..PP......",  // 13 left leg stepping forward-left
-                    ".PP.......",  // 14
-                    ".KK.......",  // 15 left shoe
-                },
-            },
-
-            // ── STRENGTH / LIFTER ──────────────────────────────────────────────
-            ["strength"] = new[]
-            {
-                new[] // frame 0  arms down, holding dumbbells
-                {
-                    "...HHHH...",  // 0
-                    "..HFFFFH..",  // 1
-                    "..HFEFFH..",  // 2
-                    "..HFFFFH..",  // 3
-                    "...HHHH...",  // 4
-                    "..GGGGG...",  // 5  shirt
-                    ".GGGGGGG..",  // 6  arms at sides
-                    "G.GGGGG.G.",  // 7  fists at cols 0 and 8
-                    "GG.....GG.",  // 8  dumbbell plates extended
-                    "..PPPPP...",  // 9
-                    "..PPPPP...",  // 10
-                    "..PP.PP...",  // 11
-                    "..PP.PP...",  // 12
-                    "..PP.PP...",  // 13
-                    "..KK.KK...",  // 14
-                    "..KK.KK...",  // 15
-                },
-                new[] // frame 1  arms raised overhead with dumbbells
-                {
-                    "G..HHHH..G",  // 0  dumbbells flanking head
-                    "G.HFFFFHG.",  // 1  arms rising
-                    ".GHFEFFHG.",  // 2
-                    ".GHFFFFHG.",  // 3
-                    "G..HHHH..G",  // 4
-                    "...GGGGG..",  // 5  shirt (arms tucked in)
-                    "...GGGGG..",  // 6
-                    "...GGGGG..",  // 7
-                    "..PPPPP...",  // 8
-                    "..PPPPP...",  // 9
-                    "..PP.PP...",  // 10
-                    "..PP.PP...",  // 11
-                    "..PP.PP...",  // 12
-                    "..KK.KK...",  // 13
-                    "..........",  // 14  (body ends higher when arms are up)
+                    "....YY....",  // 0
+                    "...YYYY...",  // 1
+                    "..PPPPPP..",  // 2
+                    ".PPPPPPPP.",  // 3
+                    "PPPPPPPPPP",  // 4
+                    "PP.EE.EE.P",  // 5
+                    "PP.EW.EW.P",  // 6
+                    "PPC.....CP",  // 7
+                    "PP.MMMM.PP",  // 8  wider smile
+                    ".PPPPPPPP.",  // 9
+                    "..PPPPPP..",  // 10
+                    "...PP.PP..",  // 11 feet together (hop)
+                    "...PP.PP..",  // 12
+                    "..PP..PP..",  // 13
+                    "..........",  // 14
                     "..........",  // 15
                 },
             },
 
-            // ── FLEXIBILITY / YOGI ────────────────────────────────────────────
+            // ── CARDIO───────────────────────────
+            ["cardio"] = new[]
+            {
+                new[] // frame 0 – left foot forward
+                {
+                    "..........",  // 0
+                    "..RRRRRR..",  // 1  headband across forehead
+                    "..PPPPPP..",  // 2  body top
+                    ".PPPPPPPP.",  // 3
+                    "PPPPPPPPPP",  // 4
+                    "PP.EE.EE.P",  // 5  determined eyes (no shine)
+                    "PP.EE.EE.P",  // 6
+                    "PPC.....CP",  // 7  cheeks
+                    "PP..MM..PP",  // 8  mouth
+                    ".PPPPPPPP.",  // 9  body bottom
+                    "..PPPPPP..",  // 10
+                    "PPP....PP.",  // 11 left foot fwd (cols 0-2), right foot back (7-8)
+                    "PPP.....P.",  // 12
+                    ".PP.......",  // 13
+                    "..........",  // 14
+                    "..........",  // 15
+                },
+                new[] // frame 1 – right foot forward
+                {
+                    "..........",  // 0
+                    "..RRRRRR..",  // 1  headband
+                    "..PPPPPP..",  // 2
+                    ".PPPPPPPP.",  // 3
+                    "PPPPPPPPPP",  // 4
+                    "PP.EE.EE.P",  // 5
+                    "PP.EE.EE.P",  // 6
+                    "PPC.....CP",  // 7
+                    "PP..MM..PP",  // 8
+                    ".PPPPPPPP.",  // 9
+                    "..PPPPPP..",  // 10
+                    ".PP....PPP",  // 11 left foot back (cols 1-2), right foot fwd (7-9)
+                    ".P.....PPP",  // 12
+                    ".......PP.",  // 13
+                    "..........",  // 14
+                    "..........",  // 15
+                },
+            },
+
+            // ── STRENGTH  ───────────────────────────
+            ["strength"] = new[]
+            {
+                new[] // frame 0 – gloves lowered at sides
+                {
+                    "..........",  // 0
+                    "..........",  // 1
+                    "..PPPPPP..",  // 2  body top
+                    ".PPPPPPPP.",  // 3
+                    "PPPPPPPPPP",  // 4
+                    "PP.EE.EE.P",  // 5  eyes
+                    "PP.EW.EW.P",  // 6  eye shine
+                    "PPC.....CP",  // 7  cheeks
+                    "PP..MM..PP",  // 8  mouth
+                    "BPPPPPPPPB",  // 9  gloves at lower body sides
+                    "BB.PPPP.BB",  // 10 gloves below body
+                    "..PP..PP..",  // 11 feet
+                    "..PP..PP..",  // 12
+                    "..........",  // 13
+                    "..........",  // 14
+                    "..........",  // 15
+                },
+                new[] // frame 1 – gloves raised overhead
+                {
+                    ".BB....BB.",  // 0  gloves raised
+                    ".BB....BB.",  // 1
+                    "..PPPPPP..",  // 2  body top
+                    ".PPPPPPPP.",  // 3
+                    "PPPPPPPPPP",  // 4
+                    "PP.EE.EE.P",  // 5
+                    "PP.EW.EW.P",  // 6
+                    "PPC.....CP",  // 7
+                    "PP..MM..PP",  // 8
+                    ".PPPPPPPP.",  // 9
+                    "..PPPPPP..",  // 10
+                    "..PP..PP..",  // 11 feet
+                    "..PP..PP..",  // 12
+                    "..........",  // 13
+                    "..........",  // 14
+                    "..........",  // 15
+                },
+            },
+
+            // ── FLEXIBILITY  ─────────────────────────
             ["flexibility"] = new[]
             {
-                new[] // frame 0  T-pose (arms fully spread)
+                new[] // frame 0 – arms spread wide (T-pose)
                 {
-                    "...HHHH...",  // 0
-                    "..HFFFFH..",  // 1
-                    "..HFEFFH..",  // 2
-                    "..HFFFFH..",  // 3
-                    "...HHHH...",  // 4
-                    "VVVVVVVVVV",  // 5  arms fully spread = full width
-                    "..VVVVVV..",  // 6
-                    "..VVVVVV..",  // 7
-                    "...PPPP...",  // 8
-                    "...PPPP...",  // 9
-                    "...PP.PP..",  // 10 legs split
-                    "...PP.PP..",  // 11
-                    "...PP.PP..",  // 12
-                    "...PP.PP..",  // 13
-                    "...KK.KK..",  // 14
-                    "...KK.KK..",  // 15
+                    "..........",  // 0
+                    "..........",  // 1
+                    "..PPPPPP..",  // 2  body top
+                    ".PPPPPPPP.",  // 3
+                    "PPPPPPPPPP",  // 4
+                    "PP.EE.EE.P",  // 5  eyes
+                    "PP.EW.EW.P",  // 6  eye shine
+                    "PPC.....CP",  // 7  cheeks
+                    "PP..MM..PP",  // 8  mouth
+                    "VPPPPPPPPV",  // 9  violet arms at body sides
+                    "VV.PPPP.VV",  // 10 arms extended wide
+                    "..PP..PP..",  // 11 feet
+                    "..PP..PP..",  // 12
+                    "..........",  // 13
+                    "..........",  // 14
+                    "..........",  // 15
                 },
-                new[] // frame 1  arms raised, wide warrior stance
+                new[] // frame 1 – arms raised overhead (warrior pose)
                 {
-                    ".V.HHHH.V.",  // 0  arms starting to raise
-                    ".VHFFFFHV.",  // 1
-                    "..HFEFFH..",  // 2
-                    "..HFFFFH..",  // 3
-                    ".V.HHHH.V.",  // 4
-                    "...VVVVV..",  // 5
-                    "...VVVVV..",  // 6
-                    "...VVVVV..",  // 7
-                    "...PPPP...",  // 8
-                    "PP.....PP.",  // 9  wide stance
-                    "P.......P.",  // 10
-                    "PP.....PP.",  // 11
-                    "PP.....PP.",  // 12
-                    "KK.....KK.",  // 13
+                    ".VV....VV.",  // 0  arms raised
+                    ".VV....VV.",  // 1
+                    "..PPPPPP..",  // 2  body top
+                    ".PPPPPPPP.",  // 3
+                    "PPPPPPPPPP",  // 4
+                    "PP.EE.EE.P",  // 5
+                    "PP.EW.EW.P",  // 6
+                    "PPC.....CP",  // 7
+                    "PP..MM..PP",  // 8
+                    ".PPPPPPPP.",  // 9
+                    "..PPPPPP..",  // 10
+                    "VP......PV",  // 11 wide stance legs
+                    "VP......PV",  // 12
+                    ".V......V.",  // 13
                     "..........",  // 14
                     "..........",  // 15
                 },

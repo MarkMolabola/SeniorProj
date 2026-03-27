@@ -4,12 +4,12 @@
              x:Class="MDRNJfitness.Views.PixelAvatarView">
 
     <!--
-        80 × 128 = 10 sprite cols × 8  ×  16 sprite rows × 8
+        160 × 256 = 10 sprite cols × 16  ×  16 sprite rows × 16
         Rendered with crisp nearest-neighbour scaling via GraphicsView.
     -->
     <GraphicsView x:Name="AvatarCanvas"
-                  WidthRequest="80"
-                  HeightRequest="128"
+                  WidthRequest="160"
+                  HeightRequest="256"
                   HorizontalOptions="Center" />
 
 </ContentView>
