@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MDRNJfitness.Enums
+namespace MDRNJ.Shared.Enums
 {
     public enum XPReason
     {

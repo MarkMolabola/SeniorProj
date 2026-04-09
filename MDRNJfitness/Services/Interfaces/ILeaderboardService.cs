@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using MDRNJ.Shared.DTOs.Leaderboard;
 
 namespace MDRNJfitness.Services.Interfaces
 {
-    internal interface ILeaderboardService
+    public interface ILeaderboardService
     {
+        Task<List<LeaderboardEntryDto>> GetTopAsync(int count = 50);
     }
 }

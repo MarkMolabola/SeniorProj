@@ -3,12 +3,63 @@
     x:Class="MDRNJfitness.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:MDRNJfitness"
+    xmlns:views="clr-namespace:MDRNJfitness.Views"
     Title="MDRNJfitness">
 
+    <!-- Login shown on first launch; after login navigate to //DashboardPage -->
     <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        Title="Login"
+        Route="LoginPage"
+        ContentTemplate="{DataTemplate views:LoginPage}"
+        Shell.NavBarIsVisible="False" />
+
+    <!-- Main tabbed navigation -->
+    <TabBar>
+        <Tab Title="Dashboard">
+            <ShellContent
+                Route="DashboardPage"
+                ContentTemplate="{DataTemplate views:DashboardPage}" />
+        </Tab>
+        <Tab Title="Workout">
+            <ShellContent
+                Route="WorkoutPage"
+                ContentTemplate="{DataTemplate views:WorkoutPage}" />
+        </Tab>
+        <Tab Title="Character">
+            <ShellContent
+                Route="CharacterPage"
+                ContentTemplate="{DataTemplate views:CharacterPage}" />
+        </Tab>
+        <Tab Title="Challenges">
+            <ShellContent
+                Route="ChallengePage"
+                ContentTemplate="{DataTemplate views:ChallengePage}" />
+        </Tab>
+        <Tab Title="Leaderboard">
+            <ShellContent
+                Route="LeaderboardPage"
+                ContentTemplate="{DataTemplate views:LeaderboardPage}" />
+        </Tab>
+        <Tab Title="Friends">
+            <ShellContent
+                Route="FriendsPage"
+                ContentTemplate="{DataTemplate views:FriendsPage}" />
+        </Tab>
+        <Tab Title="Calendar">
+            <ShellContent
+                Route="CalendarPage"
+                ContentTemplate="{DataTemplate views:CalendarPage}" />
+        </Tab>
+        <Tab Title="Profile">
+            <ShellContent
+                Route="ProfilePage"
+                ContentTemplate="{DataTemplate views:ProfilePage}" />
+        </Tab>
+        <Tab Title="Quests">
+            <ShellContent
+                Route="QuestPage"
+                ContentTemplate="{DataTemplate views:QuestPage}" />
+        </Tab>
+    </TabBar>
 
 </Shell>

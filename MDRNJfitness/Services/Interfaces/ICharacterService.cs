@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using MDRNJ.Shared.DTOs.Character;
 
 namespace MDRNJfitness.Services.Interfaces
 {
-    internal interface ICharacterService
+    public interface ICharacterService
     {
+        Task<CharacterStateDto> GetCharacterAsync();
+        Task<CharacterStateDto> EvolveAsync();
+        Task<ActivityScoreDto> GetActivityScoreAsync();
+        Task<ActivityScoreDto> RecalculateActivityScoreAsync();
     }
 }

@@ -1,10 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using MDRNJ.Shared.DTOs.Character;
+using MDRNJfitness.Helpers.Extensions;
+using MDRNJfitness.Services.Interfaces;
 
 namespace MDRNJfitness.Services
 {
-    internal class CharacterService
+    public class CharacterService : ICharacterService
     {
+        private readonly HttpClient _http;
+
+        public CharacterService(HttpClient http) => _http = http;
+
+        public Task<CharacterStateDto> GetCharacterAsync() =>
+            _http.GetAsync<CharacterStateDto>("api/character")!;
+
+        public Task<CharacterStateDto> EvolveAsync() =>
+            _http.PostAsync<CharacterStateDto>("api/character/evolve", new { })!;
+
+        public Task<ActivityScoreDto> GetActivityScoreAsync() =>
+            _http.GetAsync<ActivityScoreDto>("api/character/activity-score")!;
+
+        public Task<ActivityScoreDto> RecalculateActivityScoreAsync() =>
+            _http.PostAsync<ActivityScoreDto>("api/character/activity-score/recalculate", new { })!;
     }
 }

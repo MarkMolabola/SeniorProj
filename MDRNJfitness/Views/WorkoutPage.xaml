@@ -1,12 +1,149 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:conv="clr-namespace:MDRNJfitness.Helpers.Converters"
              x:Class="MDRNJfitness.Views.WorkoutPage"
-             Title="WorkoutPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             Title="{Binding Title}"
+             BackgroundColor="#F4FFF7">
+
+    <ContentPage.Resources>
+        <toolkit:InvertedBoolConverter x:Key="InvertBool" />
+        <conv:UtcToLocalConverter x:Key="UtcToLocal" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="18">
+
+            <Label Text="Workout"
+                   FontSize="30"
+                   FontAttributes="Bold"
+                   TextColor="#1F2937" />
+
+            <!-- Start / active workout card -->
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 18"
+                    Padding="16">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Start a Workout"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="#1F2937" />
+
+                    <Picker Title="Workout Type"
+                            SelectedItem="{Binding WorkoutType}"
+                            IsEnabled="{Binding HasActiveWorkout, Converter={StaticResource InvertBool}}">
+                        <Picker.Items>
+                            <x:String>Running</x:String>
+                            <x:String>Weightlifting</x:String>
+                            <x:String>Cycling</x:String>
+                            <x:String>Swimming</x:String>
+                            <x:String>HIIT</x:String>
+                            <x:String>Yoga</x:String>
+                            <x:String>Boxing</x:String>
+                            <x:String>Hiking</x:String>
+                            <x:String>Rowing</x:String>
+                            <x:String>Basketball</x:String>
+                            <x:String>Other</x:String>
+                        </Picker.Items>
+                    </Picker>
+
+                    <Button Text="Start Workout"
+                            Command="{Binding StartWorkoutCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            IsVisible="{Binding HasActiveWorkout, Converter={StaticResource InvertBool}}"
+                            BackgroundColor="#FF7043"
+                            TextColor="White"
+                            CornerRadius="12"
+                            HeightRequest="50" />
+
+                    <!-- Active workout info + stopwatch -->
+                    <VerticalStackLayout Spacing="10"
+                                         IsVisible="{Binding HasActiveWorkout}">
+
+                        <Label Text="{Binding ActiveWorkout.WorkoutType, StringFormat='Active: {0}'}"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="#2563EB" />
+
+                        <Border BackgroundColor="#2563EB"
+                                StrokeShape="RoundRectangle 12"
+                                Stroke="#2563EB"
+                                Padding="12,8"
+                                HorizontalOptions="Center">
+                            <Label Text="{Binding ElapsedTime}"
+                                   FontSize="36"
+                                   FontAttributes="Bold"
+                                   TextColor="White"
+                                   FontFamily="OpenSansRegular"
+                                   HorizontalOptions="Center" />
+                        </Border>
+
+                        <Button Text="Complete Workout"
+                                Command="{Binding CompleteWorkoutCommand}"
+                                IsEnabled="{Binding IsNotBusy}"
+                                BackgroundColor="#16A34A"
+                                TextColor="White"
+                                CornerRadius="12"
+                                HeightRequest="50" />
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- History -->
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="14">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Workout History"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="#1F2937" />
+
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding History}">
+                        <BindableLayout.EmptyView>
+                            <Label Text="No workouts yet. Start one above!"
+                                   FontSize="13"
+                                   TextColor="#6B7280" />
+                        </BindableLayout.EmptyView>
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border BackgroundColor="#F9FAFB"
+                                        Stroke="#E5E7EB"
+                                        StrokeShape="RoundRectangle 12"
+                                        Padding="12"
+                                        Margin="0,0,0,8">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                            <Label Text="{Binding WorkoutType}"
+                                                   FontAttributes="Bold"
+                                                   FontSize="16"
+                                                   TextColor="#2563EB" />
+                                            <Label Text="{Binding StartTime, Converter={StaticResource UtcToLocal}, StringFormat='{0:MMM d, yyyy  h:mm tt}'}"
+                                                   FontSize="12"
+                                                   TextColor="#6B7280" />
+                                            <Label Text="{Binding DurationMins, StringFormat='{0} mins'}"
+                                                   FontSize="12"
+                                                   TextColor="#6B7280" />
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="1"
+                                               Text="{Binding XPAwarded, StringFormat='+{0} XP'}"
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               TextColor="#16A34A"
+                                               VerticalOptions="Center" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

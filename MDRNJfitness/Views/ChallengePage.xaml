@@ -2,11 +2,130 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MDRNJfitness.Views.ChallengePage"
-             Title="ChallengePage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             Title="{Binding Title}"
+             BackgroundColor="#F4FFF7">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="18">
+
+            <Label Text="Challenges"
+                   FontSize="30"
+                   FontAttributes="Bold"
+                   TextColor="#1F2937" />
+
+            <!-- Available Challenges -->
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="14">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Available Challenges"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="#1F2937" />
+
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding ActiveChallenges}">
+                        <BindableLayout.EmptyView>
+                            <Label Text="No active challenges."
+                                   FontSize="13"
+                                   TextColor="#6B7280" />
+                        </BindableLayout.EmptyView>
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border BackgroundColor="#F9FAFB"
+                                        Stroke="#E5E7EB"
+                                        StrokeShape="RoundRectangle 12"
+                                        Padding="12"
+                                        Margin="0,0,0,8">
+                                    <VerticalStackLayout Spacing="6">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding Title}"
+                                                   FontAttributes="Bold"
+                                                   FontSize="15"
+                                                   TextColor="#1F2937" />
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding XPReward, StringFormat='+{0} XP'}"
+                                                   FontAttributes="Bold"
+                                                   FontSize="14"
+                                                   TextColor="#16A34A" />
+                                        </Grid>
+                                        <Label Text="{Binding Description}"
+                                               FontSize="13"
+                                               TextColor="#4B5563" />
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding EndDate, StringFormat='Ends: {0:MMM d}'}"
+                                                   FontSize="12"
+                                                   TextColor="#6B7280" />
+                                            <Button Grid.Column="1"
+                                                    Text="Join"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.JoinCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    BackgroundColor="#2563EB"
+                                                    TextColor="White"
+                                                    CornerRadius="8"
+                                                    Padding="12,4"
+                                                    HeightRequest="34" />
+                                        </Grid>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- My Challenges -->
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="14">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="My Challenges"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="#1F2937" />
+
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding MyChallenges}">
+                        <BindableLayout.EmptyView>
+                            <Label Text="You haven't joined any challenges."
+                                   FontSize="13"
+                                   TextColor="#6B7280" />
+                        </BindableLayout.EmptyView>
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border BackgroundColor="#F9FAFB"
+                                        Stroke="#E5E7EB"
+                                        StrokeShape="RoundRectangle 12"
+                                        Padding="12"
+                                        Margin="0,0,0,8">
+                                    <VerticalStackLayout Spacing="6">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding Title}"
+                                                   FontAttributes="Bold"
+                                                   FontSize="15"
+                                                   TextColor="#1F2937" />
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding Status}"
+                                                   FontSize="13"
+                                                   TextColor="#2563EB" />
+                                        </Grid>
+                                        <ProgressBar Progress="{Binding Progress}"
+                                                     ProgressColor="#2563EB"
+                                                     BackgroundColor="#E5E7EB" />
+                                        <Label Text="{Binding Progress, StringFormat='{0:P0} complete'}"
+                                               FontSize="12"
+                                               TextColor="#6B7280" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

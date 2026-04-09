@@ -2,11 +2,146 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MDRNJfitness.Views.FriendsPage"
-             Title="FriendsPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             Title="{Binding Title}"
+             BackgroundColor="#F4FFF7">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="18">
+
+            <Label Text="Friends"
+                   FontSize="30"
+                   FontAttributes="Bold"
+                   TextColor="#1F2937" />
+
+            <!-- Add friend -->
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 18"
+                    Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Add Friend"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="#1F2937" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry Grid.Column="0"
+                               Placeholder="Username"
+                               Text="{Binding SearchUsername}" />
+                        <Button Grid.Column="1"
+                                Text="Send"
+                                Command="{Binding SendRequestCommand}"
+                                IsEnabled="{Binding IsNotBusy}"
+                                BackgroundColor="#2563EB"
+                                TextColor="White"
+                                CornerRadius="10"
+                                Padding="16,0" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Pending requests -->
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="14">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Pending Requests"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="#1F2937" />
+
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding PendingRequests}">
+                        <BindableLayout.EmptyView>
+                            <Label Text="No pending requests."
+                                   FontSize="13"
+                                   TextColor="#6B7280" />
+                        </BindableLayout.EmptyView>
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border BackgroundColor="#F9FAFB"
+                                        Stroke="#E5E7EB"
+                                        StrokeShape="RoundRectangle 12"
+                                        Padding="12"
+                                        Margin="0,0,0,8">
+                                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                                        <Label Grid.Column="0"
+                                               Text="{Binding Username}"
+                                               FontAttributes="Bold"
+                                               TextColor="#1F2937"
+                                               VerticalOptions="Center" />
+                                        <Button Grid.Column="1"
+                                                Text="Accept"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AcceptCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#16A34A"
+                                                TextColor="White"
+                                                CornerRadius="8"
+                                                Padding="12,4" HeightRequest="36" />
+                                        <Button Grid.Column="2"
+                                                Text="Decline"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeclineCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#EF4444"
+                                                TextColor="White"
+                                                CornerRadius="8"
+                                                Padding="12,4" HeightRequest="36" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Friends list -->
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="14">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Friends"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="#1F2937" />
+
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Friends}">
+                        <BindableLayout.EmptyView>
+                            <Label Text="No friends yet. Send a request above!"
+                                   FontSize="13"
+                                   TextColor="#6B7280" />
+                        </BindableLayout.EmptyView>
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border BackgroundColor="#F9FAFB"
+                                        Stroke="#E5E7EB"
+                                        StrokeShape="RoundRectangle 12"
+                                        Padding="12"
+                                        Margin="0,0,0,8">
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                        <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                                            <Label Text="{Binding Username}"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#1F2937" />
+                                            <Label Text="{Binding Status}"
+                                                   FontSize="12"
+                                                   TextColor="#6B7280" />
+                                        </VerticalStackLayout>
+                                        <Button Grid.Column="1"
+                                                Text="View"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ViewProfileCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#2563EB"
+                                                TextColor="White"
+                                                CornerRadius="8"
+                                                Padding="12,4" HeightRequest="36" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

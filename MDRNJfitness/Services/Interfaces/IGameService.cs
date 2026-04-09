@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using MDRNJ.Shared.DTOs.Game;
 
 namespace MDRNJfitness.Services.Interfaces
 {
-    internal interface IGameService
+    public interface IGameService
     {
+        Task<GameStatsDto> GetStatsAsync();
+        Task CheckAchievementsAsync();
+        Task<List<AchievementDto>> GetAchievementsAsync();
     }
 }

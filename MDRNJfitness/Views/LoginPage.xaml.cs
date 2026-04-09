@@ -1,9 +1,12 @@
+using MDRNJfitness.ViewModels;
+
 namespace MDRNJfitness.Views;
 
 public partial class LoginPage : ContentPage
 {
-	public LoginPage()
-	{
-		InitializeComponent();
-	}
+    public LoginPage(LoginViewModel vm)
+    {
+        InitializeComponent();
+        BindingContext = vm;
+    }
 }

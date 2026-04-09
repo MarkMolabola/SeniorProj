@@ -1,12 +1,187 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:conv="clr-namespace:MDRNJfitness.Helpers.Converters"
              x:Class="MDRNJfitness.Views.DashboardPage"
-             Title="DashboardPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             Title="{Binding Title}"
+             BackgroundColor="#F4FFF7">
+
+    <ContentPage.Resources>
+        <conv:UtcToLocalConverter x:Key="UtcToLocal" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+            <VerticalStackLayout Padding="20" Spacing="18">
+
+                <Label Text="Dashboard"
+                       FontSize="30"
+                       FontAttributes="Bold"
+                       TextColor="#1F2937" />
+
+                <!-- Level / XP Card -->
+                <Border BackgroundColor="White"
+                        Stroke="#D9EAD3"
+                        StrokeShape="RoundRectangle 18"
+                        Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{Binding UserName, StringFormat='Welcome back, {0}!'}"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="#1F2937" />
+                        <Label Text="{Binding Stats.CurrentLevel, StringFormat='Level {0}'}"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="#2563EB" />
+                        <Label Text="{Binding Stats.TotalXP, StringFormat='Total XP: {0}'}"
+                               FontSize="16"
+                               TextColor="#4B5563" />
+                        <Label Text="{Binding Stats.XPToNextLevel, StringFormat='XP to next level: {0}'}"
+                               FontSize="16"
+                               TextColor="#4B5563" />
+                        <ProgressBar Progress="{Binding XPProgress}"
+                                     HeightRequest="10"
+                                     ProgressColor="#2563EB"
+                                     BackgroundColor="#E5E7EB" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Stats Row -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+
+                    <Border Grid.Column="0"
+                            BackgroundColor="White"
+                            Stroke="#D9EAD3"
+                            StrokeShape="RoundRectangle 16"
+                            Padding="14">
+                        <VerticalStackLayout>
+                            <Label Text="Streak"
+                                   FontAttributes="Bold"
+                                   TextColor="#1F2937" />
+                            <Label Text="{Binding Stats.CurrentStreak}"
+                                   FontSize="24"
+                                   TextColor="#16A34A" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Column="1"
+                            BackgroundColor="White"
+                            Stroke="#D9EAD3"
+                            StrokeShape="RoundRectangle 16"
+                            Padding="14">
+                        <VerticalStackLayout>
+                            <Label Text="Workouts"
+                                   FontAttributes="Bold"
+                                   TextColor="#1F2937" />
+                            <Label Text="{Binding Stats.TotalWorkouts}"
+                                   FontSize="24"
+                                   TextColor="#F97316" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                </Grid>
+
+                <!-- Achievements Card -->
+                <Border BackgroundColor="White"
+                        Stroke="#D9EAD3"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="14">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Achievements"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="#1F2937" />
+
+                        <Label Text="No achievements unlocked yet."
+                               FontSize="13"
+                               TextColor="#6B7280"
+                               IsVisible="{Binding HasNoAchievements}" />
+
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Achievements}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="Auto,*,Auto"
+                                          ColumnSpacing="10"
+                                          Padding="0,6,0,6">
+                                        <Label Grid.Column="0"
+                                               Text="🏅"
+                                               FontSize="22"
+                                               VerticalOptions="Center" />
+                                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                            <Label Text="{Binding Name}"
+                                                   FontAttributes="Bold"
+                                                   FontSize="15"
+                                                   TextColor="#1F2937" />
+                                            <Label Text="{Binding Description}"
+                                                   FontSize="12"
+                                                   TextColor="#6B7280" />
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="2"
+                                               Text="{Binding XPReward, StringFormat='+{0} XP'}"
+                                               FontSize="13"
+                                               FontAttributes="Bold"
+                                               TextColor="#16A34A"
+                                               VerticalOptions="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Recent Workouts -->
+                <Border BackgroundColor="White"
+                        Stroke="#D9EAD3"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="14">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Recent Workouts"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="#1F2937" />
+
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding RecentWorkouts}">
+                            <BindableLayout.EmptyView>
+                                <Label Text="No recent workouts."
+                                       FontSize="13"
+                                       TextColor="#6B7280" />
+                            </BindableLayout.EmptyView>
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BackgroundColor="#F9FAFB"
+                                            Stroke="#E5E7EB"
+                                            StrokeShape="RoundRectangle 12"
+                                            Padding="12"
+                                            Margin="0,0,0,8">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                                <Label Text="{Binding WorkoutType}"
+                                                       FontSize="18"
+                                                       FontAttributes="Bold"
+                                                       TextColor="#2563EB" />
+                                                <Label Text="{Binding StartTime, Converter={StaticResource UtcToLocal}, StringFormat='{0:MMM d, yyyy}'}"
+                                                       FontSize="14"
+                                                       TextColor="#6B7280" />
+                                                <Label Text="{Binding DurationMins, StringFormat='{0} mins'}"
+                                                       FontSize="14"
+                                                       TextColor="#6B7280" />
+                                            </VerticalStackLayout>
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding XPAwarded, StringFormat='+{0} XP'}"
+                                                   FontSize="16"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#16A34A"
+                                                   VerticalOptions="Center" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+    </ScrollView>
+
 </ContentPage>

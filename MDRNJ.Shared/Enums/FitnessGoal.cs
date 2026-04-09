@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MDRNJfitness.Enums
+namespace MDRNJ.Shared.Enums
 {
     public enum FitnessGoal
     {
@@ -16,4 +16,4 @@ namespace MDRNJfitness.Enums
         CompeteInEvents = 7
     }
 }
-//test branching
+//commiting to devonbranch

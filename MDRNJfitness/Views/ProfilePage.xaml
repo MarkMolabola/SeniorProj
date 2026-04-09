@@ -2,11 +2,182 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MDRNJfitness.Views.ProfilePage"
-             Title="ProfilePage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             Title="{Binding Title}"
+             BackgroundColor="#F4FFF7">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="18">
+
+            <Label Text="Profile"
+                   FontSize="30"
+                   FontAttributes="Bold"
+                   TextColor="#1F2937" />
+
+            <!-- Avatar + name -->
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 18"
+                    Padding="24">
+                <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                    <Ellipse Fill="#2563EB"
+                             WidthRequest="80" HeightRequest="80"
+                             HorizontalOptions="Center" />
+                    <Label Text="{Binding Profile.DisplayName}"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           TextColor="#1F2937"
+                           HorizontalOptions="Center" />
+                    <Label Text="{Binding CurrentUser.Username, StringFormat='@{0}'}"
+                           FontSize="14"
+                           TextColor="#6B7280"
+                           HorizontalOptions="Center" />
+                    <Label Text="{Binding Profile.Bio}"
+                           FontSize="13"
+                           TextColor="#4B5563"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Stats row -->
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
+                <Border Grid.Column="0"
+                        BackgroundColor="White"
+                        Stroke="#D9EAD3"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="12">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding Stats.CurrentLevel}"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="#2563EB"
+                               HorizontalOptions="Center" />
+                        <Label Text="Level"
+                               FontSize="11"
+                               TextColor="#6B7280"
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="1"
+                        BackgroundColor="White"
+                        Stroke="#D9EAD3"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="12">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding Stats.TotalXP}"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="#F97316"
+                               HorizontalOptions="Center" />
+                        <Label Text="Total XP"
+                               FontSize="11"
+                               TextColor="#6B7280"
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="2"
+                        BackgroundColor="White"
+                        Stroke="#D9EAD3"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="12">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding Stats.CurrentStreak}"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="#16A34A"
+                               HorizontalOptions="Center" />
+                        <Label Text="Streak"
+                               FontSize="11"
+                               TextColor="#6B7280"
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- Profile details -->
+            <Border BackgroundColor="White"
+                    Stroke="#D9EAD3"
+                    StrokeShape="RoundRectangle 16"
+                    Padding="16">
+                <VerticalStackLayout Spacing="12">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                               Text="Details"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="#1F2937" />
+                        <Button Grid.Column="1"
+                                Text="Edit"
+                                Command="{Binding StartEditCommand}"
+                                IsVisible="{Binding IsNotEditing}"
+                                BackgroundColor="#2563EB"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Padding="14,4"
+                                HeightRequest="34" />
+                    </Grid>
+
+                    <!-- Read view -->
+                    <Grid ColumnDefinitions="*,*"
+                          RowDefinitions="Auto,Auto,Auto"
+                          RowSpacing="8"
+                          IsVisible="{Binding IsNotEditing}">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Fitness Goal" FontSize="13" TextColor="#6B7280" />
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Profile.FitnessGoal}" FontAttributes="Bold" TextColor="#1F2937" />
+                        <Label Grid.Row="1" Grid.Column="0" Text="Weight" FontSize="13" TextColor="#6B7280" />
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Profile.WeightKg, StringFormat='{0} kg'}" FontAttributes="Bold" TextColor="#1F2937" />
+                        <Label Grid.Row="2" Grid.Column="0" Text="Height" FontSize="13" TextColor="#6B7280" />
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding Profile.HeightCm, StringFormat='{0} cm'}" FontAttributes="Bold" TextColor="#1F2937" />
+                    </Grid>
+
+                    <!-- Edit view -->
+                    <VerticalStackLayout Spacing="10" IsVisible="{Binding IsEditing}">
+                        <Label Text="Fitness Goal" FontSize="13" TextColor="#6B7280" />
+                        <Picker ItemsSource="{Binding FitnessGoals}"
+                                SelectedItem="{Binding EditFitnessGoal}" />
+
+                        <Label Text="Weight (kg)" FontSize="13" TextColor="#6B7280" />
+                        <Entry Text="{Binding EditWeight}"
+                               Keyboard="Numeric"
+                               Placeholder="e.g. 70.5" />
+
+                        <Label Text="Height (cm)" FontSize="13" TextColor="#6B7280" />
+                        <Entry Text="{Binding EditHeight}"
+                               Keyboard="Numeric"
+                               Placeholder="e.g. 175" />
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <Button Grid.Column="0"
+                                    Text="Save"
+                                    Command="{Binding SaveProfileCommand}"
+                                    IsEnabled="{Binding IsNotBusy}"
+                                    BackgroundColor="#16A34A"
+                                    TextColor="White"
+                                    CornerRadius="10"
+                                    HeightRequest="44" />
+                            <Button Grid.Column="1"
+                                    Text="Cancel"
+                                    Command="{Binding CancelEditCommand}"
+                                    BackgroundColor="#6B7280"
+                                    TextColor="White"
+                                    CornerRadius="10"
+                                    HeightRequest="44" />
+                        </Grid>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Logout -->
+            <Button Text="Log Out"
+                    Command="{Binding LogoutCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    BackgroundColor="#EF4444"
+                    TextColor="White"
+                    CornerRadius="12"
+                    HeightRequest="50" />
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
