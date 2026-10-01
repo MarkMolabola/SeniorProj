@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MDRNJfitness — Architecture Diagram</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #0f0f1a;
+    color: #e0e0e0;
+    padding: 32px;
+    min-height: 100vh;
+  }
+  h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 6px;
+    background: linear-gradient(90deg, #00c6ff, #7b2ff7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 32px;
+  }
+  .diagram-container {
+    background: #16162a;
+    border-radius: 16px;
+    border: 1px solid #2a2a4a;
+    padding: 24px;
+    overflow-x: auto;
+  }
+  .mermaid {
+    display: flex;
+    justify-content: center;
+  }
+  .legend {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: #aaa;
+  }
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>MDRNJfitness — Architecture</h1>
+<p class="subtitle">Gamified Fitness Tracker &nbsp;|&nbsp; .NET MAUI + ASP.NET Core + Azure</p>
+
+<div class="diagram-container">
+<div class="mermaid">
+graph TB
+    %% ─── CLIENT TIER ────────────────────────────────────────────────
+    subgraph CLIENT["📱 Client — .NET MAUI (Android / iOS / macOS / Windows)"]
+        direction TB
+        subgraph PAGES["Pages (12)"]
+            P1["🏠 Dashboard"]
+            P2["💪 Workout"]
+            P3["🧬 Character"]
+            P4["🏆 Leaderboard"]
+            P5["⚔️ Challenges"]
+            P6["👥 Friends"]
+            P7["🗺️ Quests"]
+            P8["📅 Calendar"]
+            P9["👤 Profile / Login"]
+        end
+        subgraph MAUI_SVC["MAUI Services (Typed HTTP Clients)"]
+            MS1["AuthService"]
+            MS2["WorkoutService"]
+            MS3["GameService"]
+            MS4["CharacterService"]
+            MS5["LeaderboardService"]
+            MS6["ChallengeService"]
+            MS7["FriendService"]
+            MS8["QuestService"]
+        end
+        subgraph LOCAL["Local Storage"]
+            LS1["SQLite (offline cache)\nPendingWorkouts · CachedUsers"]
+            LS2["SecureStorage\n(JWT Token)"]
+        end
+        SYNC["SyncService\n(offline → online reconciliation)"]
+        LBHUB_CLIENT["LeaderboardHubClient\n(SignalR client — real-time)"]
+    end
+
+    %% ─── API TIER ───────────────────────────────────────────────────
+    subgraph API["⚙️ API — ASP.NET Core 10 Web API (Azure App Service)"]
+        direction TB
+        MW["Middleware\nJWT Auth · ExceptionMiddleware · CORS"]
+        subgraph CTRL["Controllers (9)"]
+            C1["AuthController\n/api/auth"]
+            C2["UserController\n/api/users"]
+            C3["WorkoutController\n/api/workouts"]
+            C4["GameController\n/api/game"]
+            C5["CharacterController\n/api/character"]
+            C6["ChallengeController\n/api/challenges"]
+            C7["LeaderboardController\n/api/leaderboard"]
+            C8["FriendsController\n/api/friends"]
+            C9["AchievementController · QuestController"]
+        end
+        subgraph SVC["Services (10)"]
+            S1["AuthService\n(BCrypt · JWT mint)"]
+            S2["WorkoutService\n(XP calc · history)"]
+            S3["GameService\n(XP · levels · streaks)"]
+            S4["CharacterService\n(body type · outfit)"]
+            S5["CharacterClassifierService\n(rule-based → LLM)"]
+            S6["ChallengeService · QuestService"]
+            S7["LeaderboardService · FriendService"]
+            S8["AchievementService\n(unlock checks)"]
+        end
+        LBHUB["LeaderboardHub\n/hubs/leaderboard (SignalR)"]
+        AM["AutoMapper\n(5 profiles)"]
+    end
+
+    %% ─── SHARED LIB ─────────────────────────────────────────────────
+    SHARED["📦 MDRNJ.Shared\nDTOs · Enums\n(referenced by both)"]
+
+    %% ─── DATA TIER ──────────────────────────────────────────────────
+    subgraph DATA["🗄️ Data — Azure SQL Database"]
+        direction LR
+        DB1["Users · UserProfiles\nGameStats · XPTransactions"]
+        DB2["WorkoutSessions · Exercises"]
+        DB3["CharacterState · ActivityScore"]
+        DB4["Friendships · Challenges\nChallengeParticipants"]
+        DB5["Achievements · UserAchievements\nQuests · UserQuests"]
+    end
+
+    %% ─── AZURE SERVICES ─────────────────────────────────────────────
+    subgraph AZURE["☁️ Azure — Supporting Services"]
+        direction TB
+        AAS["Azure App Service\n(API hosting · auto-scale · SSL)"]
+        ADB["Azure SQL Database\n(production DB)"]
+        ASIG["Azure SignalR Service\n(managed real-time hub)"]
+        AKEV["Azure Key Vault\n(JWT secret · DB conn string)"]
+        ABLOB["Azure Blob Storage\n(avatar images · achievement badges)"]
+        AOAI["Azure OpenAI\n(CharacterClassifier LLM — planned)"]
+        AAD["Azure AD B2C\n(social login — future)"]
+        AAPIM["Azure API Management\n(rate limiting · API gateway — optional)"]
+    end
+
+    %% ─── CONNECTIONS ────────────────────────────────────────────────
+    PAGES --> MAUI_SVC
+    MAUI_SVC --> SYNC
+    SYNC --> LS1
+    MAUI_SVC --> LS2
+    LBHUB_CLIENT <-->|"WebSocket\n(SignalR)"| LBHUB
+
+    MAUI_SVC -->|"HTTPS REST\n+ JWT Bearer"| MW
+    MW --> CTRL
+    CTRL --> SVC
+    SVC --> AM
+    SVC -->|"EF Core"| DATA
+    S5 -->|"planned"| AOAI
+
+    API --- SHARED
+    CLIENT --- SHARED
+
+    LBHUB -->|"managed by"| ASIG
+    API -->|"hosted on"| AAS
+    DATA --- ADB
+    AAS -->|"reads secrets"| AKEV
+    SVC -->|"avatar / badge URLs"| ABLOB
+    AAD -.->|"future SSO"| MW
+    AAPIM -.->|"optional gateway"| AAS
+
+    %% ─── STYLES ─────────────────────────────────────────────────────
+    classDef azure fill:#0078d4,stroke:#005ea2,color:#fff,rx:8
+    classDef maui  fill:#512bd4,stroke:#3a1fa0,color:#fff,rx:8
+    classDef api   fill:#1e7e34,stroke:#155724,color:#fff,rx:8
+    classDef data  fill:#856404,stroke:#533f03,color:#fff,rx:8
+    classDef shared fill:#495057,stroke:#343a40,color:#fff,rx:8
+
+    class AAS,ADB,ASIG,AKEV,ABLOB,AOAI,AAD,AAPIM azure
+    class CLIENT,PAGES,MAUI_SVC,LOCAL,SYNC,LBHUB_CLIENT,P1,P2,P3,P4,P5,P6,P7,P8,P9,MS1,MS2,MS3,MS4,MS5,MS6,MS7,MS8,LS1,LS2 maui
+    class API,MW,CTRL,SVC,C1,C2,C3,C4,C5,C6,C7,C8,C9,S1,S2,S3,S4,S5,S6,S7,S8,LBHUB,AM api
+    class DATA,DB1,DB2,DB3,DB4,DB5 data
+    class SHARED shared
+</div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#512bd4"></div> MAUI Client</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#1e7e34"></div> ASP.NET Core API</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#856404"></div> Data Layer</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#0078d4"></div> Azure Services</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#495057"></div> Shared Library</div>
+  <div class="legend-item" style="margin-left:16px; color:#666">— — → planned / future</div>
+</div>
+
+<div style="margin-top:32px; background:#16162a; border-radius:12px; border:1px solid #2a2a4a; padding:20px;">
+  <h2 style="color:#00c6ff; font-size:1.1rem; margin-bottom:12px;">Azure Deployment Plan</h2>
+  <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+    <tr style="border-bottom:1px solid #2a2a4a;">
+      <th style="text-align:left; padding:8px; color:#888;">Azure Service</th>
+      <th style="text-align:left; padding:8px; color:#888;">Purpose</th>
+      <th style="text-align:left; padding:8px; color:#888;">Status</th>
+    </tr>
+    <tr style="border-bottom:1px solid #1a1a2e;">
+      <td style="padding:8px; color:#0078d4;">Azure App Service</td>
+      <td style="padding:8px;">Host ASP.NET Core API — auto-scale, managed SSL, deployment slots</td>
+      <td style="padding:8px; color:#ffc107;">Planned</td>
+    </tr>
+    <tr style="border-bottom:1px solid #1a1a2e;">
+      <td style="padding:8px; color:#0078d4;">Azure SQL Database</td>
+      <td style="padding:8px;">Replace local SQLite with production-grade managed SQL Server</td>
+      <td style="padding:8px; color:#ffc107;">Planned</td>
+    </tr>
+    <tr style="border-bottom:1px solid #1a1a2e;">
+      <td style="padding:8px; color:#0078d4;">Azure SignalR Service</td>
+      <td style="padding:8px;">Managed WebSocket back-plane for LeaderboardHub — handles scale-out</td>
+      <td style="padding:8px; color:#ffc107;">Planned</td>
+    </tr>
+    <tr style="border-bottom:1px solid #1a1a2e;">
+      <td style="padding:8px; color:#0078d4;">Azure Key Vault</td>
+      <td style="padding:8px;">Store JWT secret, DB connection string — remove secrets from appsettings</td>
+      <td style="padding:8px; color:#ffc107;">Planned</td>
+    </tr>
+    <tr style="border-bottom:1px solid #1a1a2e;">
+      <td style="padding:8px; color:#0078d4;">Azure Blob Storage</td>
+      <td style="padding:8px;">Host avatar images and achievement badge assets</td>
+      <td style="padding:8px; color:#ffc107;">Planned</td>
+    </tr>
+    <tr style="border-bottom:1px solid #1a1a2e;">
+      <td style="padding:8px; color:#0078d4;">Azure OpenAI</td>
+      <td style="padding:8px;">Power CharacterClassifierService LLM body-type classification</td>
+      <td style="padding:8px; color:#6c757d;">Future (TODO)</td>
+    </tr>
+    <tr>
+      <td style="padding:8px; color:#0078d4;">Azure AD B2C</td>
+      <td style="padding:8px;">Social login (Google, Apple) — already stubbed in Program.cs</td>
+      <td style="padding:8px; color:#6c757d;">Future (stubbed)</td>
+    </tr>
+  </table>
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      primaryColor: '#1e1e3a',
+      primaryTextColor: '#e0e0e0',
+      primaryBorderColor: '#444466',
+      lineColor: '#6666aa',
+      secondaryColor: '#16162a',
+      tertiaryColor: '#0f0f1a'
+    },
+    flowchart: { curve: 'basis', padding: 20 }
+  });
+</script>
+</body>
+</html>

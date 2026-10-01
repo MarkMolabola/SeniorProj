@@ -38,7 +38,7 @@ namespace MDRNJfitness.ViewModels
             {
                 var joined = await _challenges.JoinAsync(challenge.ChallengeId);
                 MyChallenges.Add(joined);
-                await Shell.Current.DisplayAlert("Joined!", $"You joined: {challenge.Title}", "OK");
+                await Shell.Current.DisplayAlertAsync("Joined!", $"You joined: {challenge.Title}", "OK");
             });
     }
 }

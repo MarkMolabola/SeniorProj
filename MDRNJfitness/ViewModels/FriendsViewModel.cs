@@ -40,7 +40,7 @@ namespace MDRNJfitness.ViewModels
                 if (string.IsNullOrWhiteSpace(SearchUsername)) return;
                 var result = await _friends.SendRequestAsync(SearchUsername.Trim());
                 SearchUsername = string.Empty;
-                await Shell.Current.DisplayAlert("Sent", $"Friend request sent to {result.Username}.", "OK");
+                await Shell.Current.DisplayAlertAsync("Sent", $"Friend request sent to {result.Username}.", "OK");
             });
 
         [RelayCommand]

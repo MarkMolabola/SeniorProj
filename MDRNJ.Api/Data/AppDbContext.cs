@@ -35,7 +35,9 @@ namespace MDRNJ.Api.Data
                 e.HasIndex(u => u.Username).IsUnique();
                 e.Property(u => u.Email).HasMaxLength(256).IsRequired();
                 e.Property(u => u.Username).HasMaxLength(30).IsRequired();
-                e.Property(u => u.PasswordHash).IsRequired();
+                e.HasIndex(u => u.GoogleId).IsUnique();
+                e.Property(u => u.GoogleId).HasMaxLength(64);
+                e.Property(u => u.VerificationCodeHash).HasMaxLength(64);
             });
 
             // UserProfileEntity — 1:1 with User

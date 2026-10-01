@@ -15,12 +15,12 @@ namespace MDRNJ.Api.Migrations
                 name: "Achievements",
                 columns: table => new
                 {
-                    AchievementId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    BadgeImageUrl = table.Column<string>(type: "TEXT", nullable: false),
-                    XPReward = table.Column<int>(type: "INTEGER", nullable: false),
-                    Rarity = table.Column<int>(type: "INTEGER", nullable: false)
+                    AchievementId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BadgeImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    XPReward = table.Column<int>(type: "int", nullable: false),
+                    Rarity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -28,15 +28,36 @@ namespace MDRNJ.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Quests",
+                columns: table => new
+                {
+                    QuestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    XPReward = table.Column<int>(type: "int", nullable: false),
+                    QuestType = table.Column<int>(type: "int", nullable: false),
+                    TargetValue = table.Column<float>(type: "real", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Quests", x => x.QuestId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
-                    Username = table.Column<string>(type: "TEXT", maxLength: 30, nullable: false),
-                    PasswordHash = table.Column<string>(type: "TEXT", nullable: false),
-                    AvatarUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    DateJoined = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AvatarUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DateJoined = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsAdmin = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -47,13 +68,13 @@ namespace MDRNJ.Api.Migrations
                 name: "ActivityScores",
                 columns: table => new
                 {
-                    ScoreId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    StrengthScore = table.Column<float>(type: "REAL", nullable: false),
-                    CardioScore = table.Column<float>(type: "REAL", nullable: false),
-                    FlexibilityScore = table.Column<float>(type: "REAL", nullable: false),
-                    DominantSport = table.Column<int>(type: "INTEGER", nullable: false),
-                    LastCalculated = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    ScoreId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StrengthScore = table.Column<float>(type: "real", nullable: false),
+                    CardioScore = table.Column<float>(type: "real", nullable: false),
+                    FlexibilityScore = table.Column<float>(type: "real", nullable: false),
+                    DominantSport = table.Column<int>(type: "int", nullable: false),
+                    LastCalculated = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -70,16 +91,16 @@ namespace MDRNJ.Api.Migrations
                 name: "Challenges",
                 columns: table => new
                 {
-                    ChallengeId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    CreatorId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Title = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
-                    ChallengeType = table.Column<int>(type: "INTEGER", nullable: false),
-                    TargetValue = table.Column<float>(type: "REAL", nullable: false),
-                    XPReward = table.Column<int>(type: "INTEGER", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Status = table.Column<int>(type: "INTEGER", nullable: false)
+                    ChallengeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    ChallengeType = table.Column<int>(type: "int", nullable: false),
+                    TargetValue = table.Column<float>(type: "real", nullable: false),
+                    XPReward = table.Column<int>(type: "int", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -96,13 +117,13 @@ namespace MDRNJ.Api.Migrations
                 name: "CharacterStates",
                 columns: table => new
                 {
-                    CharacterId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    BodyType = table.Column<int>(type: "INTEGER", nullable: false),
-                    OutfitSlot = table.Column<string>(type: "TEXT", nullable: false),
-                    EquipmentSlot = table.Column<string>(type: "TEXT", nullable: false),
-                    AccessorySlot = table.Column<string>(type: "TEXT", nullable: true),
-                    LastEvolved = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    CharacterId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BodyType = table.Column<int>(type: "int", nullable: false),
+                    OutfitSlot = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EquipmentSlot = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AccessorySlot = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastEvolved = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -119,11 +140,11 @@ namespace MDRNJ.Api.Migrations
                 name: "Friendships",
                 columns: table => new
                 {
-                    FriendshipId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    RequesterId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    AddresseeId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Status = table.Column<int>(type: "INTEGER", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    FriendshipId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RequesterId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AddresseeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -146,14 +167,14 @@ namespace MDRNJ.Api.Migrations
                 name: "GameStats",
                 columns: table => new
                 {
-                    StatsId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    TotalXP = table.Column<int>(type: "INTEGER", nullable: false),
-                    CurrentLevel = table.Column<int>(type: "INTEGER", nullable: false),
-                    CurrentStreak = table.Column<int>(type: "INTEGER", nullable: false),
-                    LongestStreak = table.Column<int>(type: "INTEGER", nullable: false),
-                    TotalWorkouts = table.Column<int>(type: "INTEGER", nullable: false),
-                    LastWorkoutDate = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    StatsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TotalXP = table.Column<int>(type: "int", nullable: false),
+                    CurrentLevel = table.Column<int>(type: "int", nullable: false),
+                    CurrentStreak = table.Column<int>(type: "int", nullable: false),
+                    LongestStreak = table.Column<int>(type: "int", nullable: false),
+                    TotalWorkouts = table.Column<int>(type: "int", nullable: false),
+                    LastWorkoutDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -170,9 +191,9 @@ namespace MDRNJ.Api.Migrations
                 name: "UserAchievements",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    AchievementId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UnlockedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AchievementId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UnlockedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -195,13 +216,13 @@ namespace MDRNJ.Api.Migrations
                 name: "UserProfiles",
                 columns: table => new
                 {
-                    ProfileId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    DisplayName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    Bio = table.Column<string>(type: "TEXT", maxLength: 300, nullable: true),
-                    WeightKg = table.Column<float>(type: "REAL", nullable: true),
-                    HeightCm = table.Column<float>(type: "REAL", nullable: true),
-                    FitnessGoal = table.Column<int>(type: "INTEGER", nullable: false)
+                    ProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Bio = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
+                    WeightKg = table.Column<float>(type: "real", nullable: true),
+                    HeightCm = table.Column<float>(type: "real", nullable: true),
+                    FitnessGoal = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -215,18 +236,46 @@ namespace MDRNJ.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserQuests",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    QuestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Progress = table.Column<float>(type: "real", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    AssignedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CompletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserQuests", x => new { x.UserId, x.QuestId });
+                    table.ForeignKey(
+                        name: "FK_UserQuests_Quests_QuestId",
+                        column: x => x.QuestId,
+                        principalTable: "Quests",
+                        principalColumn: "QuestId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserQuests_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "WorkoutSessions",
                 columns: table => new
                 {
-                    SessionId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    WorkoutType = table.Column<int>(type: "INTEGER", nullable: false),
-                    DurationMins = table.Column<int>(type: "INTEGER", nullable: false),
-                    CaloriesBurned = table.Column<float>(type: "REAL", nullable: true),
-                    XPAwarded = table.Column<int>(type: "INTEGER", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    Notes = table.Column<string>(type: "TEXT", nullable: true)
+                    SessionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    WorkoutType = table.Column<int>(type: "int", nullable: false),
+                    DurationMins = table.Column<int>(type: "int", nullable: false),
+                    CaloriesBurned = table.Column<float>(type: "real", nullable: true),
+                    XPAwarded = table.Column<int>(type: "int", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -243,12 +292,12 @@ namespace MDRNJ.Api.Migrations
                 name: "XPTransactions",
                 columns: table => new
                 {
-                    TransactionId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Amount = table.Column<int>(type: "INTEGER", nullable: false),
-                    Reason = table.Column<int>(type: "INTEGER", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    TransactionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Amount = table.Column<int>(type: "int", nullable: false),
+                    Reason = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -265,11 +314,11 @@ namespace MDRNJ.Api.Migrations
                 name: "ChallengeParticipants",
                 columns: table => new
                 {
-                    ChallengeId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Progress = table.Column<float>(type: "REAL", nullable: false),
-                    Status = table.Column<int>(type: "INTEGER", nullable: false),
-                    JoinedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    ChallengeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Progress = table.Column<float>(type: "real", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    JoinedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -292,15 +341,15 @@ namespace MDRNJ.Api.Migrations
                 name: "Exercises",
                 columns: table => new
                 {
-                    ExerciseId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    SessionId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Category = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    Sets = table.Column<int>(type: "INTEGER", nullable: true),
-                    Reps = table.Column<int>(type: "INTEGER", nullable: true),
-                    WeightKg = table.Column<float>(type: "REAL", nullable: true),
-                    DistanceKm = table.Column<float>(type: "REAL", nullable: true),
-                    DurationSecs = table.Column<int>(type: "INTEGER", nullable: true)
+                    ExerciseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SessionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Category = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Sets = table.Column<int>(type: "int", nullable: true),
+                    Reps = table.Column<int>(type: "int", nullable: true),
+                    WeightKg = table.Column<float>(type: "real", nullable: true),
+                    DistanceKm = table.Column<float>(type: "real", nullable: true),
+                    DurationSecs = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -369,6 +418,11 @@ namespace MDRNJ.Api.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserQuests_QuestId",
+                table: "UserQuests",
+                column: "QuestId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
                 table: "Users",
                 column: "Email",
@@ -419,6 +473,9 @@ namespace MDRNJ.Api.Migrations
                 name: "UserProfiles");
 
             migrationBuilder.DropTable(
+                name: "UserQuests");
+
+            migrationBuilder.DropTable(
                 name: "XPTransactions");
 
             migrationBuilder.DropTable(
@@ -429,6 +486,9 @@ namespace MDRNJ.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "Achievements");
+
+            migrationBuilder.DropTable(
+                name: "Quests");
 
             migrationBuilder.DropTable(
                 name: "Users");

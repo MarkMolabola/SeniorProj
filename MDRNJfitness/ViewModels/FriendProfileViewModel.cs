@@ -49,7 +49,7 @@ namespace MDRNJfitness.ViewModels
             {
                 if (!Guid.TryParse(UserId, out var id)) return;
 
-                var confirm = await Shell.Current.DisplayAlert(
+                var confirm = await Shell.Current.DisplayAlertAsync(
                     "Remove Friend",
                     $"Remove {Profile?.Username} from your friends?",
                     "Remove", "Cancel");

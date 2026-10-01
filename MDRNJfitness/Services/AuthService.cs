@@ -1,6 +1,7 @@
 using MDRNJ.Shared.DTOs.Auth;
 using MDRNJ.Shared.DTOs.User;
 using MDRNJfitness.Data;
+using MDRNJfitness.Helpers;
 using MDRNJfitness.Helpers.Extensions;
 using MDRNJfitness.Services.Interfaces;
 
@@ -20,25 +21,58 @@ namespace MDRNJfitness.Services
         public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
         {
             var response = await _http.PostAsync<AuthResponseDto>("api/auth/login", dto);
-            if (response is not null)
-            {
-                await SecureStorage.SetAsync("access_token", response.AccessToken);
-                if (response.User is not null)
-                    await _userRepo.CacheCurrentUserAsync(response.User);
-            }
+            await SaveSessionAsync(response);
             return response!;
         }
 
-        public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
+        // Registration doesn't log in — the user must enter the emailed code first.
+        public async Task<RegisterResponseDto> RegisterAsync(RegisterDto dto) =>
+            (await _http.PostAsync<RegisterResponseDto>("api/auth/register", dto))!;
+
+        public async Task<AuthResponseDto> VerifyEmailAsync(VerifyEmailDto dto)
         {
-            var response = await _http.PostAsync<AuthResponseDto>("api/auth/register", dto);
-            if (response is not null)
-            {
-                await SecureStorage.SetAsync("access_token", response.AccessToken);
-                if (response.User is not null)
-                    await _userRepo.CacheCurrentUserAsync(response.User);
-            }
+            var response = await _http.PostAsync<AuthResponseDto>("api/auth/verify-email", dto);
+            await SaveSessionAsync(response);
             return response!;
+        }
+
+        public Task ResendVerificationAsync(string email) =>
+            _http.PostAsync("api/auth/resend-verification", new ResendVerificationDto { Email = email });
+
+        public async Task<bool> SignInWithGoogleAsync()
+        {
+            WebAuthenticatorResult result;
+            try
+            {
+                // Opens the API's Google endpoint in a browser tab. When done, the API redirects to
+                // mdrnjfitness://auth#access_token=... and the OS hands that URL back to the app.
+                result = await WebAuthenticator.Default.AuthenticateAsync(
+                    new Uri(new Uri(ApiConstants.BaseUrl), "api/auth/google"),
+                    new Uri(ApiConstants.AuthCallbackUrl));
+            }
+            catch (TaskCanceledException)
+            {
+                return false; // user closed the browser
+            }
+
+            if (result.Properties.TryGetValue("error", out var error))
+            {
+                if (error == "google_sign_in_cancelled")
+                    return false;
+                throw new InvalidOperationException(error == "google_not_configured"
+                    ? "Google sign-in isn't set up on the server yet."
+                    : error);
+            }
+
+            var token = result.AccessToken
+                ?? throw new InvalidOperationException("Google sign-in didn't return a token.");
+
+            await SecureStorage.SetAsync("access_token", token);
+            var user = await _http.GetAsync<UserDto>("api/users/me");
+            if (user is not null)
+                await _userRepo.CacheCurrentUserAsync(user);
+
+            return true;
         }
 
         public async Task LogoutAsync()
@@ -49,5 +83,13 @@ namespace MDRNJfitness.Services
 
         public Task<UserDto?> GetCurrentUserAsync() =>
             _userRepo.GetCachedCurrentUserAsync();
+
+        private async Task SaveSessionAsync(AuthResponseDto? response)
+        {
+            if (response is null) return;
+            await SecureStorage.SetAsync("access_token", response.AccessToken);
+            if (response.User is not null)
+                await _userRepo.CacheCurrentUserAsync(response.User);
+        }
     }
 }

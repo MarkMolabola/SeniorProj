@@ -1,3 +1,4 @@
+using MDRNJ.Api.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -26,6 +27,10 @@ namespace MDRNJ.Api.Middleware
             try
             {
                 await _next(context);
+            }
+            catch (EmailNotVerifiedException ex)
+            {
+                await WriteErrorAsync(context, HttpStatusCode.Forbidden, ex.Message);
             }
             catch (KeyNotFoundException ex)
             {

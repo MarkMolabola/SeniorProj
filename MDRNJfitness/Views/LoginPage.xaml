@@ -20,53 +20,108 @@
                    FontSize="20"
                    HorizontalOptions="Center" />
 
-            <Border StrokeShape="RoundRectangle 12" Padding="16" Margin="0,8,0,0">
-                <VerticalStackLayout Spacing="12">
+            <!-- ── Sign in / Register ───────────────────── -->
+            <VerticalStackLayout Spacing="16"
+                                 IsVisible="{Binding IsVerifyMode, Converter={StaticResource InvertBool}}">
 
-                    <Entry Placeholder="Email"
-                           Text="{Binding Email}"
-                           Keyboard="Email" />
+                <Border StrokeShape="RoundRectangle 12" Padding="16" Margin="0,8,0,0">
+                    <VerticalStackLayout Spacing="12">
 
-                    <Entry Placeholder="Password"
-                           Text="{Binding Password}"
-                           IsPassword="True" />
+                        <Entry Placeholder="Email"
+                               Text="{Binding Email}"
+                               Keyboard="Email" />
 
-                    <Entry Placeholder="Username"
-                           Text="{Binding Username}"
-                           IsVisible="{Binding IsRegisterMode}" />
+                        <Entry Placeholder="Password"
+                               Text="{Binding Password}"
+                               IsPassword="True" />
 
-                    <Entry Placeholder="Display Name"
-                           Text="{Binding DisplayName}"
-                           IsVisible="{Binding IsRegisterMode}" />
+                        <Entry Placeholder="Username"
+                               Text="{Binding Username}"
+                               IsVisible="{Binding IsRegisterMode}" />
 
+                        <Entry Placeholder="Display Name"
+                               Text="{Binding DisplayName}"
+                               IsVisible="{Binding IsRegisterMode}" />
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <Button Text="Sign In"
+                        Command="{Binding LoginCommand}"
+                        IsEnabled="{Binding IsNotBusy}"
+                        IsVisible="{Binding IsRegisterMode, Converter={StaticResource InvertBool}}" />
+
+                <Button Text="Register"
+                        Command="{Binding RegisterCommand}"
+                        IsEnabled="{Binding IsNotBusy}"
+                        IsVisible="{Binding IsRegisterMode}" />
+
+                <VerticalStackLayout Spacing="16" IsVisible="{Binding IsGoogleSignInSupported}">
+                    <Label Text="or" HorizontalOptions="Center" TextColor="Gray" />
+
+                    <Button Text="Continue with Google"
+                            Command="{Binding SignInWithGoogleCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            BackgroundColor="White"
+                            TextColor="Black"
+                            BorderColor="LightGray"
+                            BorderWidth="1" />
                 </VerticalStackLayout>
-            </Border>
 
-            <Button Text="Sign In"
-                    Command="{Binding LoginCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    IsVisible="{Binding IsRegisterMode, Converter={StaticResource InvertBool}}" />
+                <Button Text="Need an account? Register"
+                        Command="{Binding ToggleModeCommand}"
+                        IsVisible="{Binding IsRegisterMode, Converter={StaticResource InvertBool}}"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource Primary}" />
 
-            <Button Text="Register"
-                    Command="{Binding RegisterCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    IsVisible="{Binding IsRegisterMode}" />
+                <Button Text="Already have an account? Sign In"
+                        Command="{Binding ToggleModeCommand}"
+                        IsVisible="{Binding IsRegisterMode}"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource Primary}" />
+
+            </VerticalStackLayout>
+
+            <!-- ── Verify email ─────────────────────────── -->
+            <VerticalStackLayout Spacing="16" IsVisible="{Binding IsVerifyMode}">
+
+                <Label Text="{Binding VerifyMessage}"
+                       HorizontalTextAlignment="Center" />
+
+                <Label Text="{Binding Email}"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center" />
+
+                <Border StrokeShape="RoundRectangle 12" Padding="16">
+                    <Entry Placeholder="6-digit code"
+                           Text="{Binding VerificationCode}"
+                           Keyboard="Numeric"
+                           MaxLength="6"
+                           FontSize="24"
+                           CharacterSpacing="8"
+                           HorizontalTextAlignment="Center" />
+                </Border>
+
+                <Button Text="Verify"
+                        Command="{Binding VerifyEmailCommand}"
+                        IsEnabled="{Binding IsNotBusy}" />
+
+                <Button Text="Resend code"
+                        Command="{Binding ResendCodeCommand}"
+                        IsEnabled="{Binding IsNotBusy}"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource Primary}" />
+
+                <Button Text="Back to Sign In"
+                        Command="{Binding BackToSignInCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="Gray" />
+
+            </VerticalStackLayout>
 
             <ActivityIndicator IsRunning="{Binding IsBusy}"
                                IsVisible="{Binding IsBusy}"
                                HorizontalOptions="Center" />
-
-            <Button Text="Need an account? Register"
-                    Command="{Binding ToggleModeCommand}"
-                    IsVisible="{Binding IsRegisterMode, Converter={StaticResource InvertBool}}"
-                    BackgroundColor="Transparent"
-                    TextColor="{StaticResource Primary}" />
-
-            <Button Text="Already have an account? Sign In"
-                    Command="{Binding ToggleModeCommand}"
-                    IsVisible="{Binding IsRegisterMode}"
-                    BackgroundColor="Transparent"
-                    TextColor="{StaticResource Primary}" />
 
         </VerticalStackLayout>
     </ScrollView>

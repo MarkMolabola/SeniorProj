@@ -6,7 +6,13 @@ namespace MDRNJfitness.Services.Interfaces
     public interface IAuthService
     {
         Task<AuthResponseDto> LoginAsync(LoginDto dto);
-        Task<AuthResponseDto> RegisterAsync(RegisterDto dto);
+        Task<RegisterResponseDto> RegisterAsync(RegisterDto dto);
+        Task<AuthResponseDto> VerifyEmailAsync(VerifyEmailDto dto);
+        Task ResendVerificationAsync(string email);
+
+        /// <summary>Returns false if the user cancelled the Google sign-in screen.</summary>
+        Task<bool> SignInWithGoogleAsync();
+
         Task LogoutAsync();
         Task<UserDto?> GetCurrentUserAsync();
     }

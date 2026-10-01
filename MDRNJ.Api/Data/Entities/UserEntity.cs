@@ -8,10 +8,20 @@ namespace MDRNJ.Api.Data.Entities
         public Guid UserId { get; set; } = Guid.NewGuid();
         public string Email { get; set; } = null!;
         public string Username { get; set; } = null!;
-        public string PasswordHash { get; set; } = null!;
+        public string? PasswordHash { get; set; }   // null for Google-only accounts
         public string? AvatarUrl { get; set; }
         public DateTime DateJoined { get; set; } = DateTime.UtcNow;
         public bool IsAdmin { get; set; } = false;
+
+        // Email verification
+        public bool EmailVerified { get; set; } = false;
+        public string? VerificationCodeHash { get; set; }
+        public DateTime? VerificationCodeExpiresAt { get; set; }
+        public DateTime? VerificationCodeSentAt { get; set; }
+        public int VerificationAttempts { get; set; }
+
+        // External login
+        public string? GoogleId { get; set; }
 
         // Navigation
         public UserProfileEntity? Profile { get; set; }

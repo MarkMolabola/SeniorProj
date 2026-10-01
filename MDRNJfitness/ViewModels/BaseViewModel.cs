@@ -23,7 +23,7 @@ namespace MDRNJfitness.ViewModels
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+                await Shell.Current.DisplayAlertAsync("Error", ex.Message, "OK");
             }
             finally
             {
