@@ -10,6 +10,9 @@ namespace MDRNJ.Api.Data.Entities
         public int XPReward { get; set; }
         public ChallengeType QuestType { get; set; }
         public float TargetValue { get; set; }
+
+        /// <summary>Only workouts of this type count; null means any workout.</summary>
+        public WorkoutType? WorkoutType { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public bool IsActive { get; set; } = true;

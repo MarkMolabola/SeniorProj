@@ -29,21 +29,8 @@
                     <Border Style="{StaticResource PxSunken}" Padding="10,0">
                         <Picker Style="{StaticResource PxPicker}"
                                 Title="Workout type"
-                                SelectedItem="{Binding WorkoutType}">
-                            <Picker.Items>
-                                <x:String>Running</x:String>
-                                <x:String>Weightlifting</x:String>
-                                <x:String>Cycling</x:String>
-                                <x:String>Swimming</x:String>
-                                <x:String>HIIT</x:String>
-                                <x:String>Yoga</x:String>
-                                <x:String>Boxing</x:String>
-                                <x:String>Hiking</x:String>
-                                <x:String>Rowing</x:String>
-                                <x:String>Basketball</x:String>
-                                <x:String>Other</x:String>
-                            </Picker.Items>
-                        </Picker>
+                                ItemsSource="{Binding WorkoutTypes}"
+                                SelectedItem="{Binding WorkoutType}" />
                     </Border>
 
                     <Button Style="{StaticResource PxButton}"

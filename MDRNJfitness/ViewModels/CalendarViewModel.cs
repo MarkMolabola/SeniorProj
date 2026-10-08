@@ -26,11 +26,7 @@ namespace MDRNJfitness.ViewModels
         [ObservableProperty] private TimeSpan _backlogTime = TimeSpan.FromHours(8);
         [ObservableProperty] private int _backlogDuration = 30;
 
-        public List<string> WorkoutTypes { get; } = new()
-        {
-            "Running", "Weightlifting", "Cycling", "Swimming",
-            "HIIT", "Yoga", "Boxing", "Hiking", "Rowing", "Basketball", "Other"
-        };
+        public IReadOnlyList<string> WorkoutTypes { get; } = MDRNJ.Shared.Game.WorkoutTypes.SelectableNames;
 
         // Badge state — recalculated after every load
         [ObservableProperty]

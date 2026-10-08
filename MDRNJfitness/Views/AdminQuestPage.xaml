@@ -55,6 +55,15 @@
                                 SelectedItem="{Binding FormQuestType}" />
                     </Border>
 
+                    <Label Style="{StaticResource PxCaption}" Text="WORKOUT TYPE" />
+                    <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                        <Picker Style="{StaticResource PxPicker}"
+                                ItemsSource="{Binding WorkoutTypes}"
+                                SelectedItem="{Binding FormWorkoutType}" />
+                    </Border>
+                    <Label Style="{StaticResource PxMuted}" FontSize="17"
+                           Text="Only workouts of this type count. Players pick from the same list on the Train tab." />
+
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="12" RowDefinitions="Auto,Auto" RowSpacing="10">
                         <Label Grid.Column="0" Style="{StaticResource PxCaption}" Text="XP REWARD" />
                         <Label Grid.Column="1" Style="{StaticResource PxCaption}" Text="TARGET" />
@@ -123,6 +132,8 @@
                                         <Label.FormattedText>
                                             <FormattedString>
                                                 <Span Text="{Binding QuestType}" />
+                                                <Span Text=" · " />
+                                                <Span Text="{Binding WorkoutType}" />
                                                 <Span Text=" · target " />
                                                 <Span Text="{Binding TargetValue, StringFormat='{0:0.#}'}" />
                                                 <Span Text=" · " />

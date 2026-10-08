@@ -6,14 +6,13 @@ using MDRNJ.Shared.Game;
 using MDRNJfitness.Helpers.Sprites;
 using MDRNJfitness.Models.Character;
 using MDRNJfitness.Services.Interfaces;
+using MDRNJfitness.Views;
 using System.Collections.ObjectModel;
 
 namespace MDRNJfitness.ViewModels
 {
     public partial class CharacterViewModel : BaseViewModel
     {
-        private const string RemoveOption = "Take it off";
-
         private readonly ICharacterService _character;
         private readonly IGearService _gear;
         private List<string> _owned = new();
@@ -22,7 +21,6 @@ namespace MDRNJfitness.ViewModels
         [ObservableProperty] private ActivityScoreDto? _activityScore;
         [ObservableProperty] private string _avatarId = HeroAvatars.Classic;
         [ObservableProperty] private IReadOnlyList<string> _heroGear = Array.Empty<string>();
-        [ObservableProperty] private bool _isCustomizing;
 
         /// <summary>Worn gear that has no art for the current hero yet (so it isn't drawn).</summary>
         [ObservableProperty] private bool _hasHiddenGear;
@@ -39,6 +37,13 @@ namespace MDRNJfitness.ViewModels
 
         public ObservableCollection<GearSlotCard> GearSlots { get; } =
             new(GearCatalog.DisplayOrder.Select(s => new GearSlotCard(s)));
+
+        // ── Gear pop-up: owned items for the tapped slot ──
+        private GearSlotCard? _pickerSlot;
+        public ObservableCollection<CollectionCard> SlotChoices { get; } = new();
+        [ObservableProperty] private string _pickerTitle = string.Empty;
+        [ObservableProperty] private bool _hasSlotChoices;
+        [ObservableProperty] private bool _pickerSlotHasItem;
 
         public CharacterViewModel(ICharacterService character, IGearService gear)
         {
@@ -79,42 +84,65 @@ namespace MDRNJfitness.ViewModels
             }
         }
 
+        /// <summary>CUSTOMIZE: pop-up grid of hero looks.</summary>
         [RelayCommand]
-        public void ToggleCustomize() => IsCustomizing = !IsCustomizing;
+        public Task OpenCustomizeAsync() =>
+            Shell.Current.Navigation.PushModalAsync(new AvatarPickerPage(this));
 
         [RelayCommand]
         public async Task SelectAvatarAsync(HeroAvatarOption option)
         {
-            if (option.Id == AvatarId) return;
-
-            await RunSafeAsync(async () => Show(await _character.SetAvatarAsync(option.Id)));
+            if (option.Id != AvatarId)
+                await RunSafeAsync(async () => Show(await _character.SetAvatarAsync(option.Id)));
+            await ClosePopupAsync();
         }
 
-        /// <summary>Pick which owned item to wear in a slot (or take the current one off).</summary>
+        /// <summary>Gear slot tapped: pop-up of the owned items for that category.</summary>
         [RelayCommand]
-        public async Task ChooseGearAsync(GearSlotCard slot)
+        public Task ChooseGearAsync(GearSlotCard slot)
         {
-            var choices = GearCatalog.All
-                .Where(i => i.Slot == slot.Slot && _owned.Contains(i.Id))
-                .ToList();
+            _pickerSlot = slot;
+            PickerTitle = slot.Label;
+            PickerSlotHasItem = slot.ItemId is not null;
 
-            if (choices.Count == 0)
-            {
-                await Shell.Current.DisplayAlertAsync($"No {slot.Label.ToLowerInvariant()} gear yet",
-                    "Buy gear in the Shop on the Home tab, then equip it here.", "OK");
-                return;
-            }
+            SlotChoices.Clear();
+            foreach (var item in GearCatalog.All.Where(i => i.Slot == slot.Slot && _owned.Contains(i.Id)))
+                SlotChoices.Add(new CollectionCard(item) { Equipped = item.Id == slot.ItemId });
+            HasSlotChoices = SlotChoices.Count > 0;
 
-            var names = choices.Select(i => i.Id == slot.ItemId ? $"{i.Name} (wearing)" : i.Name).ToList();
-            if (slot.ItemId is not null) names.Add(RemoveOption);
+            return Shell.Current.Navigation.PushModalAsync(new GearPickerPage(this));
+        }
 
-            var picked = await Shell.Current.DisplayActionSheetAsync(slot.Label, "Cancel", null, names.ToArray());
-            if (picked is null || picked == "Cancel") return;
+        /// <summary>Tap an item: wear it, or take it off if it's already worn.</summary>
+        [RelayCommand]
+        public async Task WearChoiceAsync(CollectionCard card)
+        {
+            if (_pickerSlot is null) return;
+            var itemId = card.Equipped ? null : card.Item.Id;
+            await RunSafeAsync(async () => ShowInventory(await _gear.EquipAsync(_pickerSlot.Slot, itemId)));
+            await ClosePopupAsync();
+        }
 
-            var itemId = picked == RemoveOption ? null : choices[names.IndexOf(picked)].Id;
-            if (itemId == slot.ItemId) return;
+        [RelayCommand]
+        public async Task TakeOffAsync()
+        {
+            if (_pickerSlot is null) return;
+            await RunSafeAsync(async () => ShowInventory(await _gear.EquipAsync(_pickerSlot.Slot, null)));
+            await ClosePopupAsync();
+        }
 
-            await RunSafeAsync(async () => ShowInventory(await _gear.EquipAsync(slot.Slot, itemId)));
+        [RelayCommand]
+        public async Task VisitShopAsync()
+        {
+            await ClosePopupAsync();
+            await Shell.Current.GoToAsync("//ShopPage");
+        }
+
+        [RelayCommand]
+        public async Task ClosePopupAsync()
+        {
+            if (Shell.Current.Navigation.ModalStack.Count > 0)
+                await Shell.Current.Navigation.PopModalAsync();
         }
     }
 }

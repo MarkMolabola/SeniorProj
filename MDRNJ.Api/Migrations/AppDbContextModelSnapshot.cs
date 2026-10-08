@@ -384,6 +384,9 @@ namespace MDRNJ.Api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("WorkoutType")
+                        .HasColumnType("int");
+
                     b.Property<int>("XPReward")
                         .HasColumnType("int");
 

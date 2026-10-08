@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Gear slot pop-up: the player's Collection items for one category.
+    Tap to wear (tap the worn one to take it off). BindingContext is the Hero tab's CharacterViewModel.
+-->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             xmlns:local="clr-namespace:MDRNJfitness.Views"
+             xmlns:vm="clr-namespace:MDRNJfitness.ViewModels"
+             x:Class="MDRNJfitness.Views.GearPickerPage"
+             ios:Page.ModalPresentationStyle="OverFullScreen"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#E60B0918">
+
+    <Grid Padding="24,40">
+        <Border Style="{StaticResource PxPanel}" Padding="14,16" VerticalOptions="Center">
+            <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Style="{StaticResource PxHeading}" Text="{Binding PickerTitle}" VerticalOptions="Center" />
+                    <Button Grid.Column="1" Style="{StaticResource PxButtonSecondary}" Text="✕"
+                            Command="{Binding ClosePopupCommand}" />
+                </Grid>
+
+                <Label Grid.Row="1" Style="{StaticResource PxMuted}" FontSize="17"
+                       Text="Tap an item to wear it. Tap the one you're wearing to take it off." />
+
+                <!-- Owned items for this slot -->
+                <CollectionView Grid.Row="2"
+                                ItemsSource="{Binding SlotChoices}"
+                                SelectionMode="None"
+                                MaximumHeightRequest="380"
+                                IsVisible="{Binding HasSlotChoices}">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="8" VerticalItemSpacing="8" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource PxSunken}" Padding="6,8">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding Equipped}" Value="True">
+                                        <Setter Property="Stroke" Value="{StaticResource PxGold}" />
+                                        <Setter Property="StrokeThickness" Value="3" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CharacterViewModel}}, Path=WearChoiceCommand}"
+                                        CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+
+                                <VerticalStackLayout Spacing="4">
+                                    <local:GearIconView ItemId="{Binding Item.Id}" HeightRequest="56" />
+                                    <Label Style="{StaticResource PxBody}" FontSize="16" Text="{Binding Item.Name}"
+                                           HorizontalTextAlignment="Center" LineBreakMode="TailTruncation" MaxLines="2" />
+                                    <Label Style="{StaticResource PxCaption}" FontSize="7" Text="WEARING"
+                                           TextColor="{StaticResource PxGold}" HorizontalOptions="Center"
+                                           IsVisible="{Binding Equipped}" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Nothing owned in this category yet -->
+                <Border Grid.Row="2" Style="{StaticResource PxSunken}" Padding="14,18">
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding HasSlotChoices}" Value="True">
+                            <Setter Property="IsVisible" Value="False" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Label Style="{StaticResource PxMuted}" HorizontalTextAlignment="Center"
+                           Text="You don't own anything for this slot yet. Pick something up in the Shop!" />
+                </Border>
+
+                <Grid Grid.Row="3" ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Button Grid.Column="0" Style="{StaticResource PxButtonSecondary}" Text="TAKE OFF"
+                            Command="{Binding TakeOffCommand}"
+                            IsEnabled="{Binding PickerSlotHasItem}" />
+                    <Button Grid.Column="1" Style="{StaticResource PxButton}" FontSize="10" Padding="12,10"
+                            MinimumHeightRequest="44" Text="SHOP"
+                            Command="{Binding VisitShopCommand}" />
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>

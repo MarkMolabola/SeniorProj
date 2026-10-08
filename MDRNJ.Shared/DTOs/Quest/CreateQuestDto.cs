@@ -20,6 +20,10 @@ namespace MDRNJ.Shared.DTOs.Quest
         [Range(0, float.MaxValue)]
         public float TargetValue { get; set; }
 
+        /// <summary>Only this workout type counts toward the quest (a WorkoutTypes name), or "Any".</summary>
+        [MaxLength(30)]
+        public string? WorkoutType { get; set; }
+
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
     }

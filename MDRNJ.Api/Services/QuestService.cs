@@ -4,6 +4,7 @@ using MDRNJ.Api.Services.Interfaces;
 using MDRNJ.Shared.DTOs.Game;
 using MDRNJ.Shared.DTOs.Quest;
 using MDRNJ.Shared.Enums;
+using MDRNJ.Shared.Game;
 using Microsoft.EntityFrameworkCore;
 
 namespace MDRNJ.Api.Services
@@ -25,6 +26,8 @@ namespace MDRNJ.Api.Services
         {
             if (!Enum.TryParse<ChallengeType>(dto.QuestType, true, out var questType))
                 throw new ArgumentException($"Unknown quest type: {dto.QuestType}");
+            if (!WorkoutTypes.TryParseQuestFilter(dto.WorkoutType, out var workoutType))
+                throw new ArgumentException($"Unknown workout type: {dto.WorkoutType}");
 
             var quest = new QuestEntity
             {
@@ -32,6 +35,7 @@ namespace MDRNJ.Api.Services
                 Description = dto.Description,
                 XPReward = dto.XPReward,
                 QuestType = questType,
+                WorkoutType = workoutType,
                 TargetValue = dto.TargetValue,
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate
@@ -56,6 +60,12 @@ namespace MDRNJ.Api.Services
             if (dto.StartDate.HasValue) quest.StartDate = dto.StartDate;
             if (dto.EndDate.HasValue) quest.EndDate = dto.EndDate;
             if (dto.IsActive.HasValue) quest.IsActive = dto.IsActive.Value;
+            if (dto.WorkoutType is not null)
+            {
+                if (!WorkoutTypes.TryParseQuestFilter(dto.WorkoutType, out var workoutType))
+                    throw new ArgumentException($"Unknown workout type: {dto.WorkoutType}");
+                quest.WorkoutType = workoutType;
+            }
             if (dto.QuestType is not null)
             {
                 if (!Enum.TryParse<ChallengeType>(dto.QuestType, true, out var questType))
@@ -185,6 +195,7 @@ namespace MDRNJ.Api.Services
             Description = q.Description,
             XPReward = q.XPReward,
             QuestType = q.QuestType.ToString(),
+            WorkoutType = q.WorkoutType?.ToString() ?? WorkoutTypes.Any,
             TargetValue = q.TargetValue,
             StartDate = q.StartDate,
             EndDate = q.EndDate,
@@ -200,6 +211,7 @@ namespace MDRNJ.Api.Services
             Description = uq.Quest.Description,
             XPReward = uq.Quest.XPReward,
             QuestType = uq.Quest.QuestType.ToString(),
+            WorkoutType = uq.Quest.WorkoutType?.ToString() ?? WorkoutTypes.Any,
             TargetValue = uq.Quest.TargetValue,
             Progress = uq.Progress,
             Status = uq.Status.ToString(),

@@ -53,6 +53,15 @@
                                 </Grid>
 
                                 <Label Style="{StaticResource PxMuted}" Text="{Binding Description}" />
+                                <Label Style="{StaticResource PxBody}" FontSize="19" TextColor="{StaticResource PxOrange}"
+                                       Text="{Binding WorkoutType, StringFormat='Counts: {0} workouts only'}">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding WorkoutType}" Value="Any">
+                                            <Setter Property="Text" Value="Counts: any workout" />
+                                            <Setter Property="TextColor" Value="{StaticResource PxTextMuted}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
 
                                 <controls:XPBarControl HeightRequest="14"
                                                        FillColor="{StaticResource PxTeal}"

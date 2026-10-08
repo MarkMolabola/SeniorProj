@@ -68,6 +68,7 @@ namespace MDRNJ.Api.Services
             {
                 var quest = uq.Quest;
                 if (!InWindow(when, quest.StartDate, quest.EndDate)) continue;
+                if (quest.WorkoutType is { } required && required != session.WorkoutType) continue;
 
                 uq.Progress = Advance(uq.Progress, quest.QuestType, session, stats);
                 if (uq.Progress < quest.TargetValue) continue;

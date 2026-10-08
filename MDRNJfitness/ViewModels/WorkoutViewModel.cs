@@ -18,6 +18,8 @@ namespace MDRNJfitness.ViewModels
 
         public ObservableCollection<WorkoutDto> History { get; } = new();
 
+        public IReadOnlyList<string> WorkoutTypes { get; } = MDRNJ.Shared.Game.WorkoutTypes.SelectableNames;
+
         private IDispatcherTimer? _stopwatchTimer;
         private DateTime _workoutStartedAt;
 

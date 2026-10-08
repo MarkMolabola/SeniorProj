@@ -17,6 +17,7 @@ namespace MDRNJfitness.ViewModels
         [ObservableProperty] private string _formDescription = string.Empty;
         [ObservableProperty] private string _formXPReward = string.Empty;
         [ObservableProperty] private string _formQuestType = "WorkoutCount";
+        [ObservableProperty] private string _formWorkoutType = AnyWorkout;
         [ObservableProperty] private string _formTargetValue = string.Empty;
         [ObservableProperty] private DateTime _formStartDate = DateTime.Today;
         [ObservableProperty] private DateTime _formEndDate = DateTime.Today.AddDays(7);
@@ -28,6 +29,11 @@ namespace MDRNJfitness.ViewModels
         {
             "WorkoutCount", "Distance", "Streak", "XPRace"
         };
+
+        /// <summary>"Any" plus exactly the types players can pick on the Train tab.</summary>
+        private const string AnyWorkout = MDRNJ.Shared.Game.WorkoutTypes.Any;
+        public List<string> WorkoutTypes { get; } =
+            new[] { AnyWorkout }.Concat(MDRNJ.Shared.Game.WorkoutTypes.SelectableNames).ToList();
 
         public AdminQuestViewModel(IQuestService quests)
         {
@@ -66,6 +72,7 @@ namespace MDRNJfitness.ViewModels
                         Description = string.IsNullOrWhiteSpace(FormDescription) ? null : FormDescription,
                         XPReward = xp,
                         QuestType = FormQuestType,
+                        WorkoutType = FormWorkoutType,
                         TargetValue = target,
                         StartDate = FormStartDate,
                         EndDate = FormEndDate
@@ -82,6 +89,7 @@ namespace MDRNJfitness.ViewModels
                         Description = string.IsNullOrWhiteSpace(FormDescription) ? null : FormDescription,
                         XPReward = xp,
                         QuestType = FormQuestType,
+                        WorkoutType = FormWorkoutType,
                         TargetValue = target,
                         StartDate = FormStartDate,
                         EndDate = FormEndDate
@@ -102,6 +110,7 @@ namespace MDRNJfitness.ViewModels
             FormDescription = quest.Description ?? string.Empty;
             FormXPReward = quest.XPReward.ToString();
             FormQuestType = quest.QuestType;
+            FormWorkoutType = quest.WorkoutType;
             FormTargetValue = quest.TargetValue.ToString();
             FormStartDate = quest.StartDate ?? DateTime.Today;
             FormEndDate = quest.EndDate ?? DateTime.Today.AddDays(7);
@@ -133,6 +142,7 @@ namespace MDRNJfitness.ViewModels
             FormDescription = string.Empty;
             FormXPReward = string.Empty;
             FormQuestType = "WorkoutCount";
+            FormWorkoutType = AnyWorkout;
             FormTargetValue = string.Empty;
             FormStartDate = DateTime.Today;
             FormEndDate = DateTime.Today.AddDays(7);

@@ -8,6 +8,9 @@
         public int XPReward { get; set; }
         public string QuestType { get; set; } = null!;
         public float TargetValue { get; set; }
+
+        /// <summary>Only this workout type counts toward the quest (a WorkoutTypes name), or "Any".</summary>
+        public string WorkoutType { get; set; } = "Any";
         public float Progress { get; set; }
         public string Status { get; set; } = null!;
         public DateTime? StartDate { get; set; }

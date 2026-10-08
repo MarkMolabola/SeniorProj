@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- CUSTOMIZE pop-up: tap a hero to equip it. BindingContext is the Hero tab's CharacterViewModel. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             xmlns:local="clr-namespace:MDRNJfitness.Views"
+             xmlns:vm="clr-namespace:MDRNJfitness.ViewModels"
+             x:Class="MDRNJfitness.Views.AvatarPickerPage"
+             ios:Page.ModalPresentationStyle="OverFullScreen"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#E60B0918">
+
+    <Grid Padding="16,40">
+        <Border Style="{StaticResource PxPanel}" Padding="14,16" VerticalOptions="Center">
+            <Grid RowDefinitions="Auto,Auto,*" RowSpacing="12">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Style="{StaticResource PxHeading}" Text="CHOOSE YOUR HERO" VerticalOptions="Center" />
+                    <Button Grid.Column="1" Style="{StaticResource PxButtonSecondary}" Text="✕"
+                            Command="{Binding ClosePopupCommand}" />
+                </Grid>
+
+                <Label Grid.Row="1" Style="{StaticResource PxMuted}" FontSize="17"
+                       Text="Looks are cosmetic: stats and progress stay the same. The Classic Hero's outfit changes as you train." />
+
+                <CollectionView Grid.Row="2"
+                                ItemsSource="{Binding AvatarOptions}"
+                                SelectionMode="None"
+                                MaximumHeightRequest="520">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="8" VerticalItemSpacing="8" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource PxSunken}" Padding="6,8">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="Stroke" Value="{StaticResource PxGold}" />
+                                        <Setter Property="StrokeThickness" Value="3" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CharacterViewModel}}, Path=SelectAvatarCommand}"
+                                        CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+
+                                <VerticalStackLayout Spacing="4">
+                                    <local:PixelAvatarView AvatarId="{Binding Id}"
+                                                           AvatarType="{Binding PreviewOutfit}"
+                                                           Gear="{Binding PreviewGear}"
+                                                           WidthRequest="64"
+                                                           HeightRequest="64"
+                                                           HorizontalOptions="Center" />
+                                    <Label Style="{StaticResource PxBody}" FontSize="16" Text="{Binding Name}"
+                                           HorizontalTextAlignment="Center" LineBreakMode="TailTruncation" />
+                                    <Label Style="{StaticResource PxCaption}" FontSize="7" Text="EQUIPPED"
+                                           TextColor="{StaticResource PxGold}" HorizontalOptions="Center"
+                                           IsVisible="{Binding IsSelected}" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>
