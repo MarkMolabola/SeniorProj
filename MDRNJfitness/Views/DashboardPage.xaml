@@ -26,8 +26,12 @@
                     </Label.FormattedText>
                 </Label>
                 <Border Grid.Column="1" Style="{StaticResource PxChip}" BackgroundColor="{StaticResource PxPanel}" Padding="10,2">
-                    <Label Style="{StaticResource PxBody}"
-                           Text="{Binding Stats.CurrentStreak, StringFormat='🔥 {0}'}" />
+                    <HorizontalStackLayout Spacing="6">
+                        <Image Source="icon_flame.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                        <Label Style="{StaticResource PxBody}"
+                               Text="{Binding Stats.CurrentStreak}"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
                 </Border>
             </Grid>
 

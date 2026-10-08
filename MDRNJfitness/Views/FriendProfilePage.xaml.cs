@@ -9,4 +9,8 @@ public partial class FriendProfilePage : ContentPage
         InitializeComponent();
         BindingContext = vm;
     }
+
+    // The pixel theme hides the nav bar, so pushed pages provide their own back button
+    private async void OnBackClicked(object? sender, EventArgs e) =>
+        await Shell.Current.GoToAsync("..");
 }

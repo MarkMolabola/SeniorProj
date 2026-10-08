@@ -147,6 +147,22 @@
         <Setter Property="MinimumHeightRequest" Value="44" />
     </Style>
 
+    <!-- Destructive actions (log out, remove friend) -->
+    <Style x:Key="PxButtonDanger" TargetType="Button" BasedOn="{StaticResource PxButton}">
+        <Setter Property="TextColor" Value="{StaticResource PxInk}" />
+        <Setter Property="BackgroundColor" Value="{StaticResource PxStr}" />
+    </Style>
+
+    <!-- Text-only button for secondary actions ("Need an account?") -->
+    <Style x:Key="PxLinkButton" TargetType="Button">
+        <Setter Property="FontFamily" Value="PixelBody" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="TextColor" Value="{StaticResource PxTeal}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="BorderWidth" Value="0" />
+        <Setter Property="Padding" Value="8,4" />
+    </Style>
+
     <!-- ── Inputs (place inside a PxSunken border) ───────────────────────── -->
     <Style x:Key="PxEntry" TargetType="Entry">
         <Setter Property="FontFamily" Value="PixelBody" />

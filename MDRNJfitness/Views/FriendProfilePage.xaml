@@ -1,125 +1,110 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- A friend's hero, stats and recent training. -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MDRNJfitness.Views"
              x:Class="MDRNJfitness.Views.FriendProfilePage"
              Title="{Binding Title}"
-             BackgroundColor="#F4FFF7">
+             Style="{StaticResource PxPage}">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="18">
+        <VerticalStackLayout Padding="20,16,20,32" Spacing="20">
 
-            <!-- Avatar + name + sport -->
-            <Border BackgroundColor="White"
-                    Stroke="#D9EAD3"
-                    StrokeShape="RoundRectangle 18"
-                    Padding="24">
-                <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
-                    <local:PixelAvatarView AvatarType="{Binding Profile.SpriteState}"
-                                           HorizontalOptions="Center" />
-                    <Label Text="{Binding Profile.Username}"
-                           FontSize="22"
-                           FontAttributes="Bold"
-                           TextColor="#1F2937"
+            <Button Style="{StaticResource PxButtonSecondary}"
+                    Text="◀ BACK"
+                    HorizontalOptions="Start"
+                    Clicked="OnBackClicked" />
+
+            <!-- ── Hero card ───────────────────────────────────────── -->
+            <Border Style="{StaticResource PxPanel}">
+                <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                    <Border Style="{StaticResource PxSunken}" HorizontalOptions="Center" Padding="8">
+                        <local:PixelAvatarView AvatarType="{Binding Profile.SpriteState}"
+                                               WidthRequest="128" HeightRequest="128" />
+                    </Border>
+                    <Label Style="{StaticResource PxHeading}"
+                           Text="{Binding Profile.Username}"
+                           TextTransform="Uppercase"
                            HorizontalOptions="Center" />
-                    <Label Text="{Binding Profile.DominantSport, StringFormat='Dominant: {0}'}"
-                           FontSize="13"
-                           TextColor="#6B7280"
+                    <Label Style="{StaticResource PxMuted}"
+                           Text="{Binding Profile.DominantSport, StringFormat='Main training: {0}'}"
                            HorizontalOptions="Center" />
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Stats row -->
+            <!-- ── Stats ───────────────────────────────────────────── -->
             <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
-                <Border Grid.Column="0" BackgroundColor="White" Stroke="#D9EAD3" StrokeShape="RoundRectangle 14" Padding="10">
+                <Border Grid.Column="0" Style="{StaticResource PxSunken}" Padding="4,10">
                     <VerticalStackLayout HorizontalOptions="Center">
-                        <Label Text="{Binding Profile.CurrentLevel}"
-                               FontSize="20" FontAttributes="Bold" TextColor="#2563EB" HorizontalOptions="Center" />
-                        <Label Text="Level" FontSize="11" TextColor="#6B7280" HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxStatValue}" FontSize="28" Text="{Binding Profile.CurrentLevel}"
+                               TextColor="{StaticResource PxGold}" HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxCaption}" Text="LV" HorizontalOptions="Center" />
                     </VerticalStackLayout>
                 </Border>
-                <Border Grid.Column="1" BackgroundColor="White" Stroke="#D9EAD3" StrokeShape="RoundRectangle 14" Padding="10">
+                <Border Grid.Column="1" Style="{StaticResource PxSunken}" Padding="4,10">
                     <VerticalStackLayout HorizontalOptions="Center">
-                        <Label Text="{Binding Profile.TotalXP}"
-                               FontSize="20" FontAttributes="Bold" TextColor="#F97316" HorizontalOptions="Center" />
-                        <Label Text="XP" FontSize="11" TextColor="#6B7280" HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxStatValue}" FontSize="28" Text="{Binding Profile.TotalXP}"
+                               TextColor="{StaticResource PxTeal}" HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxCaption}" Text="XP" HorizontalOptions="Center" />
                     </VerticalStackLayout>
                 </Border>
-                <Border Grid.Column="2" BackgroundColor="White" Stroke="#D9EAD3" StrokeShape="RoundRectangle 14" Padding="10">
+                <Border Grid.Column="2" Style="{StaticResource PxSunken}" Padding="4,10">
                     <VerticalStackLayout HorizontalOptions="Center">
-                        <Label Text="{Binding Profile.TotalWorkouts}"
-                               FontSize="20" FontAttributes="Bold" TextColor="#2563EB" HorizontalOptions="Center" />
-                        <Label Text="Workouts" FontSize="11" TextColor="#6B7280" HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxStatValue}" FontSize="28" Text="{Binding Profile.TotalWorkouts}"
+                               HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxCaption}" Text="SESSIONS" HorizontalOptions="Center" />
                     </VerticalStackLayout>
                 </Border>
-                <Border Grid.Column="3" BackgroundColor="White" Stroke="#D9EAD3" StrokeShape="RoundRectangle 14" Padding="10">
+                <Border Grid.Column="3" Style="{StaticResource PxSunken}" Padding="4,10">
                     <VerticalStackLayout HorizontalOptions="Center">
-                        <Label Text="{Binding Profile.CurrentStreak}"
-                               FontSize="20" FontAttributes="Bold" TextColor="#16A34A" HorizontalOptions="Center" />
-                        <Label Text="Streak" FontSize="11" TextColor="#6B7280" HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxStatValue}" FontSize="28" Text="{Binding Profile.CurrentStreak}"
+                               TextColor="{StaticResource PxOrange}" HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxCaption}" Text="STREAK" HorizontalOptions="Center" />
                     </VerticalStackLayout>
                 </Border>
             </Grid>
 
-            <!-- Recent workouts -->
-            <Border BackgroundColor="White"
-                    Stroke="#D9EAD3"
-                    StrokeShape="RoundRectangle 16"
-                    Padding="14">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Recent Workouts"
-                           FontSize="20"
-                           FontAttributes="Bold"
-                           TextColor="#1F2937" />
-
-                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding RecentWorkouts}">
-                        <BindableLayout.EmptyView>
-                            <Label Text="No workouts recorded yet."
-                                   FontSize="13"
-                                   TextColor="#6B7280" />
-                        </BindableLayout.EmptyView>
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate>
-                                <Border BackgroundColor="#F9FAFB"
-                                        Stroke="#E5E7EB"
-                                        StrokeShape="RoundRectangle 12"
-                                        Padding="12"
-                                        Margin="0,0,0,8">
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <VerticalStackLayout Grid.Column="0" Spacing="2">
-                                            <Label Text="{Binding WorkoutType}"
-                                                   FontAttributes="Bold"
-                                                   FontSize="15"
-                                                   TextColor="#2563EB" />
-                                            <Label Text="{Binding StartTime, StringFormat='{0:MMM d, yyyy}'}"
-                                                   FontSize="12"
-                                                   TextColor="#6B7280" />
-                                            <Label Text="{Binding DurationMins, StringFormat='{0} mins'}"
-                                                   FontSize="12"
-                                                   TextColor="#6B7280" />
-                                        </VerticalStackLayout>
-                                        <Label Grid.Column="1"
-                                               Text="{Binding XPAwarded, StringFormat='+{0} XP'}"
-                                               FontAttributes="Bold"
-                                               FontSize="14"
-                                               TextColor="#16A34A"
-                                               VerticalOptions="Center" />
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
-                    </VerticalStackLayout>
+            <!-- ── Recent training ─────────────────────────────────── -->
+            <VerticalStackLayout Spacing="12">
+                <Label Style="{StaticResource PxCaption}" Text="RECENT SESSIONS" />
+                <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding RecentWorkouts}">
+                    <BindableLayout.EmptyView>
+                        <Border Style="{StaticResource PxPanel}">
+                            <Label Style="{StaticResource PxMuted}" Text="No sessions recorded yet." />
+                        </Border>
+                    </BindableLayout.EmptyView>
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource PxPanel}" Padding="16,12">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                        <Label Style="{StaticResource PxBody}"
+                                               Text="{Binding WorkoutType}"
+                                               TextColor="{StaticResource PxTeal}" />
+                                        <Label Style="{StaticResource PxMuted}">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding StartTime, StringFormat='{0:MMM d}'}" />
+                                                    <Span Text=" · " />
+                                                    <Span Text="{Binding DurationMins, StringFormat='{0} min'}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1"
+                                           Style="{StaticResource PxXp}"
+                                           Text="{Binding XPAwarded, StringFormat='+{0} XP'}" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
-            </Border>
+            </VerticalStackLayout>
 
-            <!-- Remove friend -->
-            <Button Text="Remove Friend"
+            <Button Style="{StaticResource PxButtonDanger}"
+                    Text="REMOVE FRIEND"
                     Command="{Binding RemoveFriendCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    BackgroundColor="#EF4444"
-                    TextColor="White"
-                    CornerRadius="12"
-                    HeightRequest="50" />
+                    IsEnabled="{Binding IsNotBusy}" />
 
         </VerticalStackLayout>
     </ScrollView>

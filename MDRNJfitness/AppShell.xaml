@@ -13,52 +13,54 @@
         ContentTemplate="{DataTemplate views:LoginPage}"
         Shell.NavBarIsVisible="False" />
 
-    <!-- Main tabbed navigation -->
+    <!--
+        Main navigation: 5 bottom tabs. Tabs with several pages show them as
+        top sub-tabs. Page routes are unchanged, so //WorkoutPage etc. still work.
+    -->
     <TabBar>
-        <Tab Title="Dashboard">
+        <Tab Title="Home" Route="home" Icon="tab_home.png">
             <ShellContent
                 Route="DashboardPage"
                 ContentTemplate="{DataTemplate views:DashboardPage}" />
         </Tab>
-        <Tab Title="Workout">
+        <Tab Title="Train" Route="train" Icon="tab_train.png">
             <ShellContent
+                Title="Workout"
                 Route="WorkoutPage"
                 ContentTemplate="{DataTemplate views:WorkoutPage}" />
-        </Tab>
-        <Tab Title="Character">
             <ShellContent
-                Route="CharacterPage"
-                ContentTemplate="{DataTemplate views:CharacterPage}" />
-        </Tab>
-        <Tab Title="Challenges">
-            <ShellContent
-                Route="ChallengePage"
-                ContentTemplate="{DataTemplate views:ChallengePage}" />
-        </Tab>
-        <Tab Title="Leaderboard">
-            <ShellContent
-                Route="LeaderboardPage"
-                ContentTemplate="{DataTemplate views:LeaderboardPage}" />
-        </Tab>
-        <Tab Title="Friends">
-            <ShellContent
-                Route="FriendsPage"
-                ContentTemplate="{DataTemplate views:FriendsPage}" />
-        </Tab>
-        <Tab Title="Calendar">
-            <ShellContent
+                Title="Calendar"
                 Route="CalendarPage"
                 ContentTemplate="{DataTemplate views:CalendarPage}" />
         </Tab>
-        <Tab Title="Profile">
+        <Tab Title="Hero" Route="hero" Icon="tab_hero.png">
             <ShellContent
+                Title="Hero"
+                Route="CharacterPage"
+                ContentTemplate="{DataTemplate views:CharacterPage}" />
+            <ShellContent
+                Title="Profile"
                 Route="ProfilePage"
                 ContentTemplate="{DataTemplate views:ProfilePage}" />
         </Tab>
-        <Tab Title="Quests">
+        <Tab Title="Quests" Route="quests" Icon="tab_quests.png">
             <ShellContent
                 Route="QuestPage"
                 ContentTemplate="{DataTemplate views:QuestPage}" />
+        </Tab>
+        <Tab Title="Guild" Route="guild" Icon="tab_guild.png">
+            <ShellContent
+                Title="Duels"
+                Route="ChallengePage"
+                ContentTemplate="{DataTemplate views:ChallengePage}" />
+            <ShellContent
+                Title="Friends"
+                Route="FriendsPage"
+                ContentTemplate="{DataTemplate views:FriendsPage}" />
+            <ShellContent
+                Title="Ranks"
+                Route="LeaderboardPage"
+                ContentTemplate="{DataTemplate views:LeaderboardPage}" />
         </Tab>
     </TabBar>
 

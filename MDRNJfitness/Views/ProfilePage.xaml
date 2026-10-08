@@ -1,121 +1,65 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- Account details, body stats, and log out. -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MDRNJfitness.Views.ProfilePage"
              Title="{Binding Title}"
-             BackgroundColor="#F4FFF7">
+             Style="{StaticResource PxPage}">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="18">
+        <VerticalStackLayout Padding="20,24,20,32" Spacing="20">
 
-            <Label Text="Profile"
-                   FontSize="30"
-                   FontAttributes="Bold"
-                   TextColor="#1F2937" />
+            <Label Style="{StaticResource PxTitle}" Text="PROFILE" />
 
-            <!-- Avatar + name -->
-            <Border BackgroundColor="White"
-                    Stroke="#D9EAD3"
-                    StrokeShape="RoundRectangle 18"
-                    Padding="24">
-                <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
-                    <Ellipse Fill="#2563EB"
-                             WidthRequest="80" HeightRequest="80"
-                             HorizontalOptions="Center" />
-                    <Label Text="{Binding Profile.DisplayName}"
-                           FontSize="22"
-                           FontAttributes="Bold"
-                           TextColor="#1F2937"
-                           HorizontalOptions="Center" />
-                    <Label Text="{Binding CurrentUser.Username, StringFormat='@{0}'}"
-                           FontSize="14"
-                           TextColor="#6B7280"
-                           HorizontalOptions="Center" />
-                    <Label Text="{Binding Profile.Bio}"
-                           FontSize="13"
-                           TextColor="#4B5563"
-                           HorizontalOptions="Center"
-                           HorizontalTextAlignment="Center" />
+            <!-- ── Name card ───────────────────────────────────────── -->
+            <Border Style="{StaticResource PxPanel}">
+                <VerticalStackLayout Spacing="4">
+                    <Label Style="{StaticResource PxHeading}"
+                           Text="{Binding Profile.DisplayName}"
+                           TextTransform="Uppercase" />
+                    <Label Style="{StaticResource PxBody}"
+                           Text="{Binding CurrentUser.Username, StringFormat='@{0}'}"
+                           TextColor="{StaticResource PxTeal}" />
+                    <Label Style="{StaticResource PxMuted}" Text="{Binding Profile.Bio}" />
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Stats row -->
+            <!-- ── Stats ───────────────────────────────────────────── -->
             <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
-                <Border Grid.Column="0"
-                        BackgroundColor="White"
-                        Stroke="#D9EAD3"
-                        StrokeShape="RoundRectangle 16"
-                        Padding="12">
+                <Border Grid.Column="0" Style="{StaticResource PxSunken}" Padding="8,12">
                     <VerticalStackLayout HorizontalOptions="Center">
-                        <Label Text="{Binding Stats.CurrentLevel}"
-                               FontSize="22"
-                               FontAttributes="Bold"
-                               TextColor="#2563EB"
-                               HorizontalOptions="Center" />
-                        <Label Text="Level"
-                               FontSize="11"
-                               TextColor="#6B7280"
-                               HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxStatValue}" Text="{Binding Stats.CurrentLevel}"
+                               TextColor="{StaticResource PxGold}" HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxCaption}" Text="LEVEL" HorizontalOptions="Center" />
                     </VerticalStackLayout>
                 </Border>
-                <Border Grid.Column="1"
-                        BackgroundColor="White"
-                        Stroke="#D9EAD3"
-                        StrokeShape="RoundRectangle 16"
-                        Padding="12">
+                <Border Grid.Column="1" Style="{StaticResource PxSunken}" Padding="8,12">
                     <VerticalStackLayout HorizontalOptions="Center">
-                        <Label Text="{Binding Stats.TotalXP}"
-                               FontSize="22"
-                               FontAttributes="Bold"
-                               TextColor="#F97316"
-                               HorizontalOptions="Center" />
-                        <Label Text="Total XP"
-                               FontSize="11"
-                               TextColor="#6B7280"
-                               HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxStatValue}" Text="{Binding Stats.TotalXP}"
+                               TextColor="{StaticResource PxTeal}" HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxCaption}" Text="TOTAL XP" HorizontalOptions="Center" />
                     </VerticalStackLayout>
                 </Border>
-                <Border Grid.Column="2"
-                        BackgroundColor="White"
-                        Stroke="#D9EAD3"
-                        StrokeShape="RoundRectangle 16"
-                        Padding="12">
+                <Border Grid.Column="2" Style="{StaticResource PxSunken}" Padding="8,12">
                     <VerticalStackLayout HorizontalOptions="Center">
-                        <Label Text="{Binding Stats.CurrentStreak}"
-                               FontSize="22"
-                               FontAttributes="Bold"
-                               TextColor="#16A34A"
-                               HorizontalOptions="Center" />
-                        <Label Text="Streak"
-                               FontSize="11"
-                               TextColor="#6B7280"
-                               HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxStatValue}" Text="{Binding Stats.CurrentStreak}"
+                               TextColor="{StaticResource PxOrange}" HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxCaption}" Text="STREAK" HorizontalOptions="Center" />
                     </VerticalStackLayout>
                 </Border>
             </Grid>
 
-            <!-- Profile details -->
-            <Border BackgroundColor="White"
-                    Stroke="#D9EAD3"
-                    StrokeShape="RoundRectangle 16"
-                    Padding="16">
+            <!-- ── Details ─────────────────────────────────────────── -->
+            <Border Style="{StaticResource PxPanel}">
                 <VerticalStackLayout Spacing="12">
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Grid.Column="0"
-                               Text="Details"
-                               FontSize="20"
-                               FontAttributes="Bold"
-                               TextColor="#1F2937" />
+                        <Label Grid.Column="0" Style="{StaticResource PxHeading}" Text="DETAILS" VerticalOptions="Center" />
                         <Button Grid.Column="1"
-                                Text="Edit"
+                                Style="{StaticResource PxButtonSecondary}"
+                                Text="EDIT"
                                 Command="{Binding StartEditCommand}"
-                                IsVisible="{Binding IsNotEditing}"
-                                BackgroundColor="#2563EB"
-                                TextColor="White"
-                                CornerRadius="8"
-                                Padding="14,4"
-                                HeightRequest="34" />
+                                IsVisible="{Binding IsNotEditing}" />
                     </Grid>
 
                     <!-- Read view -->
@@ -123,60 +67,54 @@
                           RowDefinitions="Auto,Auto,Auto"
                           RowSpacing="8"
                           IsVisible="{Binding IsNotEditing}">
-                        <Label Grid.Row="0" Grid.Column="0" Text="Fitness Goal" FontSize="13" TextColor="#6B7280" />
-                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Profile.FitnessGoal}" FontAttributes="Bold" TextColor="#1F2937" />
-                        <Label Grid.Row="1" Grid.Column="0" Text="Weight" FontSize="13" TextColor="#6B7280" />
-                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Profile.WeightKg, StringFormat='{0} kg'}" FontAttributes="Bold" TextColor="#1F2937" />
-                        <Label Grid.Row="2" Grid.Column="0" Text="Height" FontSize="13" TextColor="#6B7280" />
-                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding Profile.HeightCm, StringFormat='{0} cm'}" FontAttributes="Bold" TextColor="#1F2937" />
+                        <Label Grid.Row="0" Grid.Column="0" Style="{StaticResource PxMuted}" Text="Fitness goal" />
+                        <Label Grid.Row="0" Grid.Column="1" Style="{StaticResource PxBody}" Text="{Binding Profile.FitnessGoal}" />
+                        <Label Grid.Row="1" Grid.Column="0" Style="{StaticResource PxMuted}" Text="Weight" />
+                        <Label Grid.Row="1" Grid.Column="1" Style="{StaticResource PxBody}" Text="{Binding Profile.WeightKg, StringFormat='{0} kg'}" />
+                        <Label Grid.Row="2" Grid.Column="0" Style="{StaticResource PxMuted}" Text="Height" />
+                        <Label Grid.Row="2" Grid.Column="1" Style="{StaticResource PxBody}" Text="{Binding Profile.HeightCm, StringFormat='{0} cm'}" />
                     </Grid>
 
                     <!-- Edit view -->
                     <VerticalStackLayout Spacing="10" IsVisible="{Binding IsEditing}">
-                        <Label Text="Fitness Goal" FontSize="13" TextColor="#6B7280" />
-                        <Picker ItemsSource="{Binding FitnessGoals}"
-                                SelectedItem="{Binding EditFitnessGoal}" />
+                        <Label Style="{StaticResource PxCaption}" Text="FITNESS GOAL" />
+                        <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                            <Picker Style="{StaticResource PxPicker}"
+                                    ItemsSource="{Binding FitnessGoals}"
+                                    SelectedItem="{Binding EditFitnessGoal}" />
+                        </Border>
 
-                        <Label Text="Weight (kg)" FontSize="13" TextColor="#6B7280" />
-                        <Entry Text="{Binding EditWeight}"
-                               Keyboard="Numeric"
-                               Placeholder="e.g. 70.5" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12" RowDefinitions="Auto,Auto" RowSpacing="10">
+                            <Label Grid.Column="0" Style="{StaticResource PxCaption}" Text="WEIGHT (KG)" />
+                            <Label Grid.Column="1" Style="{StaticResource PxCaption}" Text="HEIGHT (CM)" />
+                            <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource PxSunken}" Padding="10,0">
+                                <Entry Style="{StaticResource PxEntry}" Text="{Binding EditWeight}" Keyboard="Numeric" Placeholder="70.5" />
+                            </Border>
+                            <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource PxSunken}" Padding="10,0">
+                                <Entry Style="{StaticResource PxEntry}" Text="{Binding EditHeight}" Keyboard="Numeric" Placeholder="175" />
+                            </Border>
+                        </Grid>
 
-                        <Label Text="Height (cm)" FontSize="13" TextColor="#6B7280" />
-                        <Entry Text="{Binding EditHeight}"
-                               Keyboard="Numeric"
-                               Placeholder="e.g. 175" />
-
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                             <Button Grid.Column="0"
-                                    Text="Save"
-                                    Command="{Binding SaveProfileCommand}"
-                                    IsEnabled="{Binding IsNotBusy}"
-                                    BackgroundColor="#16A34A"
-                                    TextColor="White"
-                                    CornerRadius="10"
-                                    HeightRequest="44" />
+                                    Style="{StaticResource PxButtonSecondary}"
+                                    Text="CANCEL"
+                                    Command="{Binding CancelEditCommand}" />
                             <Button Grid.Column="1"
-                                    Text="Cancel"
-                                    Command="{Binding CancelEditCommand}"
-                                    BackgroundColor="#6B7280"
-                                    TextColor="White"
-                                    CornerRadius="10"
-                                    HeightRequest="44" />
+                                    Style="{StaticResource PxButton}"
+                                    Text="SAVE"
+                                    Command="{Binding SaveProfileCommand}"
+                                    IsEnabled="{Binding IsNotBusy}" />
                         </Grid>
                     </VerticalStackLayout>
 
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Logout -->
-            <Button Text="Log Out"
+            <Button Style="{StaticResource PxButtonDanger}"
+                    Text="LOG OUT"
                     Command="{Binding LogoutCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    BackgroundColor="#EF4444"
-                    TextColor="White"
-                    CornerRadius="12"
-                    HeightRequest="50" />
+                    IsEnabled="{Binding IsNotBusy}" />
 
         </VerticalStackLayout>
     </ScrollView>

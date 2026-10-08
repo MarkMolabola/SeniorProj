@@ -1,126 +1,162 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- Title screen: sign in, register, and email verification. -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:local="clr-namespace:MDRNJfitness.Views"
              x:Class="MDRNJfitness.Views.LoginPage"
-             Shell.NavBarIsVisible="False">
+             Style="{StaticResource PxPage}">
     <ContentPage.Resources>
         <toolkit:InvertedBoolConverter x:Key="InvertBool" />
     </ContentPage.Resources>
 
     <ScrollView>
-        <VerticalStackLayout Padding="32" Spacing="16" VerticalOptions="Center">
+        <VerticalStackLayout Padding="24,40" Spacing="20" VerticalOptions="Center">
 
-            <Label Text="MDRNJ Fitness"
-                   FontSize="32" FontAttributes="Bold"
-                   HorizontalOptions="Center"
-                   TextColor="{StaticResource Primary}" />
+            <!-- ── Title ─────────────────────────────────────────────── -->
+            <Border Style="{StaticResource PxSunken}" HorizontalOptions="Center" Padding="10">
+                <local:PixelAvatarView x:Name="Mascot" WidthRequest="112" HeightRequest="112" />
+            </Border>
 
-            <Label Text="{Binding Title}"
-                   FontSize="20"
-                   HorizontalOptions="Center" />
+            <VerticalStackLayout Spacing="6">
+                <Label Style="{StaticResource PxTitle}"
+                       Text="MDRNJ"
+                       FontSize="30"
+                       TextColor="{StaticResource PxGold}"
+                       HorizontalOptions="Center" />
+                <Label Style="{StaticResource PxTitle}"
+                       Text="FITNESS"
+                       FontSize="16"
+                       HorizontalOptions="Center" />
+                <Label Style="{StaticResource PxMuted}"
+                       Text="Train hard. Level up."
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
 
-            <!-- ── Sign in / Register ───────────────────── -->
+            <!-- ── Sign in / Register ───────────────────────────────── -->
             <VerticalStackLayout Spacing="16"
                                  IsVisible="{Binding IsVerifyMode, Converter={StaticResource InvertBool}}">
 
-                <Border StrokeShape="RoundRectangle 12" Padding="16" Margin="0,8,0,0">
-                    <VerticalStackLayout Spacing="12">
+                <Border Style="{StaticResource PxPanel}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Style="{StaticResource PxHeading}"
+                               Text="{Binding Title}"
+                               TextTransform="Uppercase" />
 
-                        <Entry Placeholder="Email"
-                               Text="{Binding Email}"
-                               Keyboard="Email" />
+                        <Label Style="{StaticResource PxCaption}" Text="EMAIL" />
+                        <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                            <Entry Style="{StaticResource PxEntry}"
+                                   Placeholder="you@example.com"
+                                   Text="{Binding Email}"
+                                   Keyboard="Email" />
+                        </Border>
 
-                        <Entry Placeholder="Password"
-                               Text="{Binding Password}"
-                               IsPassword="True" />
+                        <Label Style="{StaticResource PxCaption}" Text="PASSWORD" />
+                        <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                            <Entry Style="{StaticResource PxEntry}"
+                                   Placeholder="••••••••"
+                                   Text="{Binding Password}"
+                                   IsPassword="True" />
+                        </Border>
 
-                        <Entry Placeholder="Username"
-                               Text="{Binding Username}"
-                               IsVisible="{Binding IsRegisterMode}" />
+                        <VerticalStackLayout Spacing="10" IsVisible="{Binding IsRegisterMode}">
+                            <Label Style="{StaticResource PxCaption}" Text="USERNAME" />
+                            <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                                <Entry Style="{StaticResource PxEntry}"
+                                       Placeholder="hero_name"
+                                       Text="{Binding Username}" />
+                            </Border>
 
-                        <Entry Placeholder="Display Name"
-                               Text="{Binding DisplayName}"
-                               IsVisible="{Binding IsRegisterMode}" />
-
+                            <Label Style="{StaticResource PxCaption}" Text="DISPLAY NAME" />
+                            <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                                <Entry Style="{StaticResource PxEntry}"
+                                       Placeholder="What friends see"
+                                       Text="{Binding DisplayName}" />
+                            </Border>
+                        </VerticalStackLayout>
                     </VerticalStackLayout>
                 </Border>
 
-                <Button Text="Sign In"
+                <Button Style="{StaticResource PxButton}"
+                        Text="START"
                         Command="{Binding LoginCommand}"
                         IsEnabled="{Binding IsNotBusy}"
                         IsVisible="{Binding IsRegisterMode, Converter={StaticResource InvertBool}}" />
 
-                <Button Text="Register"
+                <Button Style="{StaticResource PxButton}"
+                        Text="CREATE HERO"
                         Command="{Binding RegisterCommand}"
                         IsEnabled="{Binding IsNotBusy}"
                         IsVisible="{Binding IsRegisterMode}" />
 
-                <VerticalStackLayout Spacing="16" IsVisible="{Binding IsGoogleSignInSupported}">
-                    <Label Text="or" HorizontalOptions="Center" TextColor="Gray" />
-
-                    <Button Text="Continue with Google"
+                <VerticalStackLayout Spacing="12" IsVisible="{Binding IsGoogleSignInSupported}">
+                    <Label Style="{StaticResource PxMuted}" Text="— or —" HorizontalOptions="Center" />
+                    <Button Style="{StaticResource PxButtonSecondary}"
+                            Text="CONTINUE WITH GOOGLE"
                             Command="{Binding SignInWithGoogleCommand}"
-                            IsEnabled="{Binding IsNotBusy}"
-                            BackgroundColor="White"
-                            TextColor="Black"
-                            BorderColor="LightGray"
-                            BorderWidth="1" />
+                            IsEnabled="{Binding IsNotBusy}" />
                 </VerticalStackLayout>
 
-                <Button Text="Need an account? Register"
+                <Button Style="{StaticResource PxLinkButton}"
+                        Text="New here? Create an account"
                         Command="{Binding ToggleModeCommand}"
                         IsVisible="{Binding IsRegisterMode, Converter={StaticResource InvertBool}}"
-                        BackgroundColor="Transparent"
-                        TextColor="{StaticResource Primary}" />
+                        HorizontalOptions="Center" />
 
-                <Button Text="Already have an account? Sign In"
+                <Button Style="{StaticResource PxLinkButton}"
+                        Text="Already have an account? Sign in"
                         Command="{Binding ToggleModeCommand}"
                         IsVisible="{Binding IsRegisterMode}"
-                        BackgroundColor="Transparent"
-                        TextColor="{StaticResource Primary}" />
-
+                        HorizontalOptions="Center" />
             </VerticalStackLayout>
 
-            <!-- ── Verify email ─────────────────────────── -->
+            <!-- ── Verify email ─────────────────────────────────────── -->
             <VerticalStackLayout Spacing="16" IsVisible="{Binding IsVerifyMode}">
 
-                <Label Text="{Binding VerifyMessage}"
-                       HorizontalTextAlignment="Center" />
+                <Border Style="{StaticResource PxPanel}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Style="{StaticResource PxHeading}" Text="CHECK YOUR EMAIL" />
+                        <Label Style="{StaticResource PxMuted}" Text="{Binding VerifyMessage}" />
+                        <Label Style="{StaticResource PxBody}"
+                               Text="{Binding Email}"
+                               TextColor="{StaticResource PxTeal}" />
 
-                <Label Text="{Binding Email}"
-                       FontAttributes="Bold"
-                       HorizontalOptions="Center" />
-
-                <Border StrokeShape="RoundRectangle 12" Padding="16">
-                    <Entry Placeholder="6-digit code"
-                           Text="{Binding VerificationCode}"
-                           Keyboard="Numeric"
-                           MaxLength="6"
-                           FontSize="24"
-                           CharacterSpacing="8"
-                           HorizontalTextAlignment="Center" />
+                        <Border Style="{StaticResource PxSunken}" Padding="10,4">
+                            <Entry Style="{StaticResource PxEntry}"
+                                   Placeholder="000000"
+                                   Text="{Binding VerificationCode}"
+                                   Keyboard="Numeric"
+                                   MaxLength="6"
+                                   FontSize="34"
+                                   CharacterSpacing="10"
+                                   TextColor="{StaticResource PxGold}"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+                    </VerticalStackLayout>
                 </Border>
 
-                <Button Text="Verify"
+                <Button Style="{StaticResource PxButton}"
+                        Text="VERIFY"
                         Command="{Binding VerifyEmailCommand}"
                         IsEnabled="{Binding IsNotBusy}" />
 
-                <Button Text="Resend code"
-                        Command="{Binding ResendCodeCommand}"
-                        IsEnabled="{Binding IsNotBusy}"
-                        BackgroundColor="Transparent"
-                        TextColor="{StaticResource Primary}" />
-
-                <Button Text="Back to Sign In"
-                        Command="{Binding BackToSignInCommand}"
-                        BackgroundColor="Transparent"
-                        TextColor="Gray" />
-
+                <Grid ColumnDefinitions="*,*">
+                    <Button Grid.Column="0"
+                            Style="{StaticResource PxLinkButton}"
+                            Text="Resend code"
+                            Command="{Binding ResendCodeCommand}"
+                            IsEnabled="{Binding IsNotBusy}" />
+                    <Button Grid.Column="1"
+                            Style="{StaticResource PxLinkButton}"
+                            Text="Back to sign in"
+                            TextColor="{StaticResource PxTextMuted}"
+                            Command="{Binding BackToSignInCommand}" />
+                </Grid>
             </VerticalStackLayout>
 
             <ActivityIndicator IsRunning="{Binding IsBusy}"
                                IsVisible="{Binding IsBusy}"
+                               Color="{StaticResource PxGold}"
                                HorizontalOptions="Center" />
 
         </VerticalStackLayout>

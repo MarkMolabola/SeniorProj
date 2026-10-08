@@ -1,86 +1,77 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- Global XP rankings; top three get gold / silver / bronze. -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MDRNJfitness.Views.LeaderboardPage"
              Title="{Binding Title}"
-             BackgroundColor="#F4FFF7">
+             Style="{StaticResource PxPage}">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="18">
+        <VerticalStackLayout Padding="20,24,20,32" Spacing="20">
 
-            <Label Text="Leaderboard"
-                   FontSize="30"
-                   FontAttributes="Bold"
-                   TextColor="#1F2937" />
+            <Label Style="{StaticResource PxTitle}" Text="HALL OF FAME" />
 
-            <Border BackgroundColor="White"
-                    Stroke="#D9EAD3"
-                    StrokeShape="RoundRectangle 16"
-                    Padding="14">
-                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Entries}">
-                    <BindableLayout.EmptyView>
-                        <Label Text="No leaderboard data yet."
-                               FontSize="13"
-                               TextColor="#6B7280" />
-                    </BindableLayout.EmptyView>
-                    <BindableLayout.ItemTemplate>
-                        <DataTemplate>
-                            <Border BackgroundColor="#F9FAFB"
-                                    Stroke="#E5E7EB"
-                                    StrokeShape="RoundRectangle 12"
-                                    Padding="12"
-                                    Margin="0,0,0,8">
-                                <Grid ColumnDefinitions="40,*,Auto,Auto" ColumnSpacing="8">
+            <VerticalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding Entries}">
+                <BindableLayout.EmptyView>
+                    <Border Style="{StaticResource PxPanel}">
+                        <Label Style="{StaticResource PxMuted}" Text="No rankings yet. Go earn some XP!" />
+                    </Border>
+                </BindableLayout.EmptyView>
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource PxPanel}" Padding="12,10">
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding Rank}" Value="1">
+                                    <Setter Property="Stroke" Value="{StaticResource PxGold}" />
+                                </DataTrigger>
+                            </Border.Triggers>
 
-                                    <!-- Rank -->
-                                    <Label Grid.Column="0"
+                            <Grid ColumnDefinitions="48,*,Auto,Auto" ColumnSpacing="12">
+                                <!-- Rank -->
+                                <Border Grid.Column="0" Style="{StaticResource PxSunken}" Padding="0" HeightRequest="44">
+                                    <Label Style="{StaticResource PxTitle}"
+                                           FontSize="14"
                                            Text="{Binding Rank}"
-                                           FontSize="20"
-                                           FontAttributes="Bold"
-                                           TextColor="#F97316"
-                                           VerticalOptions="Center"
-                                           HorizontalOptions="Center" />
+                                           TextColor="{StaticResource PxTextMuted}"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding Rank}" Value="1">
+                                                <Setter Property="TextColor" Value="{StaticResource PxGold}" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" Binding="{Binding Rank}" Value="2">
+                                                <Setter Property="TextColor" Value="#C9CCD6" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" Binding="{Binding Rank}" Value="3">
+                                                <Setter Property="TextColor" Value="#CD7F32" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
 
-                                    <!-- Name + username -->
-                                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
-                                        <Label Text="{Binding DisplayName}"
-                                               FontAttributes="Bold"
-                                               TextColor="#1F2937" />
-                                        <Label Text="{Binding Username, StringFormat='@{0}'}"
-                                               FontSize="12"
-                                               TextColor="#6B7280" />
-                                    </VerticalStackLayout>
+                                <!-- Name -->
+                                <VerticalStackLayout Grid.Column="1" Spacing="0" VerticalOptions="Center">
+                                    <Label Style="{StaticResource PxBody}" Text="{Binding DisplayName}" LineBreakMode="TailTruncation" />
+                                    <Label Style="{StaticResource PxMuted}" Text="{Binding Username, StringFormat='@{0}'}" LineBreakMode="TailTruncation" />
+                                </VerticalStackLayout>
 
-                                    <!-- Level -->
-                                    <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" VerticalOptions="Center" Spacing="0">
-                                        <Label Text="{Binding CurrentLevel}"
-                                               FontAttributes="Bold"
-                                               TextColor="#2563EB"
-                                               HorizontalOptions="Center" />
-                                        <Label Text="LVL"
-                                               FontSize="10"
-                                               TextColor="#6B7280"
-                                               HorizontalOptions="Center" />
-                                    </VerticalStackLayout>
+                                <!-- Level -->
+                                <VerticalStackLayout Grid.Column="2" Spacing="0" VerticalOptions="Center">
+                                    <Label Style="{StaticResource PxBody}" Text="{Binding CurrentLevel}"
+                                           TextColor="{StaticResource PxTeal}" HorizontalOptions="Center" />
+                                    <Label Style="{StaticResource PxCaption}" Text="LV" HorizontalOptions="Center" />
+                                </VerticalStackLayout>
 
-                                    <!-- XP -->
-                                    <VerticalStackLayout Grid.Column="3" HorizontalOptions="End" VerticalOptions="Center" Spacing="0">
-                                        <Label Text="{Binding TotalXP}"
-                                               FontAttributes="Bold"
-                                               TextColor="#16A34A"
-                                               HorizontalOptions="End" />
-                                        <Label Text="XP"
-                                               FontSize="10"
-                                               TextColor="#6B7280"
-                                               HorizontalOptions="End" />
-                                    </VerticalStackLayout>
-
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </BindableLayout.ItemTemplate>
-                </VerticalStackLayout>
-            </Border>
+                                <!-- XP -->
+                                <VerticalStackLayout Grid.Column="3" Spacing="0" VerticalOptions="Center">
+                                    <Label Style="{StaticResource PxXp}" Text="{Binding TotalXP}" HorizontalOptions="End" />
+                                    <Label Style="{StaticResource PxCaption}" Text="XP" HorizontalOptions="End" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
 
         </VerticalStackLayout>
     </ScrollView>
