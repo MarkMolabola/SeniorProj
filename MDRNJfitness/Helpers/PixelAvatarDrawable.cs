@@ -1,3 +1,4 @@
+﻿using MDRNJfitness.Helpers.Sprites;
 using Microsoft.Maui.Graphics;
 
 namespace MDRNJfitness.Helpers
@@ -245,11 +246,15 @@ namespace MDRNJfitness.Helpers
         }
     }
     */
-    /// Renders a 10×16 stick-figure pixel-art character scaled to fill the canvas.
-    /// Set AvatarType to "default", "cardio", "strength", or "flexibility".
+    /// Renders the pixel-art character, scaled by a whole number so pixels stay
+    /// crisp, centred horizontally and standing on the bottom of the canvas.
+    /// Set AvatarType to the character's OutfitSlot ("default", "cardio", ...).
     /// Set Frame to 0 or 1 to select the animation frame.
     ///
-    /// Color scheme:
+    /// Outfits registered in HeroSprites ("default", "cardio", "strength",
+    /// "flexibility") draw the layered 32×32 hero; unknown types draw the
+    /// default hero. The 10×16 stick figures below are kept as a fallback for
+    /// any type that has a stick figure but no hero outfit:
     ///   default     → pastel purple, front-facing, arms at sides
     ///   cardio      → pastel green,  side-profile running right
     ///   strength    → pastel red,    front-facing, overhead barbell press
@@ -461,12 +466,25 @@ namespace MDRNJfitness.Helpers
 
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
-            var key = Sprites.ContainsKey(AvatarType) ? AvatarType : "default";
-            var frames = Sprites[key];
-            var sprite = frames[Frame % frames.Length];
+            canvas.Antialias = false;
 
-            float pw = dirtyRect.Width / SpriteW;
-            float ph = dirtyRect.Height / SpriteH;
+            // Layered 32×32 hero for registered outfits, and for any unknown type
+            var useHero = HeroSprites.TryGetOutfit(AvatarType, out var outfit);
+            if (!useHero && !Sprites.ContainsKey(AvatarType))
+                useHero = HeroSprites.TryGetOutfit("default", out outfit);
+
+            if (useHero)
+            {
+                var hero = Place(dirtyRect, HeroSprites.Size, HeroSprites.Size);
+                DrawLayer(canvas, HeroSprites.Body, hero, Frame, HeroSprites.BreathRow);
+                DrawLayer(canvas, outfit, hero, Frame, HeroSprites.BreathRow);
+                return;
+            }
+
+            // Legacy 10×16 stick figures (frames are drawn per pose)
+            var frames = Sprites[AvatarType];
+            var sprite = frames[Frame % frames.Length];
+            var legacy = Place(dirtyRect, SpriteW, SpriteH);
 
             for (int row = 0; row < sprite.Length && row < SpriteH; row++)
             {
@@ -480,10 +498,63 @@ namespace MDRNJfitness.Helpers
                     {
                         canvas.FillColor = color;
                         canvas.FillRectangle(
-                            dirtyRect.X + col * pw,
-                            dirtyRect.Y + row * ph,
-                            pw, ph);
+                            legacy.X + col * legacy.Scale,
+                            legacy.Y + row * legacy.Scale,
+                            legacy.Scale, legacy.Scale);
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Largest whole-number scale that fits, centred horizontally and
+        /// bottom-aligned (feet on the floor). Falls back to a fractional scale
+        /// only when the canvas is smaller than the sprite.
+        /// </summary>
+        private static (float X, float Y, float Scale) Place(RectF area, int width, int height)
+        {
+            var fit = MathF.Min(area.Width / width, area.Height / height);
+            var scale = fit >= 1 ? MathF.Floor(fit) : fit;
+            return (
+                area.X + MathF.Floor((area.Width - width * scale) / 2),
+                area.Y + MathF.Floor(area.Height - height * scale),
+                scale);
+        }
+
+        /// <summary>
+        /// Draws one layer, merging same-colour runs into single rectangles.
+        /// On odd frames rows above breathRow sink 1px (the row just above
+        /// breathRow is dropped) so the character idles without extra art.
+        /// </summary>
+        private static void DrawLayer(ICanvas canvas, SpriteLayer layer, (float X, float Y, float Scale) at, int frame, int breathRow)
+        {
+            var breathing = frame % 2 == 1;
+
+            for (int y = 0; y < layer.Height; y++)
+            {
+                var destY = y;
+                if (breathing && y < breathRow)
+                {
+                    if (y == breathRow - 1) continue;
+                    destY = y + 1;
+                }
+
+                var row = layer.Rows[y];
+                for (int x = 0; x < row.Length;)
+                {
+                    var ch = row[x];
+                    var end = x + 1;
+                    while (end < row.Length && row[end] == ch) end++;
+
+                    if (ch != '.' && layer.Palette.TryGetValue(ch, out var color))
+                    {
+                        canvas.FillColor = color;
+                        canvas.FillRectangle(
+                            at.X + x * at.Scale,
+                            at.Y + destY * at.Scale,
+                            (end - x) * at.Scale, at.Scale);
+                    }
+                    x = end;
                 }
             }
         }

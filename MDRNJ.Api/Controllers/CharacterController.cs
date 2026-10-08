@@ -21,9 +21,6 @@ namespace MDRNJ.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get() => Ok(await _character.GetCharacterAsync(UserId));
 
-        [HttpPost("evolve")]
-        public async Task<IActionResult> Evolve() => Ok(await _character.EvolveCharacterAsync(UserId));
-
         [HttpGet("activity-score")]
         public async Task<IActionResult> GetActivityScore() => Ok(await _character.GetActivityScoreAsync(UserId));
 

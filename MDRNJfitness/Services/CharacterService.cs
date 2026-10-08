@@ -1,4 +1,4 @@
-using MDRNJ.Shared.DTOs.Character;
+﻿using MDRNJ.Shared.DTOs.Character;
 using MDRNJfitness.Helpers.Extensions;
 using MDRNJfitness.Services.Interfaces;
 
@@ -12,9 +12,6 @@ namespace MDRNJfitness.Services
 
         public Task<CharacterStateDto> GetCharacterAsync() =>
             _http.GetAsync<CharacterStateDto>("api/character")!;
-
-        public Task<CharacterStateDto> EvolveAsync() =>
-            _http.PostAsync<CharacterStateDto>("api/character/evolve", new { })!;
 
         public Task<ActivityScoreDto> GetActivityScoreAsync() =>
             _http.GetAsync<ActivityScoreDto>("api/character/activity-score")!;

@@ -1,4 +1,4 @@
-using CommunityToolkit.Maui;
+﻿using CommunityToolkit.Maui;
 using MDRNJfitness.Data;
 using MDRNJfitness.Helpers;
 using MDRNJfitness.Services;
@@ -22,6 +22,8 @@ namespace MDRNJfitness
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                    fonts.AddFont("PressStart2P-Regular.ttf", "PixelHeading");
+                    fonts.AddFont("VT323-Regular.ttf", "PixelBody");
                 });
 
 #if DEBUG
@@ -73,6 +75,9 @@ namespace MDRNJfitness
             builder.Services.AddHttpClient<IQuestService, QuestService>(
                 c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
                 .AddHttpMessageHandler<AuthHeaderHandler>();
+
+            // Reward / evolution popup after workouts
+            builder.Services.AddSingleton<ICharacterProgressPresenter, CharacterProgressPresenter>();
 
             // Sync service
             builder.Services.AddTransient<ISyncService, SyncService>();

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Pixel RPG theme. Keyed styles only (prefix "Px") so pages that haven't
+    been converted yet keep their current look. Colors live in Colors.xaml.
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:conv="clr-namespace:MDRNJfitness.Helpers.Converters">
+
+    <conv:PercentToProgressConverter x:Key="PercentToProgress" />
+    <conv:RatioToProgressConverter x:Key="RatioToProgress" />
+    <conv:StatLevelConverter x:Key="StatLevel" />
+    <conv:StatLevelProgressConverter x:Key="StatLevelProgress" />
+    <conv:BodyTypeNameConverter x:Key="BodyTypeName" />
+
+    <!-- ── Pages ─────────────────────────────────────────────────────────── -->
+    <Style x:Key="PxPage" TargetType="ContentPage">
+        <Setter Property="BackgroundColor" Value="{StaticResource PxGround}" />
+        <Setter Property="Shell.BackgroundColor" Value="{StaticResource PxGround}" />
+        <Setter Property="Shell.ForegroundColor" Value="{StaticResource PxText}" />
+        <Setter Property="Shell.TitleColor" Value="{StaticResource PxText}" />
+        <Setter Property="Shell.NavBarIsVisible" Value="False" />
+    </Style>
+
+    <!-- ── Panels ────────────────────────────────────────────────────────── -->
+    <!-- Square corners, thick ink outline and a hard (non-blurred) drop shadow -->
+    <Style x:Key="PxPanel" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{StaticResource PxPanel}" />
+        <Setter Property="Stroke" Value="{StaticResource PxInk}" />
+        <Setter Property="StrokeThickness" Value="3" />
+        <Setter Property="StrokeShape" Value="Rectangle" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="Shadow">
+            <Shadow Brush="Black" Offset="0,6" Radius="0" Opacity="0.45" />
+        </Setter>
+    </Style>
+
+    <Style x:Key="PxPanelHighlight" TargetType="Border" BasedOn="{StaticResource PxPanel}">
+        <Setter Property="BackgroundColor" Value="#2B2656" />
+        <Setter Property="Stroke" Value="{StaticResource PxGold}" />
+    </Style>
+
+    <Style x:Key="PxSunken" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{StaticResource PxPanelSunken}" />
+        <Setter Property="Stroke" Value="{StaticResource PxInk}" />
+        <Setter Property="StrokeThickness" Value="2" />
+        <Setter Property="StrokeShape" Value="Rectangle" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <Style x:Key="PxSlot" TargetType="Border" BasedOn="{StaticResource PxSunken}">
+        <Setter Property="BackgroundColor" Value="{StaticResource PxPanelRaised}" />
+        <Setter Property="WidthRequest" Value="64" />
+        <Setter Property="HeightRequest" Value="64" />
+    </Style>
+
+    <Style x:Key="PxChip" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{StaticResource PxGold}" />
+        <Setter Property="Stroke" Value="{StaticResource PxInk}" />
+        <Setter Property="StrokeThickness" Value="2" />
+        <Setter Property="StrokeShape" Value="Rectangle" />
+        <Setter Property="Padding" Value="8,6" />
+        <Setter Property="HorizontalOptions" Value="Start" />
+        <Setter Property="VerticalOptions" Value="Center" />
+    </Style>
+
+    <!-- ── Text ──────────────────────────────────────────────────────────── -->
+    <!-- PixelHeading (Press Start 2P) is wide: keep it small and short. -->
+    <Style x:Key="PxTitle" TargetType="Label">
+        <Setter Property="FontFamily" Value="PixelHeading" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextColor" Value="{StaticResource PxText}" />
+        <Setter Property="LineHeight" Value="1.4" />
+    </Style>
+
+    <Style x:Key="PxHeading" TargetType="Label" BasedOn="{StaticResource PxTitle}">
+        <Setter Property="FontSize" Value="11" />
+    </Style>
+
+    <Style x:Key="PxCaption" TargetType="Label" BasedOn="{StaticResource PxTitle}">
+        <Setter Property="FontSize" Value="8" />
+        <Setter Property="TextColor" Value="{StaticResource PxTextMuted}" />
+    </Style>
+
+    <!-- PixelBody (VT323) runs small, so body sizes are larger than usual. -->
+    <Style x:Key="PxBody" TargetType="Label">
+        <Setter Property="FontFamily" Value="PixelBody" />
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="TextColor" Value="{StaticResource PxText}" />
+    </Style>
+
+    <Style x:Key="PxMuted" TargetType="Label" BasedOn="{StaticResource PxBody}">
+        <Setter Property="FontSize" Value="19" />
+        <Setter Property="TextColor" Value="{StaticResource PxTextMuted}" />
+    </Style>
+
+    <Style x:Key="PxXp" TargetType="Label" BasedOn="{StaticResource PxBody}">
+        <Setter Property="TextColor" Value="{StaticResource PxGold}" />
+        <Setter Property="VerticalOptions" Value="Center" />
+    </Style>
+
+    <Style x:Key="PxStatValue" TargetType="Label" BasedOn="{StaticResource PxBody}">
+        <Setter Property="FontSize" Value="34" />
+    </Style>
+
+    <!-- ── Buttons ───────────────────────────────────────────────────────── -->
+    <Style x:Key="PxButton" TargetType="Button">
+        <Setter Property="FontFamily" Value="PixelHeading" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="TextColor" Value="{StaticResource PxGoldInk}" />
+        <Setter Property="BackgroundColor" Value="{StaticResource PxGold}" />
+        <Setter Property="BorderColor" Value="{StaticResource PxInk}" />
+        <Setter Property="BorderWidth" Value="3" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="Padding" Value="16,18" />
+        <Setter Property="MinimumHeightRequest" Value="56" />
+        <Setter Property="Shadow">
+            <Shadow Brush="Black" Offset="0,5" Radius="0" Opacity="0.45" />
+        </Setter>
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Pressed">
+                        <VisualState.Setters>
+                            <Setter Property="TranslationY" Value="3" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="Disabled">
+                        <VisualState.Setters>
+                            <Setter Property="BackgroundColor" Value="{StaticResource PxTrack}" />
+                            <Setter Property="TextColor" Value="{StaticResource PxTextDim}" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="PointerOver" />
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PxButtonSecondary" TargetType="Button" BasedOn="{StaticResource PxButton}">
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="TextColor" Value="{StaticResource PxText}" />
+        <Setter Property="BackgroundColor" Value="{StaticResource PxPanelRaised}" />
+        <Setter Property="Padding" Value="12,10" />
+        <Setter Property="MinimumHeightRequest" Value="44" />
+    </Style>
+
+</ResourceDictionary>

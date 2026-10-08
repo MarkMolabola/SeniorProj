@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MDRNJ.Shared.DTOs.Workout;
 using MDRNJfitness.Services.Interfaces;
@@ -9,6 +9,7 @@ namespace MDRNJfitness.ViewModels
     public partial class WorkoutViewModel : BaseViewModel
     {
         private readonly IWorkoutService _workout;
+        private readonly ICharacterProgressPresenter _progress;
 
         [ObservableProperty] private WorkoutDto? _activeWorkout;
         [ObservableProperty] private string _workoutType = "Running";
@@ -20,9 +21,10 @@ namespace MDRNJfitness.ViewModels
         private IDispatcherTimer? _stopwatchTimer;
         private DateTime _workoutStartedAt;
 
-        public WorkoutViewModel(IWorkoutService workout)
+        public WorkoutViewModel(IWorkoutService workout, ICharacterProgressPresenter progress)
         {
             _workout = workout;
+            _progress = progress;
             Title = "Workout";
         }
 
@@ -61,6 +63,8 @@ namespace MDRNJfitness.ViewModels
                 ActiveWorkout = null;
                 HasActiveWorkout = false;
                 ElapsedTime = "0:00:00";
+
+                await _progress.PresentAsync(completed?.CharacterProgress, "WORKOUT COMPLETE");
             });
 
         private void StartStopwatch()

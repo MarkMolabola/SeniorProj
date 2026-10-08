@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using MDRNJ.Api.Data;
 using MDRNJ.Api.Data.Entities;
 using MDRNJ.Api.Services.Interfaces;
@@ -17,12 +17,14 @@ namespace MDRNJ.Api.Services
         private readonly AppDbContext _db;
         private readonly IMapper _mapper;
         private readonly IAchievementService _achievements;
+        private readonly ICharacterService _character;
 
-        public WorkoutService(AppDbContext db, IMapper mapper, IAchievementService achievements)
+        public WorkoutService(AppDbContext db, IMapper mapper, IAchievementService achievements, ICharacterService character)
         {
             _db = db;
             _mapper = mapper;
             _achievements = achievements;
+            _character = character;
         }
 
         public async Task<WorkoutDto> StartWorkoutAsync(Guid userId, CreateWorkoutDto dto)
@@ -95,7 +97,7 @@ namespace MDRNJ.Api.Services
             await _db.SaveChangesAsync();
             await _achievements.CheckAndUnlockAsync(userId);
 
-            return _mapper.Map<WorkoutDto>(session);
+            return await WithCharacterProgressAsync(userId, session);
         }
 
         private static int LevelFromXP(int xp)
@@ -159,7 +161,16 @@ namespace MDRNJ.Api.Services
 
             await _db.SaveChangesAsync();
             await _achievements.CheckAndUnlockAsync(userId);
-            return _mapper.Map<WorkoutDto>(session);
+            return await WithCharacterProgressAsync(userId, session);
+        }
+
+        /// <summary>Grants the workout's stat points and attaches what changed on the character.</summary>
+        private async Task<WorkoutDto> WithCharacterProgressAsync(Guid userId, WorkoutSessionEntity session)
+        {
+            var dto = _mapper.Map<WorkoutDto>(session);
+            dto.CharacterProgress = await _character.ApplyActivityAsync(
+                userId, StatRules.ForWorkout(session.WorkoutType, session.DurationMins));
+            return dto;
         }
 
         public async Task<List<WorkoutDto>> GetMonthlyAsync(Guid userId, int year, int month)

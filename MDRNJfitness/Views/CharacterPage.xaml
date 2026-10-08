@@ -2,97 +2,122 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MDRNJfitness.Views"
+             xmlns:controls="clr-namespace:MDRNJfitness.Controls"
              x:Class="MDRNJfitness.Views.CharacterPage"
              Title="{Binding Title}"
-             BackgroundColor="#F4FFF7">
+             Style="{StaticResource PxPage}">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="18">
+        <VerticalStackLayout Padding="20,24,20,32" Spacing="24">
 
-            <Label Text="Character"
-                   FontSize="30"
-                   FontAttributes="Bold"
-                   TextColor="#1F2937" />
+            <Label Style="{StaticResource PxTitle}" Text="HERO" />
 
-            <!-- Character avatar card -->
-            <Border BackgroundColor="White"
-                    Stroke="#D9EAD3"
-                    StrokeShape="RoundRectangle 18"
-                    Padding="24">
-                <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
-                    <local:PixelAvatarView AvatarType="{Binding SpriteState}"
-                                           HorizontalOptions="Center" />
-                    <Label Text="{Binding SpriteState}"
-                           FontSize="16"
-                           FontAttributes="Bold"
-                           TextTransform="Uppercase"
-                           TextColor="#2563EB"
-                           HorizontalOptions="Center" />
+            <!-- Stage -->
+            <Border Style="{StaticResource PxPanel}" BackgroundColor="{StaticResource PxPanelSunken}" Padding="0" HeightRequest="300">
+                <Grid RowDefinitions="*,40">
+                    <BoxView Grid.Row="1" Color="{StaticResource PxPanelRaised}" />
+                    <BoxView Grid.Row="1" HeightRequest="3" VerticalOptions="Start" Color="{StaticResource PxInk}" />
+                    <local:PixelAvatarView Grid.RowSpan="2"
+                                           AvatarType="{Binding SpriteState}"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="End"
+                                           Margin="0,0,0,24" />
+                </Grid>
+            </Border>
+
+            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                <Label Style="{StaticResource PxHeading}"
+                       Text="{Binding CharacterState.BodyType, Converter={StaticResource BodyTypeName}}"
+                       TextTransform="Uppercase"
+                       HorizontalOptions="Center" />
+                <Label Style="{StaticResource PxBody}"
+                       TextColor="{StaticResource PxTeal}"
+                       Text="{Binding ActivityScore.DominantSport, StringFormat='Dominant: {0}'}"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <!-- Stats -->
+            <Border Style="{StaticResource PxPanel}">
+                <VerticalStackLayout Spacing="14">
+                    <Label Style="{StaticResource PxHeading}" Text="STATS" />
+                    <Grid ColumnDefinitions="52,*,64" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="12">
+                        <Label Grid.Row="0" Grid.Column="0" Style="{StaticResource PxHeading}" FontSize="10"
+                               TextColor="{StaticResource PxStr}" Text="STR" VerticalOptions="Center" />
+                        <controls:XPBarControl Grid.Row="0" Grid.Column="1" HeightRequest="16" VerticalOptions="Center"
+                                               FillColor="{StaticResource PxStr}"
+                                               Progress="{Binding ActivityScore.StrengthPoints, Converter={StaticResource StatLevelProgress}}" />
+                        <Label Grid.Row="0" Grid.Column="2" Style="{StaticResource PxBody}" HorizontalTextAlignment="End"
+                               Text="{Binding ActivityScore.StrengthPoints, Converter={StaticResource StatLevel}, StringFormat='Lv {0}'}" />
+
+                        <Label Grid.Row="1" Grid.Column="0" Style="{StaticResource PxHeading}" FontSize="10"
+                               TextColor="{StaticResource PxTeal}" Text="END" VerticalOptions="Center" />
+                        <controls:XPBarControl Grid.Row="1" Grid.Column="1" HeightRequest="16" VerticalOptions="Center"
+                                               FillColor="{StaticResource PxTeal}"
+                                               Progress="{Binding ActivityScore.CardioPoints, Converter={StaticResource StatLevelProgress}}" />
+                        <Label Grid.Row="1" Grid.Column="2" Style="{StaticResource PxBody}" HorizontalTextAlignment="End"
+                               Text="{Binding ActivityScore.CardioPoints, Converter={StaticResource StatLevel}, StringFormat='Lv {0}'}" />
+
+                        <Label Grid.Row="2" Grid.Column="0" Style="{StaticResource PxHeading}" FontSize="10"
+                               TextColor="{StaticResource PxFlx}" Text="FLX" VerticalOptions="Center" />
+                        <controls:XPBarControl Grid.Row="2" Grid.Column="1" HeightRequest="16" VerticalOptions="Center"
+                                               FillColor="{StaticResource PxFlx}"
+                                               Progress="{Binding ActivityScore.FlexibilityPoints, Converter={StaticResource StatLevelProgress}}" />
+                        <Label Grid.Row="2" Grid.Column="2" Style="{StaticResource PxBody}" HorizontalTextAlignment="End"
+                               Text="{Binding ActivityScore.FlexibilityPoints, Converter={StaticResource StatLevel}, StringFormat='Lv {0}'}" />
+                    </Grid>
+                    <Label Style="{StaticResource PxMuted}" FontSize="17"
+                           Text="STR = Strength · END = Cardio · FLX = Flexibility. Stats grow from workouts, quests and challenges." />
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Character details -->
-            <Border BackgroundColor="White"
-                    Stroke="#D9EAD3"
-                    StrokeShape="RoundRectangle 16"
-                    Padding="16">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Character Details"
-                           FontSize="20"
-                           FontAttributes="Bold"
-                           TextColor="#1F2937" />
-                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
-                        <Label Grid.Row="0" Grid.Column="0" Text="Body Type" FontSize="13" TextColor="#6B7280" />
-                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding CharacterState.BodyType}" FontAttributes="Bold" TextColor="#1F2937" />
-                        <Label Grid.Row="1" Grid.Column="0" Text="Outfit" FontSize="13" TextColor="#6B7280" />
-                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding CharacterState.OutfitSlot}" FontAttributes="Bold" TextColor="#1F2937" />
-                        <Label Grid.Row="2" Grid.Column="0" Text="Equipment" FontSize="13" TextColor="#6B7280" />
-                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding CharacterState.EquipmentSlot}" FontAttributes="Bold" TextColor="#1F2937" />
+            <!-- Gear -->
+            <Border Style="{StaticResource PxPanel}">
+                <VerticalStackLayout Spacing="14">
+                    <Label Style="{StaticResource PxHeading}" Text="GEAR" />
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
+                        <VerticalStackLayout Grid.Column="0" Spacing="6" HorizontalOptions="Center">
+                            <Border Style="{StaticResource PxSlot}" HorizontalOptions="Center">
+                                <Label Text="◆" FontSize="26" TextColor="{StaticResource PxOrange}"
+                                       HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+                            <Label Style="{StaticResource PxMuted}" FontSize="17" Text="Body" HorizontalOptions="Center" />
+                            <Label Style="{StaticResource PxBody}" FontSize="19" Text="{Binding CharacterState.BodyType, Converter={StaticResource BodyTypeName}}"
+                                   HorizontalTextAlignment="Center" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="6" HorizontalOptions="Center">
+                            <Border Style="{StaticResource PxSlot}" HorizontalOptions="Center">
+                                <Label Text="▲" FontSize="26" TextColor="{StaticResource PxTeal}"
+                                       HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+                            <Label Style="{StaticResource PxMuted}" FontSize="17" Text="Outfit" HorizontalOptions="Center" />
+                            <Label Style="{StaticResource PxBody}" FontSize="19" Text="{Binding CharacterState.OutfitSlot}"
+                                   HorizontalTextAlignment="Center" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="2" Spacing="6" HorizontalOptions="Center">
+                            <Border Style="{StaticResource PxSlot}" HorizontalOptions="Center">
+                                <Label Text="■" FontSize="26" TextColor="{StaticResource PxText}"
+                                       HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+                            <Label Style="{StaticResource PxMuted}" FontSize="17" Text="Equipment" HorizontalOptions="Center" />
+                            <Label Style="{StaticResource PxBody}" FontSize="19" Text="{Binding CharacterState.EquipmentSlot}"
+                                   HorizontalTextAlignment="Center" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
                     </Grid>
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Activity scores -->
-            <Border BackgroundColor="White"
-                    Stroke="#D9EAD3"
-                    StrokeShape="RoundRectangle 16"
-                    Padding="16">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Activity Scores"
-                           FontSize="20"
-                           FontAttributes="Bold"
-                           TextColor="#1F2937" />
-                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
-                        <Label Grid.Row="0" Grid.Column="0" Text="Strength" TextColor="#4B5563" />
-                        <Label Grid.Row="0" Grid.Column="1"
-                               Text="{Binding ActivityScore.StrengthScore, StringFormat='{0:F1}'}"
-                               FontAttributes="Bold"
-                               TextColor="#F97316" />
-                        <Label Grid.Row="1" Grid.Column="0" Text="Cardio" TextColor="#4B5563" />
-                        <Label Grid.Row="1" Grid.Column="1"
-                               Text="{Binding ActivityScore.CardioScore, StringFormat='{0:F1}'}"
-                               FontAttributes="Bold"
-                               TextColor="#F97316" />
-                        <Label Grid.Row="2" Grid.Column="0" Text="Flexibility" TextColor="#4B5563" />
-                        <Label Grid.Row="2" Grid.Column="1"
-                               Text="{Binding ActivityScore.FlexibilityScore, StringFormat='{0:F1}'}"
-                               FontAttributes="Bold"
-                               TextColor="#F97316" />
-                    </Grid>
-                    <Label Text="{Binding ActivityScore.DominantSport, StringFormat='Dominant: {0}'}"
-                           FontSize="13"
-                           TextColor="#6B7280" />
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- Evolve -->
-            <Button Text="Evolve Character"
-                    Command="{Binding EvolveCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
-                    BackgroundColor="#2563EB"
-                    TextColor="White"
-                    CornerRadius="12"
-                    HeightRequest="50" />
+            <!-- Evolution happens automatically as training shifts -->
+            <VerticalStackLayout Spacing="4">
+                <Label Style="{StaticResource PxMuted}"
+                       Text="Your hero evolves on its own as your training changes."
+                       HorizontalTextAlignment="Center"
+                       HorizontalOptions="Center" />
+                <Label Style="{StaticResource PxMuted}"
+                       FontSize="17"
+                       TextColor="{StaticResource PxTextDim}"
+                       Text="{Binding CharacterState.LastEvolved, StringFormat='Last evolved {0:MMM d, yyyy}'}"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
 
         </VerticalStackLayout>
     </ScrollView>

@@ -7,7 +7,14 @@ namespace MDRNJ.Api.Services.Interfaces
     public interface ICharacterService
     {
         Task<CharacterStateDto> GetCharacterAsync(Guid userId);
-        Task<CharacterStateDto> EvolveCharacterAsync(Guid userId);
+
+        /// <summary>
+        /// Adds stat points, refreshes training shares and evolves the character
+        /// (outfit / body type) when their training has shifted. Called after
+        /// workouts and quest / challenge completions.
+        /// </summary>
+        Task<CharacterProgressDto> ApplyActivityAsync(Guid userId, StatGain gain);
+
         Task<ActivityScoreDto> GetActivityScoreAsync(Guid userId);
         Task<ActivityScoreDto> RecalculateActivityScoreAsync(Guid userId);
     }

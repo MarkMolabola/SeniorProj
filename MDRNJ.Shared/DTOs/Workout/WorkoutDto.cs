@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using MDRNJ.Shared.DTOs.Character;
 
 namespace MDRNJ.Shared.DTOs.Workout
 {
@@ -16,5 +17,8 @@ namespace MDRNJ.Shared.DTOs.Workout
         public DateTime? EndTime { get; set; }
         public string? Notes { get; set; }
         public List<ExerciseDto> Exercises { get; set; } = new();
+
+        /// <summary>Set when completing the workout changed the character.</summary>
+        public CharacterProgressDto? CharacterProgress { get; set; }
     }
 }

@@ -18,5 +18,8 @@ namespace MDRNJ.Shared.DTOs.Challenge
         public string Status { get; set; }
         public float Progress { get; set; }
         public List<ChallengeParticipantDto> Participants { get; set; } = new();
+
+        /// <summary>Set when this update completed the challenge.</summary>
+        public MDRNJ.Shared.DTOs.Character.CharacterProgressDto? CharacterProgress { get; set; }
     }
 }

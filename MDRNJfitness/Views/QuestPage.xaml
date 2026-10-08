@@ -1,99 +1,102 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:MDRNJfitness.Controls"
              x:Class="MDRNJfitness.Views.QuestPage"
              Title="{Binding Title}"
-             BackgroundColor="#F4FFF7">
+             Style="{StaticResource PxPage}">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="18">
+        <VerticalStackLayout Padding="20,24,20,32" Spacing="24">
 
             <Grid ColumnDefinitions="*,Auto">
                 <Label Grid.Column="0"
-                       Text="Quests"
-                       FontSize="30"
-                       FontAttributes="Bold"
-                       TextColor="#1F2937"
+                       Style="{StaticResource PxTitle}"
+                       Text="QUEST BOARD"
                        VerticalOptions="Center" />
                 <Button Grid.Column="1"
-                        Text="Admin Panel"
-                        BackgroundColor="#2563EB"
-                        TextColor="White"
-                        CornerRadius="10"
-                        Padding="12,8"
+                        Style="{StaticResource PxButtonSecondary}"
+                        Text="ADMIN"
                         IsVisible="{Binding IsAdmin}"
                         Clicked="OnAdminPanelClicked" />
             </Grid>
 
-            <!-- Active Quests -->
-            <Border BackgroundColor="White"
-                    Stroke="#D9EAD3"
-                    StrokeShape="RoundRectangle 16"
-                    Padding="14">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="My Quests"
-                           FontSize="20"
-                           FontAttributes="Bold"
-                           TextColor="#1F2937" />
-
-                    <Label Text="No quests assigned yet."
-                           FontSize="13"
-                           TextColor="#6B7280"
-                           IsVisible="{Binding HasNoQuests}" />
-
-                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Quests}">
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate>
-                                <Border BackgroundColor="#F9FAFB"
-                                        Stroke="#E5E7EB"
-                                        StrokeShape="RoundRectangle 12"
-                                        Padding="12"
-                                        Margin="0,0,0,8">
-                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
-
-                                        <Label Grid.Row="0" Grid.Column="0"
-                                               Text="{Binding Title}"
-                                               FontSize="16"
-                                               FontAttributes="Bold"
-                                               TextColor="#1F2937" />
-
-                                        <Label Grid.Row="0" Grid.Column="1"
-                                               Text="{Binding XPReward, StringFormat='+{0} XP'}"
-                                               FontSize="14"
-                                               FontAttributes="Bold"
-                                               TextColor="#16A34A"
-                                               VerticalOptions="Center" />
-
-                                        <Label Grid.Row="1" Grid.ColumnSpan="2"
-                                               Text="{Binding Description}"
-                                               FontSize="13"
-                                               TextColor="#6B7280" />
-
-                                        <VerticalStackLayout Grid.Row="2" Grid.ColumnSpan="2" Spacing="4">
-                                            <Label Text="{Binding Status}"
-                                                   FontSize="12"
-                                                   TextColor="#2563EB"
-                                                   FontAttributes="Bold" />
-                                            <Label FontSize="11"
-                                                   TextColor="#9CA3AF">
-                                                <Label.FormattedText>
-                                                    <FormattedString>
-                                                        <Span Text="{Binding Progress}" />
-                                                        <Span Text=" / " />
-                                                        <Span Text="{Binding TargetValue}" />
-                                                    </FormattedString>
-                                                </Label.FormattedText>
-                                            </Label>
-                                        </VerticalStackLayout>
-
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
-                    </VerticalStackLayout>
-
-                </VerticalStackLayout>
+            <Border Style="{StaticResource PxPanel}" IsVisible="{Binding HasNoQuests}">
+                <Label Style="{StaticResource PxMuted}"
+                       Text="No quests on the board yet. Check back soon!" />
             </Border>
+
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding Quests}" Spacing="24">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource PxPanel}">
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding Status}" Value="Completed">
+                                    <Setter Property="Stroke" Value="{StaticResource PxGold}" />
+                                    <Setter Property="BackgroundColor" Value="#2B2656" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Border" Binding="{Binding Status}" Value="Expired">
+                                    <Setter Property="Opacity" Value="0.55" />
+                                </DataTrigger>
+                            </Border.Triggers>
+
+                            <VerticalStackLayout Spacing="10">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                    <Label Grid.Column="0"
+                                           Style="{StaticResource PxHeading}"
+                                           Text="{Binding Title}"
+                                           TextTransform="Uppercase" />
+                                    <Label Grid.Column="1"
+                                           Style="{StaticResource PxXp}"
+                                           VerticalOptions="Start"
+                                           Text="{Binding XPReward, StringFormat='+{0} XP'}" />
+                                </Grid>
+
+                                <Label Style="{StaticResource PxMuted}" Text="{Binding Description}" />
+
+                                <controls:XPBarControl HeightRequest="14"
+                                                       FillColor="{StaticResource PxTeal}"
+                                                       Segmented="False">
+                                    <controls:XPBarControl.Progress>
+                                        <MultiBinding Converter="{StaticResource RatioToProgress}">
+                                            <Binding Path="Progress" />
+                                            <Binding Path="TargetValue" />
+                                        </MultiBinding>
+                                    </controls:XPBarControl.Progress>
+                                </controls:XPBarControl>
+
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Grid.Column="0"
+                                           Style="{StaticResource PxBody}"
+                                           FontSize="19"
+                                           TextColor="{StaticResource PxTeal}"
+                                           Text="{Binding Status}"
+                                           TextTransform="Uppercase">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding Status}" Value="Completed">
+                                                <Setter Property="Text" Value="✓ COMPLETE" />
+                                                <Setter Property="TextColor" Value="{StaticResource PxGold}" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" Binding="{Binding Status}" Value="Expired">
+                                                <Setter Property="TextColor" Value="{StaticResource PxTextDim}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                    <Label Grid.Column="1" Style="{StaticResource PxMuted}">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding Progress, StringFormat='{0:0.#}'}" />
+                                                <Span Text=" / " />
+                                                <Span Text="{Binding TargetValue, StringFormat='{0:0.#}'}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
 
         </VerticalStackLayout>
     </ScrollView>

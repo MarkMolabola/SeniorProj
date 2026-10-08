@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MDRNJfitness.Views.PixelAvatarView">
+             x:Class="MDRNJfitness.Views.PixelAvatarView"
+             WidthRequest="160"
+             HeightRequest="160">
 
     <!--
-        160 × 256 = 10 sprite cols × 16  ×  16 sprite rows × 16
-        Rendered with crisp nearest-neighbour scaling via GraphicsView.
+        Default 160 × 160 = the 32 × 32 hero at 5×. The canvas fills the view
+        and the drawable picks the largest whole-number scale that fits, so
+        use multiples of 32 (96, 128, 160, 192…) for an exact fit.
     -->
     <GraphicsView x:Name="AvatarCanvas"
-                  WidthRequest="160"
-                  HeightRequest="256"
-                  HorizontalOptions="Center" />
+                  HorizontalOptions="Fill"
+                  VerticalOptions="Fill" />
 
 </ContentView>

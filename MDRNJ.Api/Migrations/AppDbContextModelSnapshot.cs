@@ -58,17 +58,26 @@ namespace MDRNJ.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<float>("CardioPoints")
+                        .HasColumnType("real");
+
                     b.Property<float>("CardioScore")
                         .HasColumnType("real");
 
                     b.Property<int>("DominantSport")
                         .HasColumnType("int");
 
+                    b.Property<float>("FlexibilityPoints")
+                        .HasColumnType("real");
+
                     b.Property<float>("FlexibilityScore")
                         .HasColumnType("real");
 
                     b.Property<DateTime>("LastCalculated")
                         .HasColumnType("datetime2");
+
+                    b.Property<float>("StrengthPoints")
+                        .HasColumnType("real");
 
                     b.Property<float>("StrengthScore")
                         .HasColumnType("real");

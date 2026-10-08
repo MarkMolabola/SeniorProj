@@ -75,6 +75,12 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
 		<PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
+		<!-- Pin patched native SQLite (GHSA-2m69-gcr7-jv3q affects 2.1.11).
+		     The generic package holds desktop Linux/Windows/macOS binaries; on Android its
+		     glibc libe_sqlite3.so replaces the Android build and SQLite fails to load, so
+		     Android gets only the .android package (iOS uses the system SQLite). -->
+		<PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13" Condition="!$(TargetFramework.Contains('-android')) And !$(TargetFramework.Contains('-ios'))" />
+		<PackageReference Include="SQLitePCLRaw.lib.e_sqlite3.android" Version="2.1.13" Condition="$(TargetFramework.Contains('-android'))" />
 	</ItemGroup>
 
 	<ItemGroup>

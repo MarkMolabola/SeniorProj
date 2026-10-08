@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using MDRNJ.Api.Data;
 using MDRNJ.Api.Data.Entities;
 using MDRNJ.Api.Services.Interfaces;
@@ -16,11 +16,13 @@ namespace MDRNJ.Api.Services
     {
         private readonly AppDbContext _db;
         private readonly IMapper _mapper;
+        private readonly ICharacterService _character;
 
-        public ChallengeService(AppDbContext db, IMapper mapper)
+        public ChallengeService(AppDbContext db, IMapper mapper, ICharacterService character)
         {
             _db = db;
             _mapper = mapper;
+            _character = character;
         }
 
         public async Task<ChallengeDto> CreateAsync(Guid userId, CreateChallengeDto dto)
@@ -120,11 +122,20 @@ namespace MDRNJ.Api.Services
                 ?? throw new KeyNotFoundException("Challenge not found.");
 
             participant.Progress = progress;
-            if (progress >= challenge.TargetValue)
+            var completedNow = false;
+            if (progress >= challenge.TargetValue && participant.Status != ChallengeStatus.Completed)
+            {
                 participant.Status = ChallengeStatus.Completed;
+                completedNow = true;
+            }
 
             await _db.SaveChangesAsync();
-            return await GetChallengeDto(challengeId, userId);
+
+            var dto = await GetChallengeDto(challengeId, userId);
+            if (completedNow)
+                dto.CharacterProgress = await _character.ApplyActivityAsync(
+                    userId, StatRules.ForCompletion(challenge.ChallengeType, challenge.XPReward));
+            return dto;
         }
 
         private async Task<ChallengeDto> GetChallengeDto(Guid challengeId, Guid userId)

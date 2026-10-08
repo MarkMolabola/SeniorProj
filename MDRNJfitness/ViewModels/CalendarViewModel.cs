@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MDRNJ.Shared.DTOs.Workout;
 using MDRNJfitness.Helpers;
@@ -11,6 +11,7 @@ namespace MDRNJfitness.ViewModels
     public partial class CalendarViewModel : BaseViewModel
     {
         private readonly IWorkoutService _workout;
+        private readonly ICharacterProgressPresenter _progress;
 
         [ObservableProperty] private DateTime _displayMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
         [ObservableProperty] private string _monthLabel = string.Empty;
@@ -49,9 +50,10 @@ namespace MDRNJfitness.ViewModels
 
         private List<WorkoutDto> _monthWorkouts = new();
 
-        public CalendarViewModel(IWorkoutService workout)
+        public CalendarViewModel(IWorkoutService workout, ICharacterProgressPresenter progress)
         {
             _workout = workout;
+            _progress = progress;
             Title = "Calendar";
         }
 
@@ -119,6 +121,8 @@ namespace MDRNJfitness.ViewModels
                 var cell = Days.FirstOrDefault(d => d.Date.Date == SelectedDay.Date.Date);
                 if (cell is not null)
                     cell.HasWorkout = true;
+
+                await _progress.PresentAsync(added.CharacterProgress, "WORKOUT LOGGED");
             });
         }
 

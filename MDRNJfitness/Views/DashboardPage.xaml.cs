@@ -16,4 +16,9 @@ public partial class DashboardPage : ContentPage
         if (BindingContext is DashboardViewModel vm)
             vm.LoadCommand.Execute(null);
     }
+
+    private async void OnStartWorkoutClicked(object? sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("//WorkoutPage");
+    }
 }

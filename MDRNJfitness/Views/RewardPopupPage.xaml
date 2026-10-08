@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Shown modally after a workout / quest / challenge changes the character:
+    stat gains, stat level-ups, and (when the outfit or body type changed)
+    a before → after evolution.
+-->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             xmlns:local="clr-namespace:MDRNJfitness.Views"
+             x:Class="MDRNJfitness.Views.RewardPopupPage"
+             ios:Page.ModalPresentationStyle="OverFullScreen"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#E60B0918">
+
+    <Grid Padding="24">
+        <Border Style="{StaticResource PxPanel}"
+                Padding="22,28,22,24"
+                VerticalOptions="Center">
+            <VerticalStackLayout Spacing="18">
+
+                <Label x:Name="HeadlineLabel"
+                       Style="{StaticResource PxTitle}"
+                       FontSize="20"
+                       TextColor="{StaticResource PxGold}"
+                       HorizontalTextAlignment="Center"
+                       HorizontalOptions="Center" />
+
+                <!-- Evolution: before → after -->
+                <Grid x:Name="EvolutionRow"
+                      ColumnDefinitions="*,Auto,*"
+                      ColumnSpacing="8"
+                      IsVisible="False">
+                    <Border Grid.Column="0" Style="{StaticResource PxSunken}" HorizontalOptions="End" Padding="6">
+                        <local:PixelAvatarView x:Name="BeforeAvatar" WidthRequest="96" HeightRequest="96" Opacity="0.6" />
+                    </Border>
+                    <Label Grid.Column="1"
+                           Style="{StaticResource PxTitle}"
+                           Text="▶"
+                           TextColor="{StaticResource PxGold}"
+                           VerticalOptions="Center" />
+                    <Border Grid.Column="2" Style="{StaticResource PxSunken}" HorizontalOptions="Start" Padding="6"
+                            Stroke="{StaticResource PxGold}">
+                        <local:PixelAvatarView x:Name="AfterAvatar" WidthRequest="96" HeightRequest="96" />
+                    </Border>
+                </Grid>
+
+                <!-- No evolution: just the hero -->
+                <Border x:Name="HeroBox"
+                        Style="{StaticResource PxSunken}"
+                        HorizontalOptions="Center"
+                        Padding="8">
+                    <local:PixelAvatarView x:Name="HeroAvatar" WidthRequest="128" HeightRequest="128" />
+                </Border>
+
+                <Label x:Name="EvolutionLabel"
+                       Style="{StaticResource PxBody}"
+                       TextColor="{StaticResource PxTeal}"
+                       HorizontalTextAlignment="Center"
+                       HorizontalOptions="Center"
+                       IsVisible="False" />
+
+                <Border Style="{StaticResource PxSunken}" Padding="16,14">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Style="{StaticResource PxCaption}" Text="REWARDS" />
+                        <VerticalStackLayout x:Name="RewardLines" Spacing="6" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Button Style="{StaticResource PxButton}"
+                        Text="CONTINUE"
+                        Clicked="OnContinueClicked" />
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>

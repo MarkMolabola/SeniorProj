@@ -1,4 +1,4 @@
-namespace MDRNJ.Shared.DTOs.Quest
+﻿namespace MDRNJ.Shared.DTOs.Quest
 {
     public class UserQuestDto
     {
@@ -14,5 +14,8 @@ namespace MDRNJ.Shared.DTOs.Quest
         public DateTime? EndDate { get; set; }
         public DateTime AssignedAt { get; set; }
         public DateTime? CompletedAt { get; set; }
+
+        /// <summary>Set when this update completed the quest.</summary>
+        public MDRNJ.Shared.DTOs.Character.CharacterProgressDto? CharacterProgress { get; set; }
     }
 }

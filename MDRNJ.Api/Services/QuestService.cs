@@ -1,4 +1,4 @@
-using MDRNJ.Api.Data;
+﻿using MDRNJ.Api.Data;
 using MDRNJ.Api.Data.Entities;
 using MDRNJ.Api.Services.Interfaces;
 using MDRNJ.Shared.DTOs.Quest;
@@ -10,8 +10,13 @@ namespace MDRNJ.Api.Services
     public class QuestService : IQuestService
     {
         private readonly AppDbContext _db;
+        private readonly ICharacterService _character;
 
-        public QuestService(AppDbContext db) => _db = db;
+        public QuestService(AppDbContext db, ICharacterService character)
+        {
+            _db = db;
+            _character = character;
+        }
 
         public async Task<QuestDto> CreateAsync(CreateQuestDto dto)
         {
@@ -140,14 +145,21 @@ namespace MDRNJ.Api.Services
                 ?? throw new KeyNotFoundException("Quest assignment not found.");
 
             userQuest.Progress = progress;
+            var completedNow = false;
             if (progress >= userQuest.Quest.TargetValue && userQuest.Status == QuestStatus.Active)
             {
                 userQuest.Status = QuestStatus.Completed;
                 userQuest.CompletedAt = DateTime.UtcNow;
+                completedNow = true;
             }
 
             await _db.SaveChangesAsync();
-            return ToUserQuestDto(userQuest);
+
+            var dto = ToUserQuestDto(userQuest);
+            if (completedNow)
+                dto.CharacterProgress = await _character.ApplyActivityAsync(
+                    userId, StatRules.ForCompletion(userQuest.Quest.QuestType, userQuest.Quest.XPReward));
+            return dto;
         }
 
         private static QuestDto ToDto(QuestEntity q, int assignedCount) => new()
