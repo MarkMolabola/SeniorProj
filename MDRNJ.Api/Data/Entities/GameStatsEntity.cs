@@ -11,6 +11,7 @@ namespace MDRNJ.Api.Data.Entities
         public int CurrentStreak { get; set; }
         public int LongestStreak { get; set; }
         public int TotalWorkouts { get; set; }
+        public int Gold { get; set; } = MDRNJ.Shared.Game.GoldRules.StartingGold;
         public DateTime? LastWorkoutDate { get; set; }
 
         // Navigation

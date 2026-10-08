@@ -60,6 +60,10 @@ namespace MDRNJfitness
                 c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
                 .AddHttpMessageHandler<AuthHeaderHandler>();
 
+            builder.Services.AddHttpClient<IGearService, GearService>(
+                c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
+                .AddHttpMessageHandler<AuthHeaderHandler>();
+
             builder.Services.AddHttpClient<ICharacterService, CharacterService>(
                 c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
                 .AddHttpMessageHandler<AuthHeaderHandler>();
@@ -98,6 +102,8 @@ namespace MDRNJfitness
             builder.Services.AddTransient<CalendarViewModel>();
             builder.Services.AddTransient<QuestViewModel>();
             builder.Services.AddTransient<AdminQuestViewModel>();
+            builder.Services.AddTransient<ShopViewModel>();
+            builder.Services.AddTransient<CollectionViewModel>();
 
             // Pages
             builder.Services.AddTransient<LoginPage>();
@@ -112,6 +118,8 @@ namespace MDRNJfitness
             builder.Services.AddTransient<CalendarPage>();
             builder.Services.AddTransient<QuestPage>();
             builder.Services.AddTransient<AdminQuestPage>();
+            builder.Services.AddTransient<ShopPage>();
+            builder.Services.AddTransient<CollectionPage>();
 
             return builder.Build();
         }

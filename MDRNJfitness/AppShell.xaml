@@ -20,8 +20,13 @@
     <TabBar>
         <Tab Title="Home" Route="home" Icon="tab_home.png">
             <ShellContent
+                Title="Home"
                 Route="DashboardPage"
                 ContentTemplate="{DataTemplate views:DashboardPage}" />
+            <ShellContent
+                Title="Shop"
+                Route="ShopPage"
+                ContentTemplate="{DataTemplate views:ShopPage}" />
         </Tab>
         <Tab Title="Train" Route="train" Icon="tab_train.png">
             <ShellContent
@@ -42,6 +47,10 @@
                 Title="Profile"
                 Route="ProfilePage"
                 ContentTemplate="{DataTemplate views:ProfilePage}" />
+            <ShellContent
+                Title="Collection"
+                Route="CollectionPage"
+                ContentTemplate="{DataTemplate views:CollectionPage}" />
         </Tab>
         <Tab Title="Quests" Route="quests" Icon="tab_quests.png">
             <ShellContent

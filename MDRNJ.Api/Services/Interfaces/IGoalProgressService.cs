@@ -16,8 +16,13 @@ namespace MDRNJ.Api.Services.Interfaces
     {
         Task<GameStatsEntity> GetOrCreateStatsAsync(Guid userId);
 
-        /// <summary>Adds XP, updates the account level and records the transaction.</summary>
+        /// <summary>
+        /// Adds XP, updates the account level and records the transaction.
+        /// Each level gained also pays <see cref="MDRNJ.Shared.Game.GoldRules.PerLevelUp"/> gold.
+        /// </summary>
         void GrantXP(GameStatsEntity stats, int amount, XPReason reason);
+
+        void GrantGold(GameStatsEntity stats, int amount);
 
         /// <summary>
         /// Advances the user's active quests for a finished workout.
@@ -26,7 +31,7 @@ namespace MDRNJ.Api.Services.Interfaces
         /// </summary>
         Task<List<GoalCompletion>> AdvanceForWorkoutAsync(GameStatsEntity stats, WorkoutSessionEntity session);
 
-        /// <summary>Grants a just-completed quest's XP reward.</summary>
+        /// <summary>Grants a just-completed quest's XP and gold reward.</summary>
         GoalCompletion CompleteQuest(GameStatsEntity stats, QuestEntity quest);
     }
 }

@@ -25,7 +25,17 @@
                         </FormattedString>
                     </Label.FormattedText>
                 </Label>
-                <Border Grid.Column="1" Style="{StaticResource PxChip}" BackgroundColor="{StaticResource PxPanel}" Padding="10,2">
+                <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                <Border Style="{StaticResource PxChip}" BackgroundColor="{StaticResource PxPanel}" Padding="10,2">
+                    <HorizontalStackLayout Spacing="6">
+                        <Image Source="icon_gold.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                        <Label Style="{StaticResource PxBody}"
+                               Text="{Binding Stats.Gold}"
+                               TextColor="{StaticResource PxGold}"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+                <Border Style="{StaticResource PxChip}" BackgroundColor="{StaticResource PxPanel}" Padding="10,2">
                     <HorizontalStackLayout Spacing="6">
                         <Image Source="icon_flame.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
                         <Label Style="{StaticResource PxBody}"
@@ -33,6 +43,7 @@
                                VerticalOptions="Center" />
                     </HorizontalStackLayout>
                 </Border>
+                </HorizontalStackLayout>
             </Grid>
 
             <!-- Hero card -->
@@ -46,6 +57,7 @@
                                 <local:PixelAvatarView Grid.RowSpan="2"
                                                        AvatarType="{Binding HeroOutfit}"
                                                        AvatarId="{Binding HeroAvatarId}"
+                                                       Gear="{Binding Hero, Converter={StaticResource GearList}}"
                                                        WidthRequest="96"
                                                        HeightRequest="96"
                                                        VerticalOptions="End"

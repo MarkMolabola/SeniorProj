@@ -147,6 +147,7 @@ namespace MDRNJ.Api.Services
 
             var stats = await _goals.GetOrCreateStatsAsync(userId);
             var levelBefore = stats.CurrentLevel;
+            var goldBefore = stats.Gold;
 
             await ResolveAndSaveAsync(new[] { challenge });
 
@@ -161,6 +162,7 @@ namespace MDRNJ.Api.Services
             dto.AccountProgress = new AccountProgressDto
             {
                 XPGained = dto.XPEarned,
+                GoldGained = stats.Gold - goldBefore,
                 PreviousLevel = levelBefore,
                 NewLevel = stats.CurrentLevel,
                 CompletedGoals = { ToGoal(challenge, dto) }
@@ -224,8 +226,8 @@ namespace MDRNJ.Api.Services
                 c.ChallengerXP = XPFor(result, c.ChallengerScore);
                 c.OpponentXP = XPFor(-result, c.OpponentScore);
 
-                await GrantAsync(c.ChallengerId, c.ChallengerXP, result > 0);
-                await GrantAsync(c.OpponentId, c.OpponentXP, result < 0);
+                await GrantAsync(c.ChallengerId, c.ChallengerXP, result, c.ChallengerScore is not null);
+                await GrantAsync(c.OpponentId, c.OpponentXP, -result, c.OpponentScore is not null);
                 touchedUsers.Add(c.ChallengerId);
                 touchedUsers.Add(c.OpponentId);
             }
@@ -239,11 +241,13 @@ namespace MDRNJ.Api.Services
         private static int XPFor(int result, float? score) =>
             score is null ? 0 : result > 0 ? DuelRules.WinXP : result == 0 ? DuelRules.TieXP : DuelRules.LossXP;
 
-        private async Task GrantAsync(Guid userId, int xp, bool won)
+        /// <summary>XP and gold for one side; <paramref name="result"/> is +1 win, 0 tie, -1 loss.</summary>
+        private async Task GrantAsync(Guid userId, int xp, int result, bool competed)
         {
-            if (xp <= 0) return;
+            if (!competed) return;
             var stats = await _goals.GetOrCreateStatsAsync(userId);
-            _goals.GrantXP(stats, xp, won ? XPReason.FriendChallengeWon : XPReason.DuelPlayed);
+            _goals.GrantXP(stats, xp, result > 0 ? XPReason.FriendChallengeWon : XPReason.DuelPlayed);
+            _goals.GrantGold(stats, GoldRules.ForDuel(result > 0 ? "Won" : result == 0 ? "Tie" : "Lost", competed));
         }
 
         /// <summary>Stat points for participants not already handled by the caller.</summary>

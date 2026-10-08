@@ -14,5 +14,6 @@ namespace MDRNJ.Shared.DTOs.Game
         public int TotalWorkouts { get; set; }
         public DateTime? LastWorkoutDate { get; set; }
         public int XPToNextLevel { get; set; }
+        public int Gold { get; set; }
     }
 }

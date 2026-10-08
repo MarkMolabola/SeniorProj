@@ -269,6 +269,11 @@ namespace MDRNJfitness.Helpers.Sprites
         private static readonly Dictionary<string, int> FullBodyBreathRows = new(StringComparer.OrdinalIgnoreCase)
         {
             ["starting_girl"] = 17,
+            ["starting_girl2"] = 15,
+            ["starter_archer"] = 18,
+            ["starter_archer2"] = 20,
+            ["starting_ninja"] = 18,
+            ["starting_buff_ninja"] = 17,
         };
 
         /// <summary>The full-body drawing for an avatar id; false for the layered "classic" hero.</summary>
@@ -281,6 +286,22 @@ namespace MDRNJfitness.Helpers.Sprites
             breathRow = FullBodyBreathRows.GetValueOrDefault(avatarId, BreathRow);
             return true;
         }
+
+        /// <summary>
+        /// Gear art for an item. Default art is drawn for the classic hero, so
+        /// full-body avatars (different shapes) only show gear that has a
+        /// version drawn for them ("item@avatar"); otherwise it's hidden rather
+        /// than floating off the body. Pass a null avatar for shop icons.
+        /// </summary>
+        public static bool TryGetGear(string itemId, string? avatarId, out SpriteLayer layer)
+        {
+            if (!string.IsNullOrEmpty(avatarId) && FullBodyAvatars.ContainsKey(avatarId))
+                return GearLayers.TryGetValue($"{itemId}@{avatarId}", out layer!);
+            return GearLayers.TryGetValue(itemId, out layer!);
+        }
+
+        /// <summary>True when this item has art that fits the hero (so it shows when worn).</summary>
+        public static bool GearFits(string itemId, string? avatarId) => TryGetGear(itemId, avatarId, out _);
 
         public static bool TryGetOutfit(string? outfitSlot, out SpriteLayer outfit)
             => Outfits.TryGetValue(string.IsNullOrWhiteSpace(outfitSlot) ? "default" : outfitSlot, out outfit!);

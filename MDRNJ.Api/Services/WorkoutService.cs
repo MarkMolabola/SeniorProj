@@ -5,6 +5,7 @@ using MDRNJ.Api.Services.Interfaces;
 using MDRNJ.Shared.DTOs.Game;
 using MDRNJ.Shared.DTOs.Workout;
 using MDRNJ.Shared.Enums;
+using MDRNJ.Shared.Game;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -98,8 +99,10 @@ namespace MDRNJ.Api.Services
             var stats = await _goals.GetOrCreateStatsAsync(userId);
             var xpBefore = stats.TotalXP;
             var levelBefore = stats.CurrentLevel;
+            var goldBefore = stats.Gold;
 
             _goals.GrantXP(stats, session.XPAwarded, XPReason.WorkoutCompleted);
+            _goals.GrantGold(stats, GoldRules.ForWorkout(session.DurationMins));
             stats.TotalWorkouts++;
 
             var today = DateTime.UtcNow.Date;
@@ -124,6 +127,7 @@ namespace MDRNJ.Api.Services
             dto.AccountProgress = new AccountProgressDto
             {
                 XPGained = stats.TotalXP - xpBefore,
+                GoldGained = stats.Gold - goldBefore,
                 PreviousLevel = levelBefore,
                 NewLevel = stats.CurrentLevel,
                 CompletedGoals = completions.Select(c => c.Goal).ToList()

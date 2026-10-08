@@ -27,6 +27,7 @@
                     <local:PixelAvatarView Grid.RowSpan="2"
                                            AvatarType="{Binding SpriteState}"
                                            AvatarId="{Binding AvatarId}"
+                                           Gear="{Binding HeroGear}"
                                            HorizontalOptions="Center"
                                            VerticalOptions="End"
                                            Margin="0,0,0,24" />
@@ -64,6 +65,7 @@
                                     <VerticalStackLayout Spacing="6">
                                         <local:PixelAvatarView AvatarId="{Binding Id}"
                                                                AvatarType="{Binding PreviewOutfit}"
+                                                               Gear="{Binding PreviewGear}"
                                                                WidthRequest="96"
                                                                HeightRequest="96"
                                                                HorizontalOptions="Center" />
@@ -129,39 +131,59 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Gear -->
+            <!-- Gear: tap a slot to wear something you own -->
             <Border Style="{StaticResource PxPanel}">
-                <VerticalStackLayout Spacing="14">
+                <VerticalStackLayout Spacing="12">
                     <Label Style="{StaticResource PxHeading}" Text="GEAR" />
-                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
-                        <VerticalStackLayout Grid.Column="0" Spacing="6" HorizontalOptions="Center">
-                            <Border Style="{StaticResource PxSlot}" HorizontalOptions="Center">
-                                <Label Text="◆" FontSize="26" TextColor="{StaticResource PxOrange}"
-                                       HorizontalOptions="Center" VerticalOptions="Center" />
-                            </Border>
-                            <Label Style="{StaticResource PxMuted}" FontSize="17" Text="Body" HorizontalOptions="Center" />
-                            <Label Style="{StaticResource PxBody}" FontSize="19" Text="{Binding CharacterState.BodyType, Converter={StaticResource BodyTypeName}}"
-                                   HorizontalTextAlignment="Center" HorizontalOptions="Center" />
-                        </VerticalStackLayout>
-                        <VerticalStackLayout Grid.Column="1" Spacing="6" HorizontalOptions="Center">
-                            <Border Style="{StaticResource PxSlot}" HorizontalOptions="Center">
-                                <Label Text="▲" FontSize="26" TextColor="{StaticResource PxTeal}"
-                                       HorizontalOptions="Center" VerticalOptions="Center" />
-                            </Border>
-                            <Label Style="{StaticResource PxMuted}" FontSize="17" Text="Outfit" HorizontalOptions="Center" />
-                            <Label Style="{StaticResource PxBody}" FontSize="19" Text="{Binding CharacterState.OutfitSlot}"
-                                   HorizontalTextAlignment="Center" HorizontalOptions="Center" />
-                        </VerticalStackLayout>
-                        <VerticalStackLayout Grid.Column="2" Spacing="6" HorizontalOptions="Center">
-                            <Border Style="{StaticResource PxSlot}" HorizontalOptions="Center">
-                                <Label Text="■" FontSize="26" TextColor="{StaticResource PxText}"
-                                       HorizontalOptions="Center" VerticalOptions="Center" />
-                            </Border>
-                            <Label Style="{StaticResource PxMuted}" FontSize="17" Text="Equipment" HorizontalOptions="Center" />
-                            <Label Style="{StaticResource PxBody}" FontSize="19" Text="{Binding CharacterState.EquipmentSlot}"
-                                   HorizontalTextAlignment="Center" HorizontalOptions="Center" />
-                        </VerticalStackLayout>
+
+                    <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="6"
+                          BindableLayout.ItemsSource="{Binding GearSlots}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <VerticalStackLayout Grid.Column="{Binding Slot, Converter={StaticResource GearSlotColumn}}"
+                                                     Spacing="4">
+                                    <VerticalStackLayout.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CharacterViewModel}}, Path=ChooseGearCommand}"
+                                                              CommandParameter="{Binding .}" />
+                                    </VerticalStackLayout.GestureRecognizers>
+
+                                    <Border Style="{StaticResource PxSunken}" HeightRequest="58" Padding="6">
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsEmpty}" Value="False">
+                                                <Setter Property="Stroke" Value="{StaticResource PxGold}" />
+                                            </DataTrigger>
+                                        </Border.Triggers>
+                                        <Grid>
+                                            <local:GearIconView ItemId="{Binding ItemId}" />
+                                            <Label Text="+" FontFamily="PixelBody" FontSize="28"
+                                                   TextColor="{StaticResource PxTextDim}"
+                                                   HorizontalOptions="Center" VerticalOptions="Center"
+                                                   IsVisible="{Binding IsEmpty}" />
+                                        </Grid>
+                                    </Border>
+                                    <Label Style="{StaticResource PxMuted}" FontSize="16" Text="{Binding Label}"
+                                           HorizontalOptions="Center" />
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
                     </Grid>
+
+                    <Label Style="{StaticResource PxMuted}"
+                           FontSize="17"
+                           TextColor="{StaticResource PxOrange}"
+                           IsVisible="{Binding HasHiddenGear}"
+                           Text="Some of your gear hasn't been drawn for this hero yet, so it's hidden. It still shows on heroes it fits." />
+
+                    <Label Style="{StaticResource PxMuted}" FontSize="17">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Training outfit: " />
+                                <Span Text="{Binding CharacterState.OutfitSlot}" TextColor="{StaticResource PxTeal}" />
+                                <Span Text=" · Build: " />
+                                <Span Text="{Binding CharacterState.BodyType, Converter={StaticResource BodyTypeName}}" TextColor="{StaticResource PxTeal}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
                 </VerticalStackLayout>
             </Border>
 

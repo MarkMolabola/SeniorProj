@@ -9,6 +9,7 @@ namespace MDRNJ.Shared.DTOs.Game
     {
         /// <summary>All XP earned, including quest / challenge rewards.</summary>
         public int XPGained { get; set; }
+        public int GoldGained { get; set; }
         public int PreviousLevel { get; set; }
         public int NewLevel { get; set; }
         public bool LeveledUp => NewLevel > PreviousLevel;

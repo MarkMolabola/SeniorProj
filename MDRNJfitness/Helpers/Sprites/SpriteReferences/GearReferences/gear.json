@@ -1,0 +1,22 @@
+{
+  "Head/RedCap": {
+    "name": "Red Cap",
+    "price": 60
+  },
+  "Top/RunnerTee": {
+    "name": "Runner Tee",
+    "price": 80
+  },
+  "Bottom/TrackShorts": {
+    "name": "Track Shorts",
+    "price": 70
+  },
+  "Shoes/RedSneakers": {
+    "name": "Red Sneakers",
+    "price": 90
+  },
+  "Accessory/Wristbands": {
+    "name": "Wristbands",
+    "price": 40
+  }
+}

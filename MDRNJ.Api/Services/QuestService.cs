@@ -160,6 +160,7 @@ namespace MDRNJ.Api.Services
 
             var stats = await _goals.GetOrCreateStatsAsync(userId);
             var levelBefore = stats.CurrentLevel;
+            var goldBefore = stats.Gold;
             var completion = _goals.CompleteQuest(stats, quest);
             await _db.SaveChangesAsync();
 
@@ -169,6 +170,7 @@ namespace MDRNJ.Api.Services
             dto.AccountProgress = new AccountProgressDto
             {
                 XPGained = quest.XPReward,
+                GoldGained = stats.Gold - goldBefore,
                 PreviousLevel = levelBefore,
                 NewLevel = stats.CurrentLevel,
                 CompletedGoals = { completion.Goal }

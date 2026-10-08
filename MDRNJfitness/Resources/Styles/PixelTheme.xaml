@@ -13,6 +13,8 @@
     <conv:StatLevelConverter x:Key="StatLevel" />
     <conv:StatLevelProgressConverter x:Key="StatLevelProgress" />
     <conv:BodyTypeNameConverter x:Key="BodyTypeName" />
+    <conv:GearListConverter x:Key="GearList" />
+    <conv:GearSlotColumnConverter x:Key="GearSlotColumn" />
 
     <!-- ── Pages ─────────────────────────────────────────────────────────── -->
     <Style x:Key="PxPage" TargetType="ContentPage">

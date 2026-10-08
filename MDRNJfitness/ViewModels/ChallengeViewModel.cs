@@ -113,6 +113,7 @@ namespace MDRNJfitness.ViewModels
                 await _progress.PresentAsync(null, new AccountProgressDto
                 {
                     XPGained = c.XPEarned,
+                    GoldGained = GoldRules.ForDuel(c.Outcome, competed: c.MyScore is not null),
                     CompletedGoals = { ToGoal(card) }
                 }, Headline(c.Outcome));
                 await _challenges.MarkResultSeenAsync(c.ChallengeId);

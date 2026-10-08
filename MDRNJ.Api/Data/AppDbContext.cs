@@ -22,6 +22,7 @@ namespace MDRNJ.Api.Data
         public DbSet<ChallengeAttemptEntity> ChallengeAttempts => Set<ChallengeAttemptEntity>();
         public DbSet<QuestEntity> Quests => Set<QuestEntity>();
         public DbSet<UserQuestEntity> UserQuests => Set<UserQuestEntity>();
+        public DbSet<UserGearEntity> UserGear => Set<UserGearEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -60,6 +61,8 @@ namespace MDRNJ.Api.Data
                  .WithOne(u => u.GameStats)
                  .HasForeignKey<GameStatsEntity>(g => g.UserId)
                  .OnDelete(DeleteBehavior.Cascade);
+                // Existing accounts get the starting gold when the column is added
+                e.Property(g => g.Gold).HasDefaultValue(MDRNJ.Shared.Game.GoldRules.StartingGold);
             });
 
             // WorkoutSessionEntity
@@ -125,6 +128,11 @@ namespace MDRNJ.Api.Data
                  .HasForeignKey<CharacterStateEntity>(c => c.UserId)
                  .OnDelete(DeleteBehavior.Cascade);
                 e.Property(c => c.AvatarId).HasMaxLength(40).HasDefaultValue("classic");
+                e.Property(c => c.HeadGear).HasMaxLength(60);
+                e.Property(c => c.TopGear).HasMaxLength(60);
+                e.Property(c => c.BottomGear).HasMaxLength(60);
+                e.Property(c => c.ShoesGear).HasMaxLength(60);
+                e.Property(c => c.AccessoryGear).HasMaxLength(60);
             });
 
             // ActivityScoreEntity — 1:1 with User
@@ -198,6 +206,17 @@ namespace MDRNJ.Api.Data
                 e.HasOne(uq => uq.Quest)
                  .WithMany(q => q.UserQuests)
                  .HasForeignKey(uq => uq.QuestId)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // UserGearEntity — shop items a user owns
+            modelBuilder.Entity<UserGearEntity>(e =>
+            {
+                e.HasKey(g => new { g.UserId, g.ItemId });
+                e.Property(g => g.ItemId).HasMaxLength(60);
+                e.HasOne(g => g.User)
+                 .WithMany(u => u.OwnedGear)
+                 .HasForeignKey(g => g.UserId)
                  .OnDelete(DeleteBehavior.Cascade);
             });
         }

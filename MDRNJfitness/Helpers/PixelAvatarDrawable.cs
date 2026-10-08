@@ -266,6 +266,9 @@ namespace MDRNJfitness.Helpers
 
         /// <summary>Chosen hero look (HeroAvatars id). Full-body avatars ignore AvatarType.</summary>
         public string AvatarId { get; set; } = "classic";
+
+        /// <summary>Worn gear item ids in draw order (bottom first, head last).</summary>
+        public IReadOnlyList<string> Gear { get; set; } = Array.Empty<string>();
         public int Frame { get; set; } = 0;
 
         private const int SpriteW = 10;
@@ -473,7 +476,9 @@ namespace MDRNJfitness.Helpers
 
             if (HeroSprites.TryGetFullBodyAvatar(AvatarId, out var fullBody, out var breathRow))
             {
-                DrawLayer(canvas, fullBody, Place(dirtyRect, HeroSprites.Size, HeroSprites.Size), Frame, breathRow);
+                var at = SpritePainter.Place(dirtyRect, HeroSprites.Size, HeroSprites.Size);
+                SpritePainter.DrawLayer(canvas, fullBody, at, Frame, breathRow);
+                DrawGear(canvas, at, breathRow);
                 return;
             }
 
@@ -484,16 +489,17 @@ namespace MDRNJfitness.Helpers
 
             if (useHero)
             {
-                var hero = Place(dirtyRect, HeroSprites.Size, HeroSprites.Size);
-                DrawLayer(canvas, HeroSprites.Body, hero, Frame, HeroSprites.BreathRow);
-                DrawLayer(canvas, outfit, hero, Frame, HeroSprites.BreathRow);
+                var hero = SpritePainter.Place(dirtyRect, HeroSprites.Size, HeroSprites.Size);
+                SpritePainter.DrawLayer(canvas, HeroSprites.Body, hero, Frame, HeroSprites.BreathRow);
+                SpritePainter.DrawLayer(canvas, outfit, hero, Frame, HeroSprites.BreathRow);
+                DrawGear(canvas, hero, HeroSprites.BreathRow);
                 return;
             }
 
             // Legacy 10×16 stick figures (frames are drawn per pose)
             var frames = Sprites[AvatarType];
             var sprite = frames[Frame % frames.Length];
-            var legacy = Place(dirtyRect, SpriteW, SpriteH);
+            var legacy = SpritePainter.Place(dirtyRect, SpriteW, SpriteH);
 
             for (int row = 0; row < sprite.Length && row < SpriteH; row++)
             {
@@ -515,57 +521,12 @@ namespace MDRNJfitness.Helpers
             }
         }
 
-        /// <summary>
-        /// Largest whole-number scale that fits, centred horizontally and
-        /// bottom-aligned (feet on the floor). Falls back to a fractional scale
-        /// only when the canvas is smaller than the sprite.
-        /// </summary>
-        private static (float X, float Y, float Scale) Place(RectF area, int width, int height)
+        /// <summary>Bought gear on top of the hero; it breathes with the body it's worn on.</summary>
+        private void DrawGear(ICanvas canvas, (float X, float Y, float Scale) at, int breathRow)
         {
-            var fit = MathF.Min(area.Width / width, area.Height / height);
-            var scale = fit >= 1 ? MathF.Floor(fit) : fit;
-            return (
-                area.X + MathF.Floor((area.Width - width * scale) / 2),
-                area.Y + MathF.Floor(area.Height - height * scale),
-                scale);
-        }
-
-        /// <summary>
-        /// Draws one layer, merging same-colour runs into single rectangles.
-        /// On odd frames rows above breathRow sink 1px (the row just above
-        /// breathRow is dropped) so the character idles without extra art.
-        /// </summary>
-        private static void DrawLayer(ICanvas canvas, SpriteLayer layer, (float X, float Y, float Scale) at, int frame, int breathRow)
-        {
-            var breathing = frame % 2 == 1;
-
-            for (int y = 0; y < layer.Height; y++)
-            {
-                var destY = y;
-                if (breathing && y < breathRow)
-                {
-                    if (y == breathRow - 1) continue;
-                    destY = y + 1;
-                }
-
-                var row = layer.Rows[y];
-                for (int x = 0; x < row.Length;)
-                {
-                    var ch = row[x];
-                    var end = x + 1;
-                    while (end < row.Length && row[end] == ch) end++;
-
-                    if (ch != '.' && layer.Palette.TryGetValue(ch, out var color))
-                    {
-                        canvas.FillColor = color;
-                        canvas.FillRectangle(
-                            at.X + x * at.Scale,
-                            at.Y + destY * at.Scale,
-                            (end - x) * at.Scale, at.Scale);
-                    }
-                    x = end;
-                }
-            }
+            foreach (var itemId in Gear)
+                if (HeroSprites.TryGetGear(itemId, AvatarId, out var layer))
+                    SpritePainter.DrawLayer(canvas, layer, at, Frame, breathRow);
         }
     }
 

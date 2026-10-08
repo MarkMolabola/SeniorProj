@@ -34,6 +34,21 @@ public partial class PixelAvatarView : ContentView
         set => SetValue(AvatarIdProperty, value);
     }
 
+    /// <summary>Worn gear item ids in draw order (bottom first, head last).</summary>
+    public static readonly BindableProperty GearProperty =
+        BindableProperty.Create(
+            nameof(Gear),
+            typeof(IReadOnlyList<string>),
+            typeof(PixelAvatarView),
+            null,
+            propertyChanged: (b, _, _) => ((PixelAvatarView)b).OnAvatarTypeChanged());
+
+    public IReadOnlyList<string>? Gear
+    {
+        get => (IReadOnlyList<string>?)GetValue(GearProperty);
+        set => SetValue(GearProperty, value);
+    }
+
     private readonly PixelAvatarDrawable _drawable = new();
     private IDispatcherTimer? _timer;
 
@@ -75,6 +90,7 @@ public partial class PixelAvatarView : ContentView
     {
         _drawable.AvatarType = AvatarType ?? "default";
         _drawable.AvatarId = AvatarId ?? "classic";
+        _drawable.Gear = Gear ?? Array.Empty<string>();
         _drawable.Frame = 0;
         AvatarCanvas.Invalidate();
     }

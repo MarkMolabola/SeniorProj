@@ -19,6 +19,7 @@ namespace MDRNJfitness.ViewModels
         [ObservableProperty] private string _userName = string.Empty;
         [ObservableProperty] private string _heroOutfit = "default";
         [ObservableProperty] private string _heroAvatarId = "classic";
+        [ObservableProperty] private MDRNJ.Shared.DTOs.Character.CharacterStateDto? _hero;
 
         public double XPProgress
         {
@@ -60,6 +61,7 @@ namespace MDRNJfitness.ViewModels
                 var hero = await _character.GetCharacterAsync();
                 HeroOutfit = hero?.OutfitSlot ?? "default";
                 HeroAvatarId = hero?.AvatarId ?? "classic";
+                Hero = hero;
 
                 await _game.CheckAchievementsAsync();
                 var allAchievements = await _game.GetAchievementsAsync();

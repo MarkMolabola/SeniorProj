@@ -187,6 +187,10 @@ namespace MDRNJ.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("AccessoryGear")
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
                     b.Property<string>("AccessorySlot")
                         .HasColumnType("nvarchar(max)");
 
@@ -200,9 +204,17 @@ namespace MDRNJ.Api.Migrations
                     b.Property<int>("BodyType")
                         .HasColumnType("int");
 
+                    b.Property<string>("BottomGear")
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
                     b.Property<string>("EquipmentSlot")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HeadGear")
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
 
                     b.Property<DateTime>("LastEvolved")
                         .HasColumnType("datetime2");
@@ -210,6 +222,14 @@ namespace MDRNJ.Api.Migrations
                     b.Property<string>("OutfitSlot")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ShoesGear")
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<string>("TopGear")
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -302,6 +322,11 @@ namespace MDRNJ.Api.Migrations
 
                     b.Property<int>("CurrentStreak")
                         .HasColumnType("int");
+
+                    b.Property<int>("Gold")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(100);
 
                     b.Property<DateTime?>("LastWorkoutDate")
                         .HasColumnType("datetime2");
@@ -446,6 +471,26 @@ namespace MDRNJ.Api.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.UserGearEntity", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ItemId")
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<int>("PricePaid")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PurchasedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("UserId", "ItemId");
+
+                    b.ToTable("UserGear");
                 });
 
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.UserProfileEntity", b =>
@@ -687,6 +732,17 @@ namespace MDRNJ.Api.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.UserGearEntity", b =>
+                {
+                    b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "User")
+                        .WithMany("OwnedGear")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.UserProfileEntity", b =>
                 {
                     b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "User")
@@ -763,6 +819,8 @@ namespace MDRNJ.Api.Migrations
                     b.Navigation("GameStats");
 
                     b.Navigation("IssuedChallenges");
+
+                    b.Navigation("OwnedGear");
 
                     b.Navigation("Profile");
 

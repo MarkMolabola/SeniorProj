@@ -140,6 +140,11 @@ namespace MDRNJ.Api.Services
                 DominantSport = activityScore?.DominantSport.ToString() ?? "None",
                 SpriteState = character?.OutfitSlot ?? "default",
                 AvatarId = character?.AvatarId ?? "classic",
+                HeadGear = character?.HeadGear,
+                TopGear = character?.TopGear,
+                BottomGear = character?.BottomGear,
+                ShoesGear = character?.ShoesGear,
+                AccessoryGear = character?.AccessoryGear,
                 RecentWorkouts = recentSessions.Select(s => new WorkoutDto
                 {
                     SessionId = s.SessionId,

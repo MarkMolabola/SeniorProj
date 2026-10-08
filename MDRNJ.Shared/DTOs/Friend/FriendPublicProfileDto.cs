@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace MDRNJ.Shared.DTOs.Friend
 {
-    public class FriendPublicProfileDto
+    public class FriendPublicProfileDto : MDRNJ.Shared.Game.IEquippedGear
     {
         public Guid UserId { get; set; }
         public string Username { get; set; } = null!;
@@ -20,6 +20,11 @@ namespace MDRNJ.Shared.DTOs.Friend
         public string DominantSport { get; set; } = "None";
         public string SpriteState { get; set; } = "default";
         public string AvatarId { get; set; } = "classic";
+        public string? HeadGear { get; set; }
+        public string? TopGear { get; set; }
+        public string? BottomGear { get; set; }
+        public string? ShoesGear { get; set; }
+        public string? AccessoryGear { get; set; }
 
         // Latest 3 completed workouts
         public List<WorkoutDto> RecentWorkouts { get; set; } = new();

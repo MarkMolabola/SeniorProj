@@ -36,14 +36,21 @@ namespace MDRNJ.Api.Services
         {
             if (amount <= 0) return;
 
+            var levelBefore = stats.CurrentLevel;
             stats.TotalXP += amount;
             stats.CurrentLevel = AccountProgression.LevelFor(stats.TotalXP);
+            GrantGold(stats, (stats.CurrentLevel - levelBefore) * GoldRules.PerLevelUp);
             _db.XPTransactions.Add(new XPTransactionEntity
             {
                 UserId = stats.UserId,
                 Amount = amount,
                 Reason = reason
             });
+        }
+
+        public void GrantGold(GameStatsEntity stats, int amount)
+        {
+            if (amount > 0) stats.Gold += amount;
         }
 
         public async Task<List<GoalCompletion>> AdvanceForWorkoutAsync(GameStatsEntity stats, WorkoutSessionEntity session)
@@ -76,6 +83,7 @@ namespace MDRNJ.Api.Services
         public GoalCompletion CompleteQuest(GameStatsEntity stats, QuestEntity quest)
         {
             GrantXP(stats, quest.XPReward, XPReason.QuestCompleted);
+            GrantGold(stats, GoldRules.ForQuest(quest.XPReward));
             return new GoalCompletion(
                 new CompletedGoalDto { Kind = QuestKind, Id = quest.QuestId, Title = quest.Title, XPReward = quest.XPReward },
                 quest.QuestType);

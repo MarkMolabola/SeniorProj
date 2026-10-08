@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Gear shop: 3 items per row, bought with gold. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:MDRNJfitness.Views"
+             xmlns:vm="clr-namespace:MDRNJfitness.ViewModels"
+             x:Class="MDRNJfitness.Views.ShopPage"
+             Title="{Binding Title}"
+             Style="{StaticResource PxPage}">
+
+    <CollectionView ItemsSource="{Binding Items}"
+                    SelectionMode="None"
+                    Margin="14,0">
+        <CollectionView.ItemsLayout>
+            <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="10" VerticalItemSpacing="10" />
+        </CollectionView.ItemsLayout>
+
+        <CollectionView.Header>
+            <VerticalStackLayout Padding="6,24,6,16" Spacing="14">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Style="{StaticResource PxTitle}" Text="SHOP" VerticalOptions="Center" />
+                    <Border Grid.Column="1" Style="{StaticResource PxChip}" BackgroundColor="{StaticResource PxPanel}" Padding="10,2">
+                        <HorizontalStackLayout Spacing="6">
+                            <Image Source="icon_gold.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                            <Label Style="{StaticResource PxBody}" Text="{Binding Gold}" TextColor="{StaticResource PxGold}" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </Grid>
+                <Label Style="{StaticResource PxMuted}" Text="Spend gold on gear for your hero. Earn gold from workouts, quests, duels and level-ups." />
+                <Border Style="{StaticResource PxPanel}" IsVisible="{Binding HasNothingForSale}">
+                    <Label Style="{StaticResource PxMuted}" Text="The shop is restocking. Check back soon!" />
+                </Border>
+            </VerticalStackLayout>
+        </CollectionView.Header>
+
+        <CollectionView.ItemTemplate>
+            <DataTemplate>
+                <Border Style="{StaticResource PxPanel}" Padding="8,10">
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding Owned}" Value="True">
+                            <Setter Property="Opacity" Value="0.6" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ShopViewModel}}, Path=BuyCommand}"
+                                              CommandParameter="{Binding .}" />
+                    </Border.GestureRecognizers>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Border Style="{StaticResource PxSunken}" Padding="6" HeightRequest="72">
+                            <local:GearIconView ItemId="{Binding Item.Id}" />
+                        </Border>
+                        <Label Style="{StaticResource PxBody}" FontSize="18" Text="{Binding Item.Name}"
+                               HorizontalTextAlignment="Center" LineBreakMode="TailTruncation" MaxLines="2" />
+                        <Label Style="{StaticResource PxCaption}" Text="{Binding SlotName}" HorizontalOptions="Center" />
+
+                        <!-- Price / owned -->
+                        <HorizontalStackLayout Spacing="4" HorizontalOptions="Center">
+                            <HorizontalStackLayout.Triggers>
+                                <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding Owned}" Value="True">
+                                    <Setter Property="IsVisible" Value="False" />
+                                </DataTrigger>
+                            </HorizontalStackLayout.Triggers>
+                            <Image Source="icon_gold.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                            <Label Style="{StaticResource PxBody}" FontSize="19" Text="{Binding Item.Price}"
+                                   TextColor="{StaticResource PxGold}" VerticalOptions="Center">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding CanAfford}" Value="False">
+                                        <Setter Property="TextColor" Value="{StaticResource PxTextDim}" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </HorizontalStackLayout>
+                        <Label Style="{StaticResource PxCaption}" Text="OWNED" TextColor="{StaticResource PxTeal}"
+                               HorizontalOptions="Center" IsVisible="{Binding Owned}" />
+                    </VerticalStackLayout>
+                </Border>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+
+        <CollectionView.Footer>
+            <BoxView HeightRequest="24" Color="Transparent" />
+        </CollectionView.Footer>
+    </CollectionView>
+</ContentPage>

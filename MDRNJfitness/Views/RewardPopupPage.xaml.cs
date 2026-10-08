@@ -1,6 +1,7 @@
 using MDRNJ.Shared.DTOs.Character;
 using MDRNJ.Shared.DTOs.Game;
 using MDRNJ.Shared.Enums;
+using MDRNJ.Shared.Game;
 using MDRNJfitness.Helpers.Sprites;
 
 namespace MDRNJfitness.Views;
@@ -35,6 +36,8 @@ public partial class RewardPopupPage : ContentPage
         var outfit = progress?.Character?.OutfitSlot ?? "default";
         var avatarId = progress?.Character?.AvatarId ?? "classic";
         BeforeAvatar.AvatarId = AfterAvatar.AvatarId = HeroAvatar.AvatarId = avatarId;
+        var gear = progress?.Character?.InDrawOrder() ?? Array.Empty<string>();
+        BeforeAvatar.Gear = AfterAvatar.Gear = HeroAvatar.Gear = gear;
 
         // Full-body avatars don't wear outfits, so a before → after would look identical
         var showsOutfit = !HeroSprites.TryGetFullBodyAvatar(avatarId, out _, out _);
@@ -60,6 +63,8 @@ public partial class RewardPopupPage : ContentPage
 
         if (account?.XPGained > 0)
             AddLine($"+{account.XPGained} XP", "PxGold");
+        if (account?.GoldGained > 0)
+            AddLine($"+{account.GoldGained} gold", "PxOrange");
         foreach (var goal in completedGoals)
             AddLine($"✔ {goal.Kind}: {goal.Title} (+{goal.XPReward} XP)", "PxTeal");
 
