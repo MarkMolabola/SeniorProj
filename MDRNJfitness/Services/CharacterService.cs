@@ -13,6 +13,9 @@ namespace MDRNJfitness.Services
         public Task<CharacterStateDto> GetCharacterAsync() =>
             _http.GetAsync<CharacterStateDto>("api/character")!;
 
+        public Task<CharacterStateDto> SetAvatarAsync(string avatarId) =>
+            _http.PutAsync<CharacterStateDto>("api/character/avatar", new SetAvatarDto { AvatarId = avatarId })!;
+
         public Task<ActivityScoreDto> GetActivityScoreAsync() =>
             _http.GetAsync<ActivityScoreDto>("api/character/activity-score")!;
 

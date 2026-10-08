@@ -1,6 +1,7 @@
 using MDRNJ.Shared.DTOs.Character;
 using MDRNJ.Shared.DTOs.Game;
 using MDRNJ.Shared.Enums;
+using MDRNJfitness.Helpers.Sprites;
 
 namespace MDRNJfitness.Views;
 
@@ -32,7 +33,12 @@ public partial class RewardPopupPage : ContentPage
         }
 
         var outfit = progress?.Character?.OutfitSlot ?? "default";
-        if (progress?.Evolved == true)
+        var avatarId = progress?.Character?.AvatarId ?? "classic";
+        BeforeAvatar.AvatarId = AfterAvatar.AvatarId = HeroAvatar.AvatarId = avatarId;
+
+        // Full-body avatars don't wear outfits, so a before → after would look identical
+        var showsOutfit = !HeroSprites.TryGetFullBodyAvatar(avatarId, out _, out _);
+        if (progress?.Evolved == true && showsOutfit)
         {
             EvolutionRow.IsVisible = true;
             HeroBox.IsVisible = false;
@@ -45,6 +51,11 @@ public partial class RewardPopupPage : ContentPage
         else
         {
             HeroAvatar.AvatarType = outfit;
+            if (progress?.Evolved == true)
+            {
+                EvolutionLabel.IsVisible = true;
+                EvolutionLabel.Text = $"New build: {BodyTypeName(progress.Character?.BodyType)}";
+            }
         }
 
         if (account?.XPGained > 0)

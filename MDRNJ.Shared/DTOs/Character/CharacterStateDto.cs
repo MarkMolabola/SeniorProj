@@ -8,6 +8,7 @@ namespace MDRNJ.Shared.DTOs.Character
     {
         public Guid CharacterId { get; set; }
         public Guid UserId { get; set; }
+        public string AvatarId { get; set; } = "classic";
         public int BodyType { get; set; }
         public string OutfitSlot { get; set; }
         public string EquipmentSlot { get; set; }

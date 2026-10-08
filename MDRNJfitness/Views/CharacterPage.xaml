@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MDRNJfitness.Views"
              xmlns:controls="clr-namespace:MDRNJfitness.Controls"
+             xmlns:vm="clr-namespace:MDRNJfitness.ViewModels"
              x:Class="MDRNJfitness.Views.CharacterPage"
              Title="{Binding Title}"
              Style="{StaticResource PxPage}">
@@ -10,7 +11,13 @@
     <ScrollView>
         <VerticalStackLayout Padding="20,24,20,32" Spacing="24">
 
-            <Label Style="{StaticResource PxTitle}" Text="HERO" />
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Grid.Column="0" Style="{StaticResource PxTitle}" Text="HERO" VerticalOptions="Center" />
+                <Button Grid.Column="1"
+                        Style="{StaticResource PxButtonSecondary}"
+                        Text="CUSTOMIZE"
+                        Command="{Binding ToggleCustomizeCommand}" />
+            </Grid>
 
             <!-- Stage -->
             <Border Style="{StaticResource PxPanel}" BackgroundColor="{StaticResource PxPanelSunken}" Padding="0" HeightRequest="300">
@@ -19,10 +26,62 @@
                     <BoxView Grid.Row="1" HeightRequest="3" VerticalOptions="Start" Color="{StaticResource PxInk}" />
                     <local:PixelAvatarView Grid.RowSpan="2"
                                            AvatarType="{Binding SpriteState}"
+                                           AvatarId="{Binding AvatarId}"
                                            HorizontalOptions="Center"
                                            VerticalOptions="End"
                                            Margin="0,0,0,24" />
                 </Grid>
+            </Border>
+
+            <!-- Customize: pick a hero look -->
+            <Border Style="{StaticResource PxPanelHighlight}" IsVisible="{Binding IsCustomizing}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Style="{StaticResource PxHeading}" Text="CHOOSE YOUR HERO" />
+                    <Label Style="{StaticResource PxMuted}"
+                           Text="Looks are cosmetic: your stats and progress stay the same. The Classic Hero's outfit changes as you train." />
+
+                    <FlexLayout BindableLayout.ItemsSource="{Binding AvatarOptions}"
+                                Wrap="Wrap"
+                                JustifyContent="Start">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource PxSunken}"
+                                        Padding="10"
+                                        Margin="0,0,12,12"
+                                        WidthRequest="136">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="Stroke" Value="{StaticResource PxGold}" />
+                                            <Setter Property="StrokeThickness" Value="3" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CharacterViewModel}}, Path=SelectAvatarCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+
+                                    <VerticalStackLayout Spacing="6">
+                                        <local:PixelAvatarView AvatarId="{Binding Id}"
+                                                               AvatarType="{Binding PreviewOutfit}"
+                                                               WidthRequest="96"
+                                                               HeightRequest="96"
+                                                               HorizontalOptions="Center" />
+                                        <Label Style="{StaticResource PxBody}"
+                                               FontSize="19"
+                                               Text="{Binding Name}"
+                                               HorizontalOptions="Center" />
+                                        <Label Style="{StaticResource PxCaption}"
+                                               Text="EQUIPPED"
+                                               TextColor="{StaticResource PxGold}"
+                                               HorizontalOptions="Center"
+                                               IsVisible="{Binding IsSelected}" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                </VerticalStackLayout>
             </Border>
 
             <VerticalStackLayout Spacing="4" HorizontalOptions="Center">

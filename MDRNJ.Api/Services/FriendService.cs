@@ -139,6 +139,7 @@ namespace MDRNJ.Api.Services
                 CurrentStreak = stats?.CurrentStreak ?? 0,
                 DominantSport = activityScore?.DominantSport.ToString() ?? "None",
                 SpriteState = character?.OutfitSlot ?? "default",
+                AvatarId = character?.AvatarId ?? "classic",
                 RecentWorkouts = recentSessions.Select(s => new WorkoutDto
                 {
                     SessionId = s.SessionId,

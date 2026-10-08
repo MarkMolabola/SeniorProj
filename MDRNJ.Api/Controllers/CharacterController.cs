@@ -1,4 +1,5 @@
 using MDRNJ.Api.Services.Interfaces;
+using MDRNJ.Shared.DTOs.Character;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -20,6 +21,10 @@ namespace MDRNJ.Api.Controllers
 
         [HttpGet]
         public async Task<IActionResult> Get() => Ok(await _character.GetCharacterAsync(UserId));
+
+        [HttpPut("avatar")]
+        public async Task<IActionResult> SetAvatar([FromBody] SetAvatarDto dto) =>
+            Ok(await _character.SetAvatarAsync(UserId, dto.AvatarId));
 
         [HttpGet("activity-score")]
         public async Task<IActionResult> GetActivityScore() => Ok(await _character.GetActivityScoreAsync(UserId));

@@ -263,6 +263,9 @@ namespace MDRNJfitness.Helpers
     public class PixelAvatarDrawable : IDrawable
     {
         public string AvatarType { get; set; } = "default";
+
+        /// <summary>Chosen hero look (HeroAvatars id). Full-body avatars ignore AvatarType.</summary>
+        public string AvatarId { get; set; } = "classic";
         public int Frame { get; set; } = 0;
 
         private const int SpriteW = 10;
@@ -467,6 +470,12 @@ namespace MDRNJfitness.Helpers
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
             canvas.Antialias = false;
+
+            if (HeroSprites.TryGetFullBodyAvatar(AvatarId, out var fullBody, out var breathRow))
+            {
+                DrawLayer(canvas, fullBody, Place(dirtyRect, HeroSprites.Size, HeroSprites.Size), Frame, breathRow);
+                return;
+            }
 
             // Layered 32×32 hero for registered outfits, and for any unknown type
             var useHero = HeroSprites.TryGetOutfit(AvatarType, out var outfit);

@@ -5,8 +5,11 @@ namespace MDRNJfitness.Helpers.Sprites
     /// OutfitSlot on top. To add an outfit, draw it on the same 32×32 grid
     /// (only the outfit's own pixels; everything else '.') and register it in
     /// <see cref="Outfits"/>.
+    ///
+    /// Other avatars are single full-body drawings generated from PNGs by
+    /// tools/png_to_sprite.py (see AvatarSprites.g.cs); they ignore outfits.
     /// </summary>
-    public static class HeroSprites
+    public static partial class HeroSprites
     {
         public const int Size = 32;
 
@@ -257,6 +260,27 @@ namespace MDRNJfitness.Helpers.Sprites
             ["strength"] = new SpriteLayer(StrengthOutfitRows, Palette),
             ["flexibility"] = new SpriteLayer(FlexibilityOutfitRows, Palette),
         };
+
+        /// <summary>
+        /// Breathing row per full-body avatar: a plain row just below the chest,
+        /// so dropping the row above it doesn't clip hands or legs. Others use
+        /// <see cref="BreathRow"/>.
+        /// </summary>
+        private static readonly Dictionary<string, int> FullBodyBreathRows = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["starting_girl"] = 17,
+        };
+
+        /// <summary>The full-body drawing for an avatar id; false for the layered "classic" hero.</summary>
+        public static bool TryGetFullBodyAvatar(string? avatarId, out SpriteLayer sprite, out int breathRow)
+        {
+            sprite = null!;
+            breathRow = BreathRow;
+            if (string.IsNullOrWhiteSpace(avatarId) || !FullBodyAvatars.TryGetValue(avatarId, out sprite!))
+                return false;
+            breathRow = FullBodyBreathRows.GetValueOrDefault(avatarId, BreathRow);
+            return true;
+        }
 
         public static bool TryGetOutfit(string? outfitSlot, out SpriteLayer outfit)
             => Outfits.TryGetValue(string.IsNullOrWhiteSpace(outfitSlot) ? "default" : outfitSlot, out outfit!);

@@ -20,6 +20,7 @@
                 <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
                     <Border Style="{StaticResource PxSunken}" HorizontalOptions="Center" Padding="8">
                         <local:PixelAvatarView AvatarType="{Binding Profile.SpriteState}"
+                                               AvatarId="{Binding Profile.AvatarId}"
                                                WidthRequest="128" HeightRequest="128" />
                     </Border>
                     <Label Style="{StaticResource PxHeading}"

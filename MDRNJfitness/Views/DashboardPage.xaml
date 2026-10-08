@@ -44,6 +44,8 @@
                             <Grid RowDefinitions="*,22">
                                 <BoxView Grid.Row="1" Color="{StaticResource PxPanelRaised}" />
                                 <local:PixelAvatarView Grid.RowSpan="2"
+                                                       AvatarType="{Binding HeroOutfit}"
+                                                       AvatarId="{Binding HeroAvatarId}"
                                                        WidthRequest="96"
                                                        HeightRequest="96"
                                                        VerticalOptions="End"

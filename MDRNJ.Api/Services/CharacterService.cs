@@ -49,6 +49,19 @@ namespace MDRNJ.Api.Services
             return _mapper.Map<CharacterStateDto>(character);
         }
 
+        public async Task<CharacterStateDto> SetAvatarAsync(Guid userId, string avatarId)
+        {
+            if (!HeroAvatars.IsValid(avatarId))
+                throw new ArgumentException($"Unknown avatar: {avatarId}");
+
+            var character = await _db.CharacterStates.FirstOrDefaultAsync(c => c.UserId == userId)
+                ?? throw new KeyNotFoundException("Character not found.");
+
+            character.AvatarId = avatarId;
+            await _db.SaveChangesAsync();
+            return _mapper.Map<CharacterStateDto>(character);
+        }
+
         public async Task<CharacterProgressDto> ApplyActivityAsync(Guid userId, StatGain gain)
         {
             var character = await _db.CharacterStates.FirstOrDefaultAsync(c => c.UserId == userId)

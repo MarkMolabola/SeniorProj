@@ -190,6 +190,13 @@ namespace MDRNJ.Api.Migrations
                     b.Property<string>("AccessorySlot")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("AvatarId")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)")
+                        .HasDefaultValue("classic");
+
                     b.Property<int>("BodyType")
                         .HasColumnType("int");
 

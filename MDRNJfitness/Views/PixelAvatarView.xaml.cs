@@ -19,6 +19,21 @@ public partial class PixelAvatarView : ContentView
         set => SetValue(AvatarTypeProperty, value);
     }
 
+    /// <summary>Chosen hero look (HeroAvatars id); "classic" draws the outfit layers.</summary>
+    public static readonly BindableProperty AvatarIdProperty =
+        BindableProperty.Create(
+            nameof(AvatarId),
+            typeof(string),
+            typeof(PixelAvatarView),
+            "classic",
+            propertyChanged: (b, _, _) => ((PixelAvatarView)b).OnAvatarTypeChanged());
+
+    public string AvatarId
+    {
+        get => (string)GetValue(AvatarIdProperty);
+        set => SetValue(AvatarIdProperty, value);
+    }
+
     private readonly PixelAvatarDrawable _drawable = new();
     private IDispatcherTimer? _timer;
 
@@ -59,6 +74,7 @@ public partial class PixelAvatarView : ContentView
     private void OnAvatarTypeChanged()
     {
         _drawable.AvatarType = AvatarType ?? "default";
+        _drawable.AvatarId = AvatarId ?? "classic";
         _drawable.Frame = 0;
         AvatarCanvas.Invalidate();
     }

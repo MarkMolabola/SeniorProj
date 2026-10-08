@@ -7,6 +7,8 @@ namespace MDRNJ.Api.Data.Entities
     {
         public Guid CharacterId { get; set; } = Guid.NewGuid();
         public Guid UserId { get; set; }
+        /// <summary>Chosen hero look; see MDRNJ.Shared.Game.HeroAvatars.</summary>
+        public string AvatarId { get; set; } = "classic";
         public BodyType BodyType { get; set; } = BodyType.Athletic;
         public string OutfitSlot { get; set; } = "default";
         public string EquipmentSlot { get; set; } = "default";

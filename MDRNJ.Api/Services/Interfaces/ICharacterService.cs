@@ -8,6 +8,9 @@ namespace MDRNJ.Api.Services.Interfaces
     {
         Task<CharacterStateDto> GetCharacterAsync(Guid userId);
 
+        /// <summary>Changes the hero look (cosmetic only).</summary>
+        Task<CharacterStateDto> SetAvatarAsync(Guid userId, string avatarId);
+
         /// <summary>
         /// Adds stat points, refreshes training shares and evolves the character
         /// (outfit / body type) when their training has shifted. Called after

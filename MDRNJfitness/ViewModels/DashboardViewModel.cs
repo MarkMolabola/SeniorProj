@@ -13,9 +13,12 @@ namespace MDRNJfitness.ViewModels
         private readonly IGameService _game;
         private readonly IWorkoutService _workout;
         private readonly IAuthService _auth;
+        private readonly ICharacterService _character;
 
         [ObservableProperty] private GameStatsDto? _stats;
         [ObservableProperty] private string _userName = string.Empty;
+        [ObservableProperty] private string _heroOutfit = "default";
+        [ObservableProperty] private string _heroAvatarId = "classic";
 
         public double XPProgress
         {
@@ -36,11 +39,12 @@ namespace MDRNJfitness.ViewModels
 
         [ObservableProperty] private bool _hasNoAchievements = true;
 
-        public DashboardViewModel(IGameService game, IWorkoutService workout, IAuthService auth)
+        public DashboardViewModel(IGameService game, IWorkoutService workout, IAuthService auth, ICharacterService character)
         {
             _game = game;
             _workout = workout;
             _auth = auth;
+            _character = character;
             Title = "Dashboard";
         }
 
@@ -52,6 +56,10 @@ namespace MDRNJfitness.ViewModels
                 UserName = user?.Username ?? string.Empty;
 
                 Stats = await _game.GetStatsAsync();
+
+                var hero = await _character.GetCharacterAsync();
+                HeroOutfit = hero?.OutfitSlot ?? "default";
+                HeroAvatarId = hero?.AvatarId ?? "classic";
 
                 await _game.CheckAchievementsAsync();
                 var allAchievements = await _game.GetAchievementsAsync();

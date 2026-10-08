@@ -124,6 +124,7 @@ namespace MDRNJ.Api.Data
                  .WithOne(u => u.CharacterState)
                  .HasForeignKey<CharacterStateEntity>(c => c.UserId)
                  .OnDelete(DeleteBehavior.Cascade);
+                e.Property(c => c.AvatarId).HasMaxLength(40).HasDefaultValue("classic");
             });
 
             // ActivityScoreEntity — 1:1 with User

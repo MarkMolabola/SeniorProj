@@ -19,6 +19,7 @@ namespace MDRNJ.Shared.DTOs.Friend
         // Dominant activity (maps to pixel avatar type)
         public string DominantSport { get; set; } = "None";
         public string SpriteState { get; set; } = "default";
+        public string AvatarId { get; set; } = "classic";
 
         // Latest 3 completed workouts
         public List<WorkoutDto> RecentWorkouts { get; set; } = new();
