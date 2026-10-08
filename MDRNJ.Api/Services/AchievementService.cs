@@ -2,6 +2,8 @@ using MDRNJ.Api.Data;
 using MDRNJ.Api.Data.Entities;
 using MDRNJ.Api.Services.Interfaces;
 using MDRNJ.Shared.DTOs.Game;
+using MDRNJ.Shared.Enums;
+using MDRNJ.Shared.Game;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,10 +15,12 @@ namespace MDRNJ.Api.Services
     public class AchievementService : IAchievementService
     {
         private readonly AppDbContext _db;
+        private readonly IGoalProgressService _goals;
 
-        public AchievementService(AppDbContext db)
+        public AchievementService(AppDbContext db, IGoalProgressService goals)
         {
             _db = db;
+            _goals = goals;
         }
 
         public async Task<List<AchievementDto>> GetAllAsync(Guid userId)
@@ -62,16 +66,18 @@ namespace MDRNJ.Api.Services
             var stats = await _db.GameStats.FirstOrDefaultAsync(g => g.UserId == userId);
             if (stats is null) return new List<AchievementDto>();
 
+            var character = await _db.CharacterStates.FirstOrDefaultAsync(c => c.UserId == userId);
+            var strengthLevel = StatProgression.LevelFor(
+                (await _db.ActivityScores.FirstOrDefaultAsync(a => a.UserId == userId))?.StrengthPoints ?? 0);
             var friendCount = await _db.Friendships.CountAsync(f =>
                 (f.RequesterId == userId || f.AddresseeId == userId) &&
-                f.Status == MDRNJ.Shared.Enums.FriendshipStatus.Accepted);
-
+                f.Status == FriendshipStatus.Accepted);
             var duelsCompleted = await _db.Challenges.CountAsync(c =>
-                c.Status == MDRNJ.Shared.Enums.ChallengeStatus.Completed &&
+                c.Status == ChallengeStatus.Completed &&
                 (c.ChallengerId == userId || c.OpponentId == userId));
             var duelsWon = await _db.Challenges.CountAsync(c => c.WinnerId == userId);
 
-            var alreadyUnlocked = await _db.UserAchievements
+            var unlockedIds = await _db.UserAchievements
                 .Where(ua => ua.UserId == userId)
                 .Select(ua => ua.AchievementId)
                 .ToHashSetAsync();
@@ -79,56 +85,78 @@ namespace MDRNJ.Api.Services
             var allAchievements = await _db.Achievements.ToListAsync();
             var newlyUnlocked = new List<AchievementDto>();
 
-            foreach (var achievement in allAchievements)
+            // Rewards add XP, which can reach a "Level N" achievement, so check until nothing new unlocks
+            bool unlockedThisPass;
+            do
             {
-                if (alreadyUnlocked.Contains(achievement.AchievementId)) continue;
-
-                bool earned = achievement.Name switch
+                unlockedThisPass = false;
+                foreach (var achievement in allAchievements)
                 {
-                    "First Sweat"      => stats.TotalWorkouts >= 1,
-                    "10 Workouts"      => stats.TotalWorkouts >= 10,
-                    "50 Workouts"      => stats.TotalWorkouts >= 50,
-                    "Century Club"     => stats.TotalWorkouts >= 100,
-                    "3-Day Streak"     => stats.LongestStreak >= 3,
-                    "7-Day Streak"     => stats.LongestStreak >= 7,
-                    "30-Day Streak"    => stats.LongestStreak >= 30,
-                    "Unstoppable"      => stats.LongestStreak >= 100,
-                    "Level 5"          => stats.CurrentLevel >= 5,
-                    "Level 10"         => stats.CurrentLevel >= 10,
-                    "Level 25"         => stats.CurrentLevel >= 25,
-                    "Level 50"         => stats.CurrentLevel >= 50,
-                    "Legend"           => stats.CurrentLevel >= 100,
-                    "Social Butterfly" => friendCount >= 1,
-                    "Squad Goals"      => friendCount >= 10,
-                    "Challenge Accepted" => duelsCompleted >= 1,
-                    "Challenger"       => duelsWon >= 10,
-                    _                  => false
-                };
+                    if (unlockedIds.Contains(achievement.AchievementId)) continue;
+                    if (!IsEarned(achievement.Name, stats, character, strengthLevel, friendCount, duelsCompleted, duelsWon)) continue;
 
-                if (!earned) continue;
+                    _db.UserAchievements.Add(new UserAchievementEntity
+                    {
+                        UserId = userId,
+                        AchievementId = achievement.AchievementId
+                    });
+                    unlockedIds.Add(achievement.AchievementId);
+                    unlockedThisPass = true;
 
-                _db.UserAchievements.Add(new UserAchievementEntity
-                {
-                    UserId = userId,
-                    AchievementId = achievement.AchievementId
-                });
+                    _goals.GrantXP(stats, achievement.XPReward, XPReason.AchievementUnlocked);
+                    _goals.GrantGold(stats, GoldRules.ForAchievement(achievement.XPReward));
 
-                newlyUnlocked.Add(new AchievementDto
-                {
-                    AchievementId = achievement.AchievementId,
-                    Name = achievement.Name,
-                    Description = achievement.Description,
-                    BadgeImageUrl = achievement.BadgeImageUrl,
-                    XPReward = achievement.XPReward,
-                    Rarity = achievement.Rarity.ToString(),
-                    UnlockedAt = DateTime.UtcNow
-                });
-            }
+                    newlyUnlocked.Add(new AchievementDto
+                    {
+                        AchievementId = achievement.AchievementId,
+                        Name = achievement.Name,
+                        Description = achievement.Description,
+                        BadgeImageUrl = achievement.BadgeImageUrl,
+                        XPReward = achievement.XPReward,
+                        Rarity = achievement.Rarity.ToString(),
+                        UnlockedAt = DateTime.UtcNow
+                    });
+                }
+            } while (unlockedThisPass);
 
             if (newlyUnlocked.Count > 0)
                 await _db.SaveChangesAsync();
 
             return newlyUnlocked;
         }
+
+        /// <summary>STR level needed for the build achievements, so one heavy session doesn't unlock them.</summary>
+        private const int PowerBuildStrengthLevel = 5;
+        private const int EliteFormStrengthLevel = 10;
+
+        private static bool IsEarned(string name, GameStatsEntity stats, CharacterStateEntity? character,
+            int strengthLevel, int friendCount, int duelsCompleted, int duelsWon) => name switch
+        {
+            "First Sweat"        => stats.TotalWorkouts >= 1,
+            "10 Workouts"        => stats.TotalWorkouts >= 10,
+            "50 Workouts"        => stats.TotalWorkouts >= 50,
+            "Century Club"       => stats.TotalWorkouts >= 100,
+            "3-Day Streak"       => stats.LongestStreak >= 3,
+            "7-Day Streak"       => stats.LongestStreak >= 7,
+            "30-Day Streak"      => stats.LongestStreak >= 30,
+            "Unstoppable"        => stats.LongestStreak >= 100,
+            "Level 5"            => stats.CurrentLevel >= 5,
+            "Level 10"           => stats.CurrentLevel >= 10,
+            "Level 25"           => stats.CurrentLevel >= 25,
+            "Level 50"           => stats.CurrentLevel >= 50,
+            "Legend"             => stats.CurrentLevel >= 100,
+            "Social Butterfly"   => friendCount >= 1,
+            "Squad Goals"        => friendCount >= 10,
+            "Challenge Accepted" => duelsCompleted >= 1,
+            "Challenger"         => duelsWon >= 10,
+            // A hero starts in the default outfit with an Athletic build; leaving either means it evolved
+            "Transformation"     => character is not null &&
+                                    (character.OutfitSlot != "default" || character.BodyType != BodyType.Athletic),
+            "Power Build"        => character?.BodyType is BodyType.Muscular or BodyType.Powerlifter
+                                    && strengthLevel >= PowerBuildStrengthLevel,
+            "Elite Form"         => character?.BodyType == BodyType.Powerlifter
+                                    && strengthLevel >= EliteFormStrengthLevel,
+            _                    => false
+        };
     }
 }

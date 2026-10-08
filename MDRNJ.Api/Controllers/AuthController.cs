@@ -53,6 +53,17 @@ namespace MDRNJ.Api.Controllers
             return Ok(result);
         }
 
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenDto dto) =>
+            Ok(await _auth.RefreshAsync(dto.RefreshToken));
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] RefreshTokenDto dto)
+        {
+            await _auth.LogoutAsync(dto.RefreshToken);
+            return NoContent();
+        }
+
         [HttpPost("resend-verification")]
         public async Task<IActionResult> ResendVerification([FromBody] ResendVerificationDto dto)
         {
@@ -84,7 +95,8 @@ namespace MDRNJ.Api.Controllers
             try
             {
                 var auth = await _auth.GoogleSignInAsync(result.Principal!);
-                return Redirect($"{appCallback}#access_token={Uri.EscapeDataString(auth.AccessToken)}");
+                return Redirect($"{appCallback}#access_token={Uri.EscapeDataString(auth.AccessToken)}" +
+                                $"&refresh_token={Uri.EscapeDataString(auth.RefreshToken)}");
             }
             catch (Exception ex)
             {

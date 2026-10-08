@@ -392,6 +392,39 @@ namespace MDRNJ.Api.Migrations
                     b.ToTable("Quests");
                 });
 
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.RefreshTokenEntity", b =>
+                {
+                    b.Property<Guid>("RefreshTokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varbinary(32)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("RefreshTokenId");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.UserAchievementEntity", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -713,6 +746,17 @@ namespace MDRNJ.Api.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.RefreshTokenEntity", b =>
+                {
+                    b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.UserAchievementEntity", b =>
                 {
                     b.HasOne("MDRNJ.Api.Data.Entities.AchievementEntity", "Achievement")
@@ -827,6 +871,8 @@ namespace MDRNJ.Api.Migrations
                     b.Navigation("ReceivedChallenges");
 
                     b.Navigation("ReceivedFriendRequests");
+
+                    b.Navigation("RefreshTokens");
 
                     b.Navigation("SentFriendRequests");
 

@@ -274,6 +274,8 @@ namespace MDRNJfitness.Helpers.Sprites
             ["starter_archer2"] = 20,
             ["starting_ninja"] = 18,
             ["starting_buff_ninja"] = 17,
+            ["tennis_avatar"] = 21,
+            ["hot_dog_avatar"] = 16,
         };
 
         /// <summary>The full-body drawing for an avatar id; false for the layered "classic" hero.</summary>
@@ -288,17 +290,15 @@ namespace MDRNJfitness.Helpers.Sprites
         }
 
         /// <summary>
-        /// Gear art for an item. Default art is drawn for the classic hero, so
-        /// full-body avatars (different shapes) only show gear that has a
-        /// version drawn for them ("item@avatar"); otherwise it's hidden rather
-        /// than floating off the body. Pass a null avatar for shop icons.
+        /// Gear art. With a null avatar: the item's shop icon (its plain PNG).
+        /// With an avatar: how it looks worn on that hero ("item@avatar", e.g.
+        /// "red_cap@classic"). Heroes differ in shape, so an item without a
+        /// version drawn for the hero is hidden rather than floating off the body.
         /// </summary>
-        public static bool TryGetGear(string itemId, string? avatarId, out SpriteLayer layer)
-        {
-            if (!string.IsNullOrEmpty(avatarId) && FullBodyAvatars.ContainsKey(avatarId))
-                return GearLayers.TryGetValue($"{itemId}@{avatarId}", out layer!);
-            return GearLayers.TryGetValue(itemId, out layer!);
-        }
+        public static bool TryGetGear(string itemId, string? avatarId, out SpriteLayer layer) =>
+            string.IsNullOrEmpty(avatarId)
+                ? GearLayers.TryGetValue(itemId, out layer!)
+                : GearLayers.TryGetValue($"{itemId}@{avatarId}", out layer!);
 
         /// <summary>True when this item has art that fits the hero (so it shows when worn).</summary>
         public static bool GearFits(string itemId, string? avatarId) => TryGetGear(itemId, avatarId, out _);

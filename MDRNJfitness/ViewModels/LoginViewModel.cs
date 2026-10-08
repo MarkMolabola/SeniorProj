@@ -30,6 +30,21 @@ namespace MDRNJfitness.ViewModels
             Title = "Sign In";
         }
 
+        private bool _triedResume;
+
+        /// <summary>Skips the login screen when a saved session is still valid (once per launch).</summary>
+        public async Task TryResumeSessionAsync()
+        {
+            if (_triedResume) return;
+            _triedResume = true;
+
+            await RunSafeAsync(async () =>
+            {
+                if (await _auth.TryResumeSessionAsync())
+                    await Shell.Current.GoToAsync("//DashboardPage");
+            });
+        }
+
         [RelayCommand]
         public async Task LoginAsync() =>
             await RunSafeAsync(async () =>

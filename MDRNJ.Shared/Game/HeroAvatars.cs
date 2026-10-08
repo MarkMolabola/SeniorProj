@@ -15,6 +15,8 @@ namespace MDRNJ.Shared.Game
         public const string BuffNinja = "starting_buff_ninja";
         public const string StartingGirl2 = "starting_girl2";
         public const string Ninja = "starting_ninja";
+        public const string TennisPro = "tennis_avatar";
+        public const string HotDog = "hot_dog_avatar";
 
         public static readonly IReadOnlyList<(string Id, string Name)> All = new[]
         {
@@ -25,6 +27,8 @@ namespace MDRNJ.Shared.Game
             (Archer2, "Archer II"),
             (Ninja, "Ninja"),
             (BuffNinja, "Buff Ninja"),
+            (TennisPro, "Tennis Pro"),
+            (HotDog, "Hot Dog"),
         };
 
         public static bool IsValid(string? id) => All.Any(a => a.Id == id);

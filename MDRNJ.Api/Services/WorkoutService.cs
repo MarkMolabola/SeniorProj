@@ -116,7 +116,6 @@ namespace MDRNJ.Api.Services
             var completions = await _goals.AdvanceForWorkoutAsync(stats, session);
 
             await _db.SaveChangesAsync();
-            await _achievements.CheckAndUnlockAsync(userId);
 
             var gain = StatRules.ForWorkout(session.WorkoutType, session.DurationMins);
             foreach (var completion in completions)
@@ -124,13 +123,24 @@ namespace MDRNJ.Api.Services
 
             var dto = _mapper.Map<WorkoutDto>(session);
             dto.CharacterProgress = await _character.ApplyActivityAsync(userId, gain);
+
+            // After evolving, so body-type achievements see the new build
+            var achievements = await _achievements.CheckAndUnlockAsync(userId);
             dto.AccountProgress = new AccountProgressDto
             {
                 XPGained = stats.TotalXP - xpBefore,
                 GoldGained = stats.Gold - goldBefore,
                 PreviousLevel = levelBefore,
                 NewLevel = stats.CurrentLevel,
-                CompletedGoals = completions.Select(c => c.Goal).ToList()
+                CompletedGoals = completions.Select(c => c.Goal)
+                    .Concat(achievements.Select(a => new CompletedGoalDto
+                    {
+                        Kind = "Achievement",
+                        Id = a.AchievementId,
+                        Title = a.Name,
+                        XPReward = a.XPReward
+                    }))
+                    .ToList()
             };
             return dto;
         }

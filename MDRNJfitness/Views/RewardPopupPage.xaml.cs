@@ -23,6 +23,7 @@ public partial class RewardPopupPage : ContentPage
         HeadlineLabel.Text = _leveledUp ? "LEVEL UP!"
             : progress?.Evolved == true ? "EVOLVED!"
             : completedGoals.Any(g => g.Kind == "Quest") ? "QUEST COMPLETE!"
+            : completedGoals.Any(g => g.Kind == "Achievement") ? "ACHIEVEMENT!"
             : completedGoals.Count > 0 ? headline // duel results pass VICTORY! / DEFEAT
             : progress?.LevelUps.Count > 0 ? "STAT UP!"
             : headline;

@@ -4,26 +4,21 @@ using System.Threading.Tasks;
 
 namespace MDRNJ.Api.Services
 {
+    /// <summary>Picks the hero's body type from the player's recent training mix.</summary>
     public class CharacterClassifierService
     {
-        // TODO: inject HttpClient and IConfiguration for LLM API calls
-        public CharacterClassifierService() { }
-
-        public async Task<BodyType> ClassifyBodyTypeAsync(ActivityScoreEntity activityScore)
+        public Task<BodyType> ClassifyBodyTypeAsync(ActivityScoreEntity activityScore)
         {
-            // TODO: call LLM API with activityScore data and parse response
-            await Task.CompletedTask;
-
             if (activityScore.StrengthScore >= 60)
-                return activityScore.StrengthScore >= 80 ? BodyType.Powerlifter : BodyType.Muscular;
+                return Task.FromResult(activityScore.StrengthScore >= 80 ? BodyType.Powerlifter : BodyType.Muscular);
 
             if (activityScore.CardioScore >= 60)
-                return BodyType.Slim;
+                return Task.FromResult(BodyType.Slim);
 
             if (activityScore.StrengthScore >= 30 && activityScore.CardioScore >= 30)
-                return BodyType.Athletic;
+                return Task.FromResult(BodyType.Athletic);
 
-            return BodyType.Toned;
+            return Task.FromResult(BodyType.Toned);
         }
     }
 }

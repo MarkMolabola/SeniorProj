@@ -14,6 +14,9 @@ namespace MDRNJfitness.Services.Interfaces
         Task<bool> SignInWithGoogleAsync();
 
         Task LogoutAsync();
+
+        /// <summary>Signs back in with the saved refresh token (app launch). False if there's no valid session.</summary>
+        Task<bool> TryResumeSessionAsync();
         Task<UserDto?> GetCurrentUserAsync();
     }
 }

@@ -18,5 +18,45 @@
   "Accessory/Wristbands": {
     "name": "Wristbands",
     "price": 40
+  },
+  "Head/Hat1": {
+    "name": "Black Cap",
+    "price": 60
+  },
+  "Head/Hat2": {
+    "name": "Gold Emblem Cap",
+    "price": 90
+  },
+  "Head/hat3": {
+    "name": "Ranger Cap",
+    "price": 50
+  },
+  "Head/pinkHat": {
+    "name": "Pink Cap",
+    "price": 70
+  },
+  "Bottom/BlackShorts": {
+    "name": "Black Gym Shorts",
+    "price": 60
+  },
+  "Bottom/RedShorts": {
+    "name": "Red Shorts",
+    "price": 55
+  },
+  "Shoes/Shoes1": {
+    "name": "Pink Trainers",
+    "price": 80
+  },
+  "Shoes/Shoes2": {
+    "name": "Blaze Sneakers",
+    "price": 120
+  },
+  "Accessory/gloves": {
+    "name": "Pink Boxing Gloves",
+    "price": 75
+  },
+  "Accessory/redGloves": {
+    "name": "Red Boxing Gloves",
+    "price": 85
   }
 }

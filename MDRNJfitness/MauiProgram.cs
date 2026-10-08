@@ -37,6 +37,7 @@ namespace MDRNJfitness
             builder.Services.AddSingleton<UserRepo>();
 
             // HTTP handler
+            builder.Services.AddSingleton<TokenRefresher>();
             builder.Services.AddTransient<AuthHeaderHandler>();
 
             // HTTP services (typed clients with auth handler)

@@ -9,7 +9,371 @@ namespace MDRNJfitness.Helpers.Sprites
         /// <summary>Shop gear art keyed by item id, or "item_id@avatar_id" for a per-hero version.</summary>
         private static readonly Dictionary<string, SpriteLayer> GearLayers = new(StringComparer.OrdinalIgnoreCase)
         {
+            ["hat1"] = new SpriteLayer(new[]
+            {
+                "..............ABCD..............", // 0
+                "...........DDDDDDDDDD...........", // 1
+                "........EDDFFFFGHGGGIDDJ........", // 2
+                "......DDCFFKLKKMNOKPGGGCDD......", // 3
+                ".....DQQFRKSSSTMNOLKPPGGGGD.....", // 4
+                "....DGBKRLSULSRMNKSTVWWXGGQD....", // 5
+                "...DGFKTSYSLRUTMNKSUTPWZPGGQD...", // 6
+                "...aGKRLSSSUSSTMNKSLKZVbPPGQD...", // 7
+                "..AcXKLUSddUSSRMNKSYUKXWWVPGGD..", // 8
+                ".DcFKUYSUSUdSTKMNTUUYUVWbBWPGQD.", // 9
+                ".DcOTSdULdUdSKKeeTTYSSKVWBWWGQD.", // 10
+                "DCFKddSUUYdSKKeffgUSdSKWWBBZXGWD", // 11
+                "DCFRSSSdSSYSTeMehigUdSKZWWbWPGWD", // 12
+                "DCFRSSSSUUTSKhjklggUYSUWWbBWPGBD", // 13
+                "DCFTUdUUUUSTLgkmgmgTSLYZbWbbXGbD", // 14
+                "DCFKSdYSddSSLgmmmmgTLTVBbBbbZGWD", // 15
+                "DCFTSLYYSSYSSTggggTUUTPBWbbWZGWD", // 16
+                "DCFPRTUUSSLSSLKMNKSdSTVBWWWBPGBD", // 17
+                "nCFPPTSTSSSUSUTMNRSYLTVWWWWWWQBD", // 18
+                "DCFPPPPUKKTTTLUMNLLLLPXZPPPWZQBD", // 19
+                "DCFPXXopppDDDDpqpDDDDDDpprXXWQBD", // 20
+                "DDasrrOKRRKRTRKTKKRTKBXXPPqqtDDD", // 21
+                "DkgTTRTSUTLdSUSYSYSSTWBbBWZPXuvD", // 22
+                "DkgTUSUSSUSUSSYSLSYTTZWbBBWBXudD", // 23
+                "nkgKTYUYSYSTTSSSLUUdSTZBWWWPZuSD", // 24
+                "akgKSYdSSSTSTYUUUSYUTSZbVZWPPuSD", // 25
+                "akgKTSRUYRLSSUSSLSUUTPZWWWPBXudD", // 26
+                "DkgTTLULULKRTTTTUUUUUPPWZVWZPudD", // 27
+                "DkggTRTTSTKeeeehwwxyyyZWZZZZuudD", // 28
+                ".Dkggheeeexffffddvvdzzyyyuuuu01D", // 29
+                "..AmmmOOOvvDDDDDDDDDndv2OvvvvDD.", // 30
+                "...DDDDDDDn..........DDDDDDA3...", // 31
+            },
+            new Dictionary<char, Color>
+            {
+                ['A'] = Color.FromArgb("#000100"),
+                ['B'] = Color.FromArgb("#222325"),
+                ['C'] = Color.FromArgb("#161618"),
+                ['D'] = Color.FromArgb("#000000"),
+                ['E'] = Color.FromArgb("#1F1F25"),
+                ['F'] = Color.FromArgb("#1F1F1F"),
+                ['G'] = Color.FromArgb("#1A1B1E"),
+                ['H'] = Color.FromArgb("#28252A"),
+                ['I'] = Color.FromArgb("#232329"),
+                ['J'] = Color.FromArgb("#26282C"),
+                ['K'] = Color.FromArgb("#3D3E40"),
+                ['L'] = Color.FromArgb("#3C3D3F"),
+                ['M'] = Color.FromArgb("#322D32"),
+                ['N'] = Color.FromArgb("#3B353C"),
+                ['O'] = Color.FromArgb("#3E3E41"),
+                ['P'] = Color.FromArgb("#242527"),
+                ['Q'] = Color.FromArgb("#1B1D1E"),
+                ['R'] = Color.FromArgb("#3D3D40"),
+                ['S'] = Color.FromArgb("#3C3C3F"),
+                ['T'] = Color.FromArgb("#3D3D3F"),
+                ['U'] = Color.FromArgb("#3C3C3E"),
+                ['V'] = Color.FromArgb("#242427"),
+                ['W'] = Color.FromArgb("#232426"),
+                ['X'] = Color.FromArgb("#242526"),
+                ['Y'] = Color.FromArgb("#3B3C3E"),
+                ['Z'] = Color.FromArgb("#242426"),
+                ['a'] = Color.FromArgb("#000101"),
+                ['b'] = Color.FromArgb("#232326"),
+                ['c'] = Color.FromArgb("#19191A"),
+                ['d'] = Color.FromArgb("#3B3B3E"),
+                ['e'] = Color.FromArgb("#F5F7F7"),
+                ['f'] = Color.FromArgb("#3E383E"),
+                ['g'] = Color.FromArgb("#C3B9BC"),
+                ['h'] = Color.FromArgb("#BFB4B8"),
+                ['i'] = Color.FromArgb("#373037"),
+                ['j'] = Color.FromArgb("#6B6168"),
+                ['k'] = Color.FromArgb("#443C43"),
+                ['l'] = Color.FromArgb("#5F5963"),
+                ['m'] = Color.FromArgb("#413A41"),
+                ['n'] = Color.FromArgb("#000001"),
+                ['o'] = Color.FromArgb("#16161B"),
+                ['p'] = Color.FromArgb("#0A0A0C"),
+                ['q'] = Color.FromArgb("#0E0E11"),
+                ['r'] = Color.FromArgb("#141418"),
+                ['s'] = Color.FromArgb("#060607"),
+                ['t'] = Color.FromArgb("#040405"),
+                ['u'] = Color.FromArgb("#5D5C64"),
+                ['v'] = Color.FromArgb("#38383B"),
+                ['w'] = Color.FromArgb("#A1979C"),
+                ['x'] = Color.FromArgb("#938B90"),
+                ['y'] = Color.FromArgb("#7A7A7F"),
+                ['z'] = Color.FromArgb("#52565B"),
+                ['0'] = Color.FromArgb("#373438"),
+                ['1'] = Color.FromArgb("#121314"),
+                ['2'] = Color.FromArgb("#4E5358"),
+                ['3'] = Color.FromArgb("#010101"),
+            }),
+            ["hat2"] = new SpriteLayer(new[]
+            {
+                "................................", // 0
+                "..............AAA...............", // 1
+                ".............ABCDA..............", // 2
+                "...........AAAEFFAAA............", // 3
+                ".........AAGHAAAAAGHAA..........", // 4
+                ".......AAHHIJIIJJJJJGGAA........", // 5
+                ".....AAGKHIJJLLMLNNIJJFKAA......", // 6
+                "....AJFFGJJNLLLMNLLLLJJOPJA.....", // 7
+                "...AJPPGJINLLLLMLLLLLLJJOPJA....", // 8
+                "..AQEPGJJNLLLLLMLLLLLLLIJOFJA...", // 9
+                "..AJFPIJNLLLLLLMLLLLLLLLJJFPQA..", // 10
+                "..AFPFJJLLLLRMSBTUMLLLLLJJKFJA..", // 11
+                ".AQFVJJMLLLLMWXXXBUMLLLRMJJFPJA.", // 12
+                ".AJFGJJMMLLLUXXCCCYULLRMMJJPFJA.", // 13
+                ".AJKIJJMMMLLUZCaCCbULLMMMJJJFJA.", // 14
+                "AAHHIJJMMMMMUDDDDTcUMMMMMJJJFFAA", // 15
+                "AAFFAJJMMMMMMdDBBceMMMMMMJJAEPAA", // 16
+                "AAFFAJJJMMMMMMfTgeMMMMMMJJJAFFAA", // 17
+                "AAFPAJJJJMMMMMMMMMMMMMMQJJJAFFAA", // 18
+                "AAPKAJJhJAAAAAAAAAAAAAAJhJIAFFAA", // 19
+                "AAFKiAAAhhhNNNNNNNNNMMMAAAAjFFAA", // 20
+                "AAKAAMMMMNLLLLLLLLLLLNMMMMJAAKAA", // 21
+                "AAAQJMMMLLLLLLLLLLLLLLLMMMMJQAAA", // 22
+                "AkJJJMMMLLLLLLLLLLLLLLLLMMMJJJlA", // 23
+                "AkJJJhMMLLRRRRRRLLLRRLLRMMMJJJlA", // 24
+                "AkJJJMMMMRRlmnnnnomkRRRMMMMJJJkA", // 25
+                "AkJJJMMMMmmnkppppploomMMMMMJJIkA", // 26
+                "AjhJIJqnnkAAAAAAAAAAAroohQJJJMkA", // 27
+                "AAmIhooMAAAA.......AAAAMnnjMJlAA", // 28
+                ".AAnlAAAA.............AAAAinoAA.", // 29
+                "..AAAAA..................AAAAA..", // 30
+                "................................", // 31
+            },
+            new Dictionary<char, Color>
+            {
+                ['A'] = Color.FromArgb("#000000"),
+                ['B'] = Color.FromArgb("#CD9F00"),
+                ['C'] = Color.FromArgb("#CFCD00"),
+                ['D'] = Color.FromArgb("#D1A100"),
+                ['E'] = Color.FromArgb("#BC6800"),
+                ['F'] = Color.FromArgb("#BA6700"),
+                ['G'] = Color.FromArgb("#9D450B"),
+                ['H'] = Color.FromArgb("#9A440C"),
+                ['I'] = Color.FromArgb("#242423"),
+                ['J'] = Color.FromArgb("#262625"),
+                ['K'] = Color.FromArgb("#B76600"),
+                ['L'] = Color.FromArgb("#626262"),
+                ['M'] = Color.FromArgb("#3E3E3E"),
+                ['N'] = Color.FromArgb("#646363"),
+                ['O'] = Color.FromArgb("#A04905"),
+                ['P'] = Color.FromArgb("#BB6800"),
+                ['Q'] = Color.FromArgb("#282726"),
+                ['R'] = Color.FromArgb("#61605F"),
+                ['S'] = Color.FromArgb("#AC5D04"),
+                ['T'] = Color.FromArgb("#CEA201"),
+                ['U'] = Color.FromArgb("#A65300"),
+                ['V'] = Color.FromArgb("#B76800"),
+                ['W'] = Color.FromArgb("#CB9C00"),
+                ['X'] = Color.FromArgb("#FFFFFF"),
+                ['Y'] = Color.FromArgb("#CEA500"),
+                ['Z'] = Color.FromArgb("#CDC100"),
+                ['a'] = Color.FromArgb("#CFCB00"),
+                ['b'] = Color.FromArgb("#C18200"),
+                ['c'] = Color.FromArgb("#5E8100"),
+                ['d'] = Color.FromArgb("#B87C00"),
+                ['e'] = Color.FromArgb("#A65801"),
+                ['f'] = Color.FromArgb("#B67500"),
+                ['g'] = Color.FromArgb("#A75500"),
+                ['h'] = Color.FromArgb("#404140"),
+                ['i'] = Color.FromArgb("#90908E"),
+                ['j'] = Color.FromArgb("#858483"),
+                ['k'] = Color.FromArgb("#878685"),
+                ['l'] = Color.FromArgb("#898987"),
+                ['m'] = Color.FromArgb("#C0BFBE"),
+                ['n'] = Color.FromArgb("#C2C2C1"),
+                ['o'] = Color.FromArgb("#C1C1BF"),
+                ['p'] = Color.FromArgb("#282929"),
+                ['q'] = Color.FromArgb("#434443"),
+                ['r'] = Color.FromArgb("#8C8C8B"),
+            }),
+            ["hat3"] = new SpriteLayer(new[]
+            {
+                "................................", // 0
+                "................................", // 1
+                "................................", // 2
+                "................................", // 3
+                "................................", // 4
+                "................................", // 5
+                "................................", // 6
+                "................................", // 7
+                "...............AA...............", // 8
+                "............AAABCAAA............", // 9
+                "..........AACCCDCEEFAA..........", // 10
+                ".........AGCHHCICCJFFKA.........", // 11
+                "........AGCHHHHLCJJFFFKA........", // 12
+                ".......AGCCHHHCICJJJFFFMA.......", // 13
+                "......ADMJCCHCCDJJJJFFFMKA......", // 14
+                "......ADMJJJJJJKEFFFFFFMKA......", // 15
+                ".....AKKMJJJJAANNNOFFFFPMMA.....", // 16
+                ".....AMMPEAAAQRDDKKONNFPMMA.....", // 17
+                ".....AMMPOSKDQRDDKKKSENPMMA.....", // 18
+                ".....APNFJSKDDRQDDKKSEFFOPA.....", // 19
+                ".....AOFFJKKTOONOOKKKEEFFNA.....", // 20
+                ".....OOFFCEOO.....OOUUEFFNN.....", // 21
+                "......NFFFO.........NNEEFN......", // 22
+                ".......NOO............NOO.......", // 23
+                "................................", // 24
+                "................................", // 25
+                "................................", // 26
+                "................................", // 27
+                "................................", // 28
+                "................................", // 29
+                "................................", // 30
+                "................................", // 31
+            },
+            new Dictionary<char, Color>
+            {
+                ['A'] = Color.FromArgb("#2D0510"),
+                ['B'] = Color.FromArgb("#B6481E"),
+                ['C'] = Color.FromArgb("#563B2B"),
+                ['D'] = Color.FromArgb("#EF5C23"),
+                ['E'] = Color.FromArgb("#3C2A2A"),
+                ['F'] = Color.FromArgb("#291821"),
+                ['G'] = Color.FromArgb("#EE6F3B"),
+                ['H'] = Color.FromArgb("#76612F"),
+                ['I'] = Color.FromArgb("#F7AE5B"),
+                ['J'] = Color.FromArgb("#402F2E"),
+                ['K'] = Color.FromArgb("#DB4C11"),
+                ['L'] = Color.FromArgb("#FFFFFF"),
+                ['M'] = Color.FromArgb("#C53C02"),
+                ['N'] = Color.FromArgb("#0C020E"),
+                ['O'] = Color.FromArgb("#0B020D"),
+                ['P'] = Color.FromArgb("#9A2600"),
+                ['Q'] = Color.FromArgb("#F1865A"),
+                ['R'] = Color.FromArgb("#FDB182"),
+                ['S'] = Color.FromArgb("#6C3C28"),
+                ['T'] = Color.FromArgb("#BB3803"),
+                ['U'] = Color.FromArgb("#4F372B"),
+            }),
+            ["pink_hat"] = new SpriteLayer(new[]
+            {
+                "................................", // 0
+                "................................", // 1
+                ".............AAAAAA.............", // 2
+                ".........BAABCCCCCCBAAA.........", // 3
+                ".......AAADEFGGGGGGGCHAAA.......", // 4
+                "......AAIEJGKKKKKKKGGJELBA......", // 5
+                ".....AAMENKKKKCCCEKKKKNELBA.....", // 6
+                "....AAOCNKGKKCPQQPCKKGKNERBA....", // 7
+                "...AASTEKGGGCPUVVWPCGGGKEMSBA...", // 8
+                "...AXYEJKGGCPUVVWVUPCGGKJCZSA...", // 9
+                "...BaRCNNGGCbUVccVUQCGGNNCdaA...", // 10
+                "..AHLIENNGGCQeffcfeQCGGNNESIBA..", // 11
+                "..AHIEJFFGGCPeegfeePEGGNNJEhHA..", // 12
+                "..AHiEJFFGGGCPeeeePCFGGNNJEYHA..", // 13
+                "..AHMDJFFGGGFCPeePEFGGGFFJDIHA..", // 14
+                "..ABjDJFFGGGGFCCCCFGGGGFFJDhHA..", // 15
+                "..AHRDJFFNGGGGGGGGGGGGGFFJDhBA..", // 16
+                "..AHMDJFFFECCCCCCCCCEEGFFkHMHA..", // 17
+                "..AHjHJECCllmmmmmmmmmlEEDkHjHA..", // 18
+                "..ABMHEnllllmmmmmmmmmlllnEBLBA..", // 19
+                "..ABooppllllmmmmmmmmmlllppooBA..", // 20
+                "..AoppplllllmmmmmmmmmllllppnoA..", // 21
+                "..BopplllllqreWWWWesqlllllppoA..", // 22
+                "..AoplllFseWWWeeeeeeesbllllpoA..", // 23
+                "..BopFFseetEAAAAAAAAEuesullpoA..", // 24
+                "..AovQstEBBB........AAHCuUuvoA..", // 25
+                "..AAooDBBA............AAAHooAA..", // 26
+                "...AAAAA................AAAAA...", // 27
+                "................................", // 28
+                "................................", // 29
+                "................................", // 30
+                "................................", // 31
+            },
+            new Dictionary<char, Color>
+            {
+                ['A'] = Color.FromArgb("#000000"),
+                ['B'] = Color.FromArgb("#040304"),
+                ['C'] = Color.FromArgb("#101011"),
+                ['D'] = Color.FromArgb("#0A090A"),
+                ['E'] = Color.FromArgb("#0E0E0E"),
+                ['F'] = Color.FromArgb("#D12C67"),
+                ['G'] = Color.FromArgb("#EA517F"),
+                ['H'] = Color.FromArgb("#070506"),
+                ['I'] = Color.FromArgb("#43002B"),
+                ['J'] = Color.FromArgb("#AF0F4F"),
+                ['K'] = Color.FromArgb("#FB829F"),
+                ['L'] = Color.FromArgb("#590030"),
+                ['M'] = Color.FromArgb("#4E002E"),
+                ['N'] = Color.FromArgb("#DF3E7C"),
+                ['O'] = Color.FromArgb("#920C3B"),
+                ['P'] = Color.FromArgb("#A61A4B"),
+                ['Q'] = Color.FromArgb("#CAB7C0"),
+                ['R'] = Color.FromArgb("#D30362"),
+                ['S'] = Color.FromArgb("#330023"),
+                ['T'] = Color.FromArgb("#450034"),
+                ['U'] = Color.FromArgb("#CBC1C4"),
+                ['V'] = Color.FromArgb("#222325"),
+                ['W'] = Color.FromArgb("#FEFEFE"),
+                ['X'] = Color.FromArgb("#24011B"),
+                ['Y'] = Color.FromArgb("#5B0043"),
+                ['Z'] = Color.FromArgb("#B90249"),
+                ['a'] = Color.FromArgb("#840637"),
+                ['b'] = Color.FromArgb("#C6ABBA"),
+                ['c'] = Color.FromArgb("#38A362"),
+                ['d'] = Color.FromArgb("#950049"),
+                ['e'] = Color.FromArgb("#E6E3E1"),
+                ['f'] = Color.FromArgb("#70697B"),
+                ['g'] = Color.FromArgb("#2F3133"),
+                ['h'] = Color.FromArgb("#CA0062"),
+                ['i'] = Color.FromArgb("#D30751"),
+                ['j'] = Color.FromArgb("#DD0B4D"),
+                ['k'] = Color.FromArgb("#C51F5C"),
+                ['l'] = Color.FromArgb("#D42467"),
+                ['m'] = Color.FromArgb("#F4458B"),
+                ['n'] = Color.FromArgb("#A91487"),
+                ['o'] = Color.FromArgb("#940C80"),
+                ['p'] = Color.FromArgb("#B81D8A"),
+                ['q'] = Color.FromArgb("#E391AD"),
+                ['r'] = Color.FromArgb("#D8D3D3"),
+                ['s'] = Color.FromArgb("#D0CACB"),
+                ['t'] = Color.FromArgb("#B98EA8"),
+                ['u'] = Color.FromArgb("#BF9CB0"),
+                ['v'] = Color.FromArgb("#AB8DA4"),
+            }),
             ["red_cap"] = new SpriteLayer(new[]
+            {
+                "............AAAAAAAA............", // 0
+                "...........ABBCBBBBBA...........", // 1
+                "..........ABBBBDDBBBEA..........", // 2
+                ".........ABBBBBDDBBBBEA.........", // 3
+                ".........ABBBBBBBBBBBEA.........", // 4
+                ".........AEEEEEEEEEEEEEA........", // 5
+                ".........AAAAAAAAAAAAAAA........", // 6
+                "................................", // 7
+                "................................", // 8
+                "................................", // 9
+                "................................", // 10
+                "................................", // 11
+                "................................", // 12
+                "................................", // 13
+                "................................", // 14
+                "................................", // 15
+                "................................", // 16
+                "................................", // 17
+                "................................", // 18
+                "................................", // 19
+                "................................", // 20
+                "................................", // 21
+                "................................", // 22
+                "................................", // 23
+                "................................", // 24
+                "................................", // 25
+                "................................", // 26
+                "................................", // 27
+                "................................", // 28
+                "................................", // 29
+                "................................", // 30
+                "................................", // 31
+            },
+            new Dictionary<char, Color>
+            {
+                ['A'] = Color.FromArgb("#1A1028"),
+                ['B'] = Color.FromArgb("#E2564A"),
+                ['C'] = Color.FromArgb("#FF8A7A"),
+                ['D'] = Color.FromArgb("#FFFFFF"),
+                ['E'] = Color.FromArgb("#A8352D"),
+            }),
+            ["red_cap@classic"] = new SpriteLayer(new[]
             {
                 "............AAAAAAAA............", // 0
                 "...........ABBCBBBBBA...........", // 1
@@ -138,6 +502,49 @@ namespace MDRNJfitness.Helpers.Sprites
                 ['D'] = Color.FromArgb("#C98A1E"),
                 ['E'] = Color.FromArgb("#E2564A"),
             }),
+            ["runner_tee@classic"] = new SpriteLayer(new[]
+            {
+                "................................", // 0
+                "................................", // 1
+                "................................", // 2
+                "................................", // 3
+                "................................", // 4
+                "................................", // 5
+                "................................", // 6
+                "................................", // 7
+                "................................", // 8
+                "................................", // 9
+                "................................", // 10
+                "................................", // 11
+                "................................", // 12
+                "................................", // 13
+                "................................", // 14
+                ".........ABBBA....ABBBA.........", // 15
+                ".......AABBBBBBAABBBBBBAA.......", // 16
+                "......ABBCBBBBBBBBBBBBBDBA......", // 17
+                "......ABBDABBBBBBBBBBADBBA......", // 18
+                "......AAAAABBBBBBBBBBAAAAA......", // 19
+                "..........AEEEEEEEEEEA..........", // 20
+                "..........ABBBBBBBBBDA..........", // 21
+                "..........ADBBBBBBBBDA..........", // 22
+                "..........AAAAAAAAAAAA..........", // 23
+                "................................", // 24
+                "................................", // 25
+                "................................", // 26
+                "................................", // 27
+                "................................", // 28
+                "................................", // 29
+                "................................", // 30
+                "................................", // 31
+            },
+            new Dictionary<char, Color>
+            {
+                ['A'] = Color.FromArgb("#1A1028"),
+                ['B'] = Color.FromArgb("#FFC94A"),
+                ['C'] = Color.FromArgb("#FFE39A"),
+                ['D'] = Color.FromArgb("#C98A1E"),
+                ['E'] = Color.FromArgb("#E2564A"),
+            }),
             ["runner_tee@starting_girl"] = new SpriteLayer(new[]
             {
                 "................................", // 0
@@ -180,7 +587,208 @@ namespace MDRNJfitness.Helpers.Sprites
                 ['C'] = Color.FromArgb("#FFC94A"),
                 ['D'] = Color.FromArgb("#E2564A"),
             }),
+            ["black_shorts"] = new SpriteLayer(new[]
+            {
+                "................................", // 0
+                "...........AAAAAAAAAAB..........", // 1
+                "......AAAAAACDEFFFDCCGAAAA......", // 2
+                ".....HIJKCCCCAAAAAACCCCILLA.....", // 3
+                ".....AJAAMAAAAAAAAAAAAINAOA.....", // 4
+                ".....AAPJGQRAKAAIAAKAILNCAA.....", // 5
+                ".....AAQSASATALCAJCAIALALAA.....", // 6
+                "....AAUQAAANAVNAVAIAJAJAKUAA....", // 7
+                "....AUAQHEAAVAAAMVAAAAAAWAXA....", // 8
+                "....AYAAJDAZAAAAAKZAaAAbAAcA....", // 9
+                "...dUAJAJJAVAeAAANVALSAJADAUA...", // 10
+                "...fUAJAJJAVAeAAeAVAJSOLADAUA...", // 11
+                "...AUAJgSSAVAeAAeAVAagSJAEAUA...", // 12
+                "..AAYASgggJAAeAAeAAJgWgWbDAYAA..", // 13
+                "..AhAAagWgWJAVAAVAagggggbDAiUA..", // 14
+                "..AhAAaggPaJAVAAVAaggaSSAEAiUf..", // 15
+                "..AhAAagWggSAAAAAAaggPSIFEAiXA..", // 16
+                "..AZAASagWgSgSSWgagggaJAEEAjkA..", // 17
+                "..AZAFAagWgagggggaagggSADDAjXA..", // 18
+                "..AZAFAagWJAaSgggSaPgPWPDbAjXA..", // 19
+                "..lZAEAJgWgJASPgSSAaWWWSbEAZkA..", // 20
+                "..AAEbIagggPSHSPSAJggggSAEFAkA..", // 21
+                "..AADbggggSSSSAAAJgPWWgSACDAkA..", // 22
+                ".HUAEbgWgSSAAQIAAJagggPSACEAkAA.", // 23
+                ".AXAEbgggggSJAmAAagPggWSACDAYnA.", // 24
+                ".fUAEIaPWgWWACCADASgWgWSEACAYnA.", // 25
+                ".AYHECSgggPmACIAbFAagggSbAIAAeA.", // 26
+                ".AYAAIQSSaPAACA.AFAJSaSSATAAYnA.", // 27
+                ".lYHhfAAAAAAAoA.AEhAAAAAAAiAYnA.", // 28
+                "..AAlZZZZZoooAA.AAAZZZZZZnnAAf..", // 29
+                ".....AAAAAAAA......AAAAAAAA.....", // 30
+                "................................", // 31
+            },
+            new Dictionary<char, Color>
+            {
+                ['A'] = Color.FromArgb("#000000"),
+                ['B'] = Color.FromArgb("#08070B"),
+                ['C'] = Color.FromArgb("#28293A"),
+                ['D'] = Color.FromArgb("#2F374C"),
+                ['E'] = Color.FromArgb("#30384C"),
+                ['F'] = Color.FromArgb("#31394D"),
+                ['G'] = Color.FromArgb("#060507"),
+                ['H'] = Color.FromArgb("#000101"),
+                ['I'] = Color.FromArgb("#272737"),
+                ['J'] = Color.FromArgb("#3C404C"),
+                ['K'] = Color.FromArgb("#242332"),
+                ['L'] = Color.FromArgb("#3D414E"),
+                ['M'] = Color.FromArgb("#121018"),
+                ['N'] = Color.FromArgb("#1C1B25"),
+                ['O'] = Color.FromArgb("#191721"),
+                ['P'] = Color.FromArgb("#3A3F4B"),
+                ['Q'] = Color.FromArgb("#2F313F"),
+                ['R'] = Color.FromArgb("#0C0B10"),
+                ['S'] = Color.FromArgb("#3B3F4B"),
+                ['T'] = Color.FromArgb("#22222E"),
+                ['U'] = Color.FromArgb("#7E0000"),
+                ['V'] = Color.FromArgb("#FFFFFF"),
+                ['W'] = Color.FromArgb("#3A3E4A"),
+                ['X'] = Color.FromArgb("#A50604"),
+                ['Y'] = Color.FromArgb("#7C0000"),
+                ['Z'] = Color.FromArgb("#B8C6CF"),
+                ['a'] = Color.FromArgb("#3B3F4C"),
+                ['b'] = Color.FromArgb("#2E364A"),
+                ['c'] = Color.FromArgb("#9F0503"),
+                ['d'] = Color.FromArgb("#010100"),
+                ['e'] = Color.FromArgb("#7B8DA1"),
+                ['f'] = Color.FromArgb("#000001"),
+                ['g'] = Color.FromArgb("#3A3E4B"),
+                ['h'] = Color.FromArgb("#697D8D"),
+                ['i'] = Color.FromArgb("#6E8194"),
+                ['j'] = Color.FromArgb("#BBC9D3"),
+                ['k'] = Color.FromArgb("#A70605"),
+                ['l'] = Color.FromArgb("#000100"),
+                ['m'] = Color.FromArgb("#2A2B3B"),
+                ['n'] = Color.FromArgb("#76889A"),
+                ['o'] = Color.FromArgb("#657988"),
+            }),
+            ["red_shorts"] = new SpriteLayer(new[]
+            {
+                "....AAAAAAAAAAAAAAAAAAAAAAA.....", // 0
+                "....AAAAAAAAAAAAAAAAAAAAAAA.....", // 1
+                "..AABBBBCCDEEFFFGHEDDICIBBBBAA..", // 2
+                "..AABBBJIIDDDHHHGGDDDIIIJJBBAA..", // 3
+                "..AAKLLEMNOMMPPQRQOOOSSSLLLBAA..", // 4
+                "..AAKBKTCUVEEFFFFFVVVCCCWKKKAA..", // 5
+                "..AAKBJXCUEEEFHHHGEEVIUIWWJJAA..", // 6
+                "AAKKTLLLQRPVQQOMOQPVQQPVLLLTBBAA", // 7
+                "AAKBTLLVPRPEQPMMMPPVQPYVLLVXKBAA", // 8
+                "AAKJLLVQRRPVPPOOMPPVPPPQLLLLWJAA", // 9
+                "AAKXLLPRYZQGPPOMMQPFQZaPQVLLTJAA", // 10
+                "AAKXLLaYZbQGQPOMMPYGQccaYaLLTWAA", // 11
+                "AAKVLPPZZcdGPaOMMPPFdZZZPPVLLWAA", // 12
+                "AAeLVYYbbbcPPPOOMPPacZZbPYaVLWAA", // 13
+                "AAeLPYYZZbbPfPOMMaPaZZZcaPPPVWAA", // 14
+                "AAgVPRZbbZaYYPMMMPYaacZZcPffLeAA", // 15
+                "AAXLQYZbZZPPPPMMMPYPacZZZPYRVgAA", // 16
+                "AAIhPYPPPPYYPPMMMaPPaaPPaaPfViAA", // 17
+                "AAIjPfYPPPPPfPMMMPPPPPPPYYYfhiAA", // 18
+                "AAIjPYYYPYYfYYMSMPPPPYPYYYPPhXAA", // 19
+                "AACkPRYYYPPYfRhlSfYPPYPYPPPPhIAA", // 20
+                "AACkRfbbbafRfhAAAjPPfYZbbcaYhIAA", // 21
+                "AACkfYbmbPRfkhAAAkjPRfZbZbPfhCAA", // 22
+                "AAUjffbmbPffkAA.AAjPffbbbbPRkCAA", // 23
+                "AAUkffbmmYRRkAA.AAjRffZbbmPRkCAA", // 24
+                "AAUkRRmmmYRRkAA.AAkfRYbmbbYYkCAA", // 25
+                "AAnnffmmmffkkAA.AAkjPYZmmbYfkkAA", // 26
+                "AAnnRfmmmfRnnAA.AAknRfbmmmffkkAA", // 27
+                "AAnnooSppoonnAA.AAHnooSpppohnnAA", // 28
+                "..AAnnNNNnAAA.....AAAnNNNpnAAA..", // 29
+                "..AAAAAAAAAAA.....AAAAAAAAAAAA..", // 30
+                "....AAAAAA...........AAAAAA.....", // 31
+            },
+            new Dictionary<char, Color>
+            {
+                ['A'] = Color.FromArgb("#000000"),
+                ['B'] = Color.FromArgb("#5E1E35"),
+                ['C'] = Color.FromArgb("#7E2438"),
+                ['D'] = Color.FromArgb("#AE3538"),
+                ['E'] = Color.FromArgb("#B13639"),
+                ['F'] = Color.FromArgb("#C34341"),
+                ['G'] = Color.FromArgb("#C1413F"),
+                ['H'] = Color.FromArgb("#BE413E"),
+                ['I'] = Color.FromArgb("#7A2237"),
+                ['J'] = Color.FromArgb("#5D1B33"),
+                ['K'] = Color.FromArgb("#601D36"),
+                ['L'] = Color.FromArgb("#B6393A"),
+                ['M'] = Color.FromArgb("#D2514E"),
+                ['N'] = Color.FromArgb("#CE534C"),
+                ['O'] = Color.FromArgb("#D5524F"),
+                ['P'] = Color.FromArgb("#E25D5D"),
+                ['Q'] = Color.FromArgb("#E55F5F"),
+                ['R'] = Color.FromArgb("#DF5E5D"),
+                ['S'] = Color.FromArgb("#CE4E4A"),
+                ['T'] = Color.FromArgb("#742035"),
+                ['U'] = Color.FromArgb("#802537"),
+                ['V'] = Color.FromArgb("#B53638"),
+                ['W'] = Color.FromArgb("#5E1A34"),
+                ['X'] = Color.FromArgb("#721F34"),
+                ['Y'] = Color.FromArgb("#E05C5B"),
+                ['Z'] = Color.FromArgb("#F18175"),
+                ['a'] = Color.FromArgb("#E25B5B"),
+                ['b'] = Color.FromArgb("#EF8074"),
+                ['c'] = Color.FromArgb("#F27F73"),
+                ['d'] = Color.FromArgb("#CA4443"),
+                ['e'] = Color.FromArgb("#611A34"),
+                ['f'] = Color.FromArgb("#DF5D5B"),
+                ['g'] = Color.FromArgb("#641A35"),
+                ['h'] = Color.FromArgb("#BA3A39"),
+                ['i'] = Color.FromArgb("#6B1D35"),
+                ['j'] = Color.FromArgb("#BC3A39"),
+                ['k'] = Color.FromArgb("#BD3D3A"),
+                ['l'] = Color.FromArgb("#9F2C31"),
+                ['m'] = Color.FromArgb("#EE8073"),
+                ['n'] = Color.FromArgb("#B93E39"),
+                ['o'] = Color.FromArgb("#B63936"),
+                ['p'] = Color.FromArgb("#C94D46"),
+            }),
             ["track_shorts"] = new SpriteLayer(new[]
+            {
+                "................................", // 0
+                "................................", // 1
+                "................................", // 2
+                "................................", // 3
+                "................................", // 4
+                "................................", // 5
+                "................................", // 6
+                "................................", // 7
+                "................................", // 8
+                "................................", // 9
+                "................................", // 10
+                "................................", // 11
+                "................................", // 12
+                "................................", // 13
+                "................................", // 14
+                "................................", // 15
+                "................................", // 16
+                "................................", // 17
+                "................................", // 18
+                "................................", // 19
+                "................................", // 20
+                "................................", // 21
+                "................................", // 22
+                "..........AAAAAAAAAAAA..........", // 23
+                "..........ABCCCCCCCCBA..........", // 24
+                "..........ABCCCDDCCCBA..........", // 25
+                "..........ACCCCAACCCCA..........", // 26
+                "................................", // 27
+                "................................", // 28
+                "................................", // 29
+                "................................", // 30
+                "................................", // 31
+            },
+            new Dictionary<char, Color>
+            {
+                ['A'] = Color.FromArgb("#1A1028"),
+                ['B'] = Color.FromArgb("#FFFFFF"),
+                ['C'] = Color.FromArgb("#B8323F"),
+                ['D'] = Color.FromArgb("#7A1F2B"),
+            }),
+            ["track_shorts@classic"] = new SpriteLayer(new[]
             {
                 "................................", // 0
                 "................................", // 1
@@ -303,6 +911,46 @@ namespace MDRNJfitness.Helpers.Sprites
                 ['A'] = Color.FromArgb("#E2564A"),
                 ['B'] = Color.FromArgb("#FFFFFF"),
             }),
+            ["red_sneakers@classic"] = new SpriteLayer(new[]
+            {
+                "................................", // 0
+                "................................", // 1
+                "................................", // 2
+                "................................", // 3
+                "................................", // 4
+                "................................", // 5
+                "................................", // 6
+                "................................", // 7
+                "................................", // 8
+                "................................", // 9
+                "................................", // 10
+                "................................", // 11
+                "................................", // 12
+                "................................", // 13
+                "................................", // 14
+                "................................", // 15
+                "................................", // 16
+                "................................", // 17
+                "................................", // 18
+                "................................", // 19
+                "................................", // 20
+                "................................", // 21
+                "................................", // 22
+                "................................", // 23
+                "................................", // 24
+                "................................", // 25
+                "................................", // 26
+                "................................", // 27
+                "...........AAAB..AAAB...........", // 28
+                "..........AAAAB..AAAAB..........", // 29
+                "..........BBBBB..BBBBB..........", // 30
+                "................................", // 31
+            },
+            new Dictionary<char, Color>
+            {
+                ['A'] = Color.FromArgb("#E2564A"),
+                ['B'] = Color.FromArgb("#FFFFFF"),
+            }),
             ["red_sneakers@starting_girl"] = new SpriteLayer(new[]
             {
                 "................................", // 0
@@ -342,7 +990,381 @@ namespace MDRNJfitness.Helpers.Sprites
             {
                 ['A'] = Color.FromArgb("#E2564A"),
             }),
+            ["shoes1"] = new SpriteLayer(new[]
+            {
+                "................................", // 0
+                "................................", // 1
+                "................................", // 2
+                "................................", // 3
+                "................................", // 4
+                "........AAAA........AAAA........", // 5
+                ".......ABBCDA......AEBBEA.......", // 6
+                "......AEFFGFEA....AEFFGFBA......", // 7
+                ".....AEFAAAAGEA..AEFAAAAGEA.....", // 8
+                ".....AHIAJJAIIA..AHIAJKAHHA.....", // 9
+                ".....AGALJKIAGA..AGAHKKLAMA.....", // 10
+                ".....AAAAAAAAAA..AAAAAAAAAA.....", // 11
+                ".....AGANOOAAMA..AGAAOONAGA.....", // 12
+                ".....AIPAAAPOAA..AAOOAAAPIA.....", // 13
+                ".....GAAAAAAAMA..AMAAAAAAAM.....", // 14
+                ".....FAOOPPPAGA..AGAOONNNAG.....", // 15
+                "....AGQAAAAAQFA..AGQAAAAAQFA....", // 16
+                "....AFAPPOPPAMA..AGAPOOPPAFA....", // 17
+                "....AFAHAAALAFA..AFALAAALAFA....", // 18
+                "....AARSCCCSTAA..AADSCCCSTAA....", // 19
+                "...ALAAUVVVUALA..ALAUVVVUAALA...", // 20
+                "...ALNWXWXWWWLAAAAHWXXXXWWPLA...", // 21
+                "...ALNPAAAAAPLAAAALPAAAAAPOIA...", // 22
+                "..AYAAAZZZZZAAYAAYAAZZZZZAAAYA..", // 23
+                "..AYaZZZZZZZZaYAAYaZZZZZZZZaYA..", // 24
+                "...AAbbbbbbbbAA..AAbbbbbbbbAA...", // 25
+                ".....AAAAAAAA......AAAAAAAA.....", // 26
+                "................................", // 27
+                "................................", // 28
+                "................................", // 29
+                "................................", // 30
+                "................................", // 31
+            },
+            new Dictionary<char, Color>
+            {
+                ['A'] = Color.FromArgb("#000000"),
+                ['B'] = Color.FromArgb("#E64580"),
+                ['C'] = Color.FromArgb("#E0427B"),
+                ['D'] = Color.FromArgb("#E3477D"),
+                ['E'] = Color.FromArgb("#E6467E"),
+                ['F'] = Color.FromArgb("#A60546"),
+                ['G'] = Color.FromArgb("#A90647"),
+                ['H'] = Color.FromArgb("#332C2C"),
+                ['I'] = Color.FromArgb("#322B2A"),
+                ['J'] = Color.FromArgb("#9E4E68"),
+                ['K'] = Color.FromArgb("#9D4F67"),
+                ['L'] = Color.FromArgb("#352D2C"),
+                ['M'] = Color.FromArgb("#AA0849"),
+                ['N'] = Color.FromArgb("#4F4747"),
+                ['O'] = Color.FromArgb("#4F4848"),
+                ['P'] = Color.FromArgb("#504948"),
+                ['Q'] = Color.FromArgb("#BA3866"),
+                ['R'] = Color.FromArgb("#E3497B"),
+                ['S'] = Color.FromArgb("#D93370"),
+                ['T'] = Color.FromArgb("#E64C80"),
+                ['U'] = Color.FromArgb("#F46273"),
+                ['V'] = Color.FromArgb("#FC7B86"),
+                ['W'] = Color.FromArgb("#6B6C6B"),
+                ['X'] = Color.FromArgb("#6A6B6A"),
+                ['Y'] = Color.FromArgb("#A2ADB2"),
+                ['Z'] = Color.FromArgb("#E1E1E1"),
+                ['a'] = Color.FromArgb("#BDBEBD"),
+                ['b'] = Color.FromArgb("#3F7D7F"),
+            }),
+            ["shoes2"] = new SpriteLayer(new[]
+            {
+                "................................", // 0
+                "................................", // 1
+                "........AAA..........AAA........", // 2
+                ".......ABBBA........ABBBA.......", // 3
+                ".......AAAAA........AAAAA.......", // 4
+                "......ACDDDEA......AEDDFEA......", // 5
+                "......ADGHIAA......AAIJKLA......", // 6
+                ".....ACDDMFAEA....AEAFFGNEA.....", // 7
+                ".....AOFDGFAPA....AQADDGROA.....", // 8
+                ".....AASGKLAOA....AOATUVFAA.....", // 9
+                ".....AWLRLRAOA....AOANNNRAA.....", // 10
+                ".....AEAAAAEXA....AXEAAAAEA.....", // 11
+                "....AYAZaZAALXA..AXTAAZaLALA....", // 12
+                "....AbCAAACAcLA..AYSAEAAAEcA....", // 13
+                "....APAKdeALQfA..AfQgANHSAPA....", // 14
+                "...AFDANRLALQfA..ASQDANRNADgA...", // 15
+                "...AMAEAAAEAdLA..ADGAEAAAEAfA...", // 16
+                "...AMFANFLADdPA..AQHFARFRALfA...", // 17
+                "...AHAEEECAcQOA..AXQbAPPEEAfA...", // 18
+                "..AXFUAAAAGYQA....AQDMAAAAJLOA..", // 19
+                "..AhSEECCCCcQA....AiFCCECCiciA..", // 20
+                "..AQQQQQiQhhhA....AjiQQQPjhQjA..", // 21
+                "..AkhSMMUJShkA....AkjcUMGbchlA..", // 22
+                "..ZAjiEECCQXAR....ZAkPEEEhQXAR..", // 23
+                "..ZAAkPCEQkALR....ZLAlPCCPlAAR..", // 24
+                "..ZFRAAAAAALFR....ZFNAAAAAANFR..", // 25
+                "..mZDIMMMbIFLm....mLDIMMMUKFZm..", // 26
+                "...mggFFFFYYm......mgYFFFFYYm...", // 27
+                "....mNNNNNRm........mNNNNRNm....", // 28
+                "................................", // 29
+                "................................", // 30
+                "................................", // 31
+            },
+            new Dictionary<char, Color>
+            {
+                ['A'] = Color.FromArgb("#000000"),
+                ['B'] = Color.FromArgb("#333734"),
+                ['C'] = Color.FromArgb("#5B6360"),
+                ['D'] = Color.FromArgb("#F18119"),
+                ['E'] = Color.FromArgb("#5D6562"),
+                ['F'] = Color.FromArgb("#F3851A"),
+                ['G'] = Color.FromArgb("#FDF500"),
+                ['H'] = Color.FromArgb("#FDDE00"),
+                ['I'] = Color.FromArgb("#F8AF00"),
+                ['J'] = Color.FromArgb("#FAEB00"),
+                ['K'] = Color.FromArgb("#FDBC00"),
+                ['L'] = Color.FromArgb("#C5560D"),
+                ['M'] = Color.FromArgb("#FCFB00"),
+                ['N'] = Color.FromArgb("#C2530C"),
+                ['O'] = Color.FromArgb("#2D312F"),
+                ['P'] = Color.FromArgb("#4F524F"),
+                ['Q'] = Color.FromArgb("#4A4D4A"),
+                ['R'] = Color.FromArgb("#C2540D"),
+                ['S'] = Color.FromArgb("#F9A900"),
+                ['T'] = Color.FromArgb("#E27013"),
+                ['U'] = Color.FromArgb("#FDFA00"),
+                ['V'] = Color.FromArgb("#FECD00"),
+                ['W'] = Color.FromArgb("#111411"),
+                ['X'] = Color.FromArgb("#282C29"),
+                ['Y'] = Color.FromArgb("#DB6A15"),
+                ['Z'] = Color.FromArgb("#CC5E11"),
+                ['a'] = Color.FromArgb("#FAC500"),
+                ['b'] = Color.FromArgb("#FBD600"),
+                ['c'] = Color.FromArgb("#F6A501"),
+                ['d'] = Color.FromArgb("#FCE600"),
+                ['e'] = Color.FromArgb("#F78F10"),
+                ['f'] = Color.FromArgb("#F8A300"),
+                ['g'] = Color.FromArgb("#D36313"),
+                ['h'] = Color.FromArgb("#464A46"),
+                ['i'] = Color.FromArgb("#565B58"),
+                ['j'] = Color.FromArgb("#414542"),
+                ['k'] = Color.FromArgb("#1E221E"),
+                ['l'] = Color.FromArgb("#1B1F1B"),
+                ['m'] = Color.FromArgb("#727171"),
+            }),
+            ["gloves"] = new SpriteLayer(new[]
+            {
+                "................................", // 0
+                "................................", // 1
+                "................................", // 2
+                "......AAAAAA.......AAAAAA.......", // 3
+                "....AABBCBDBAA...AACBBBCCAA.....", // 4
+                "...AECCFGGGGCHA.AIEJKGJGICLAA...", // 5
+                "..AAEMNOPNQFGDRASITOPTQJJCEAAA..", // 6
+                ".AUADMTPPNJJGLEAVWTPPTJJJCLAXA..", // 7
+                "AMYZALKJQJJJJDAAAIKJJJJJKDAaMMA.", // 8
+                "AXZZACHKFFJICHAAAbDJJJKcLLAaadLA", // 9
+                "AMZZAACBBBBDHAAAAADBCCLDDAAaadLe", // 10
+                "AMGGAfAAAAAAAAgAgAAAAAAAAhAiadLf", // 11
+                "AMGHAjkgjkkgglgAgmnnkogjkjALidEA", // 12
+                "ACHDApqAArrAAsgAgsAArrAAtuALLLEf", // 13
+                "AHHAAXAvAAAwwwjAgwwwAAAvAXAAxyA.", // 14
+                ".AyAAXAsxVVgwwAAAwunVVz0A1AAyyA.", // 15
+                ".AAAx2Ajm3ngunAAAgugn3mmAxxAAf..", // 16
+                "..AxxyAsAA4gggAAAngg4AAsAxyxA...", // 17
+                "...AxyAsAA4gAAA.AAAg4AA0AyyA....", // 18
+                "...AAAAAAAAAAAA.AAAAAAAAAAAA....", // 19
+                "...ACBFFFFFGBCA.ACCFGKKGGBCA....", // 20
+                "...ABGFNOOYFGHA.ACFNOOYFGGCA....", // 21
+                "...AHFFNOOJGGDA.ALJJOOQFFGLA....", // 22
+                "...AHMGGGGFGGDA.AEMFGKGFFGDA....", // 23
+                "...AADBBBBBBHAA.AALBBBBCBHAA....", // 24
+                "...AkAAAAAAAAoA.AoAAAAAAAAkA....", // 25
+                "....Agur555unAA..Anu5556pjA.....", // 26
+                ".....AAAAAAAA.....AAAAAAAA......", // 27
+                "................................", // 28
+                "................................", // 29
+                "................................", // 30
+                "................................", // 31
+            },
+            new Dictionary<char, Color>
+            {
+                ['A'] = Color.FromArgb("#000000"),
+                ['B'] = Color.FromArgb("#AE296D"),
+                ['C'] = Color.FromArgb("#B1296D"),
+                ['D'] = Color.FromArgb("#AE266A"),
+                ['E'] = Color.FromArgb("#B1266B"),
+                ['F'] = Color.FromArgb("#F26AA1"),
+                ['G'] = Color.FromArgb("#F36CA2"),
+                ['H'] = Color.FromArgb("#AF296B"),
+                ['I'] = Color.FromArgb("#B62B71"),
+                ['J'] = Color.FromArgb("#F56AA2"),
+                ['K'] = Color.FromArgb("#F56CA5"),
+                ['L'] = Color.FromArgb("#B1276C"),
+                ['M'] = Color.FromArgb("#DB5193"),
+                ['N'] = Color.FromArgb("#FB9CC7"),
+                ['O'] = Color.FromArgb("#F6C7E4"),
+                ['P'] = Color.FromArgb("#F6C9E6"),
+                ['Q'] = Color.FromArgb("#F367A1"),
+                ['R'] = Color.FromArgb("#3B0C29"),
+                ['S'] = Color.FromArgb("#2C0517"),
+                ['T'] = Color.FromArgb("#FD9DC9"),
+                ['U'] = Color.FromArgb("#DD5697"),
+                ['V'] = Color.FromArgb("#A81A5D"),
+                ['W'] = Color.FromArgb("#B82E70"),
+                ['X'] = Color.FromArgb("#DA4E91"),
+                ['Y'] = Color.FromArgb("#FA9FC9"),
+                ['Z'] = Color.FromArgb("#FAA1C8"),
+                ['a'] = Color.FromArgb("#FA7EB1"),
+                ['b'] = Color.FromArgb("#AA2166"),
+                ['c'] = Color.FromArgb("#BB2D74"),
+                ['d'] = Color.FromArgb("#DC5195"),
+                ['e'] = Color.FromArgb("#0C0A09"),
+                ['f'] = Color.FromArgb("#050606"),
+                ['g'] = Color.FromArgb("#21201E"),
+                ['h'] = Color.FromArgb("#070808"),
+                ['i'] = Color.FromArgb("#F97CAE"),
+                ['j'] = Color.FromArgb("#1F1F1D"),
+                ['k'] = Color.FromArgb("#242422"),
+                ['l'] = Color.FromArgb("#191918"),
+                ['m'] = Color.FromArgb("#1D1D1B"),
+                ['n'] = Color.FromArgb("#222220"),
+                ['o'] = Color.FromArgb("#262624"),
+                ['p'] = Color.FromArgb("#333431"),
+                ['q'] = Color.FromArgb("#6F6F6A"),
+                ['r'] = Color.FromArgb("#7C7B77"),
+                ['s'] = Color.FromArgb("#2C2C29"),
+                ['t'] = Color.FromArgb("#777672"),
+                ['u'] = Color.FromArgb("#4D4E4A"),
+                ['v'] = Color.FromArgb("#52514E"),
+                ['w'] = Color.FromArgb("#4F4F4D"),
+                ['x'] = Color.FromArgb("#A9155B"),
+                ['y'] = Color.FromArgb("#A61559"),
+                ['z'] = Color.FromArgb("#AC1E5E"),
+                ['0'] = Color.FromArgb("#2A2A26"),
+                ['1'] = Color.FromArgb("#D34388"),
+                ['2'] = Color.FromArgb("#BF3778"),
+                ['3'] = Color.FromArgb("#5F605C"),
+                ['4'] = Color.FromArgb("#5C5B58"),
+                ['5'] = Color.FromArgb("#7D7D7A"),
+                ['6'] = Color.FromArgb("#535450"),
+            }),
+            ["red_gloves"] = new SpriteLayer(new[]
+            {
+                "......AAAAAAA......AAAAAAA......", // 0
+                "....AABCDDDEFAA..AAGDHIDEFAA....", // 1
+                "...AJKKLLMMNOOFPAGKKQNMMLKOFA...", // 2
+                "..AJOMMLRSRQLTOBPOLMQSSRLLNOFA..", // 3
+                ".AJOLLSSUUSSVTLOWAQSSSUSVVQLOFA.", // 4
+                ".AILLXYZZZZZXXLLIAXYaaaZaXbLLIA.", // 5
+                "AcDNMXYaZaaZXbdMHAbYZZZZeXbfMIA.", // 6
+                "AcDNMRSSSRSSSRgTHcARSSSSRSVgQHcA", // 7
+                "AchMQLRSSRUSSiQTHjARUSSSSUgNQIcA", // 8
+                "AjHHTQRUSSSSSgTKHjARSSRSSSgTKHcA", // 9
+                "AkHHLTQQTLQQQLQOhlAQTQQQQQTTKhlA", // 10
+                "AmnomKQLQLLLLKmpnIAQLTQTLQKmBqEA", // 11
+                "ArrPBKmmmjmjKKBPjIAmmmjjjOKWscIA", // 12
+                "AHrrWnWhHHIIWqBcchAWhIIHIWqBccIA", // 13
+                "AhrrrWAAAAAAApjrrtAAAAAAAABjcchA", // 14
+                ".ADrcOJHhHhHGmrroAjGIHhHHBjrcIA.", // 15
+                ".AHDcKJmrrrrJrrhAjrpmrrrmJrrCDA.", // 16
+                "..AHDCpMMMMMBDChAEIJMMMLLpDCHA..", // 17
+                "...AEDAUUUUuAEDAACDAuuUUuAECA...", // 18
+                "...ACIAvAAAvACCAADDAEAAAvADDA...", // 19
+                "....AAAEAAAEAAA..AAAEAAAEAAA....", // 20
+                "....AAAAAAAAAAA..AAAAAAAAAAA....", // 21
+                "....AvEwxxxyyIA..AEEwxxxyyEA....", // 22
+                "....ACEzz011yEA..AEEzz02wyEA....", // 23
+                "....ACEzz012xEA..ACCz3022yEA....", // 24
+                "....ACEzz020xCA..ADDzz010yEA....", // 25
+                "....AECzz022xCA..AEDzz022yCA....", // 26
+                ".....AAAAAAAAA....AAAAAAAAA.....", // 27
+                ".....AAAAAAAAA....AAAAAAAAA.....", // 28
+                "....Axw2z3330xA..Axw133z32yA....", // 29
+                ".....AAAAAAAAA....AAAAAAAAA.....", // 30
+                ".......AAAAA........AAAAA.......", // 31
+            },
+            new Dictionary<char, Color>
+            {
+                ['A'] = Color.FromArgb("#000000"),
+                ['B'] = Color.FromArgb("#4A021D"),
+                ['C'] = Color.FromArgb("#620421"),
+                ['D'] = Color.FromArgb("#610221"),
+                ['E'] = Color.FromArgb("#650121"),
+                ['F'] = Color.FromArgb("#4A041E"),
+                ['G'] = Color.FromArgb("#4D0320"),
+                ['H'] = Color.FromArgb("#5F0120"),
+                ['I'] = Color.FromArgb("#61001F"),
+                ['J'] = Color.FromArgb("#4D041F"),
+                ['K'] = Color.FromArgb("#79021E"),
+                ['L'] = Color.FromArgb("#B21E1F"),
+                ['M'] = Color.FromArgb("#B22020"),
+                ['N'] = Color.FromArgb("#B52021"),
+                ['O'] = Color.FromArgb("#77021D"),
+                ['P'] = Color.FromArgb("#050103"),
+                ['Q'] = Color.FromArgb("#B41E20"),
+                ['R'] = Color.FromArgb("#DE4B44"),
+                ['S'] = Color.FromArgb("#DD4A42"),
+                ['T'] = Color.FromArgb("#B21E20"),
+                ['U'] = Color.FromArgb("#DA4A41"),
+                ['V'] = Color.FromArgb("#E04C44"),
+                ['W'] = Color.FromArgb("#47001B"),
+                ['X'] = Color.FromArgb("#EA6659"),
+                ['Y'] = Color.FromArgb("#E86455"),
+                ['Z'] = Color.FromArgb("#FAA09A"),
+                ['a'] = Color.FromArgb("#FA9F99"),
+                ['b'] = Color.FromArgb("#E86759"),
+                ['c'] = Color.FromArgb("#81051D"),
+                ['d'] = Color.FromArgb("#C62C2B"),
+                ['e'] = Color.FromArgb("#FA9F96"),
+                ['f'] = Color.FromArgb("#C92D2B"),
+                ['g'] = Color.FromArgb("#BF2626"),
+                ['h'] = Color.FromArgb("#5E001F"),
+                ['i'] = Color.FromArgb("#C32526"),
+                ['j'] = Color.FromArgb("#80021D"),
+                ['k'] = Color.FromArgb("#45021C"),
+                ['l'] = Color.FromArgb("#41011A"),
+                ['m'] = Color.FromArgb("#7E021D"),
+                ['n'] = Color.FromArgb("#0A0206"),
+                ['o'] = Color.FromArgb("#50001D"),
+                ['p'] = Color.FromArgb("#4D021E"),
+                ['q'] = Color.FromArgb("#0D0206"),
+                ['r'] = Color.FromArgb("#7E041D"),
+                ['s'] = Color.FromArgb("#080103"),
+                ['t'] = Color.FromArgb("#59001D"),
+                ['u'] = Color.FromArgb("#D9463F"),
+                ['v'] = Color.FromArgb("#680021"),
+                ['w'] = Color.FromArgb("#BDA461"),
+                ['x'] = Color.FromArgb("#8A681E"),
+                ['y'] = Color.FromArgb("#8C6A1F"),
+                ['z'] = Color.FromArgb("#FDEFDD"),
+                ['0'] = Color.FromArgb("#BBA25F"),
+                ['1'] = Color.FromArgb("#BCA35F"),
+                ['2'] = Color.FromArgb("#BBA360"),
+                ['3'] = Color.FromArgb("#FDEEDB"),
+            }),
             ["wristbands"] = new SpriteLayer(new[]
+            {
+                "................................", // 0
+                "................................", // 1
+                "................................", // 2
+                "................................", // 3
+                "................................", // 4
+                "................................", // 5
+                "................................", // 6
+                "................................", // 7
+                "................................", // 8
+                "................................", // 9
+                "................................", // 10
+                "................................", // 11
+                "................................", // 12
+                "................................", // 13
+                "................................", // 14
+                "................................", // 15
+                "................................", // 16
+                "................................", // 17
+                "................................", // 18
+                "................................", // 19
+                "................................", // 20
+                "................................", // 21
+                "......AAAA............AAAA......", // 22
+                "......BBBB............BBBB......", // 23
+                "................................", // 24
+                "................................", // 25
+                "................................", // 26
+                "................................", // 27
+                "................................", // 28
+                "................................", // 29
+                "................................", // 30
+                "................................", // 31
+            },
+            new Dictionary<char, Color>
+            {
+                ['A'] = Color.FromArgb("#3FD6C3"),
+                ['B'] = Color.FromArgb("#23968A"),
+            }),
+            ["wristbands@classic"] = new SpriteLayer(new[]
             {
                 "................................", // 0
                 "................................", // 1

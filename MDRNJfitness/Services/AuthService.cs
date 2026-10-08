@@ -11,11 +11,13 @@ namespace MDRNJfitness.Services
     {
         private readonly HttpClient _http;
         private readonly UserRepo _userRepo;
+        private readonly TokenRefresher _refresher;
 
-        public AuthService(HttpClient http, UserRepo userRepo)
+        public AuthService(HttpClient http, UserRepo userRepo, TokenRefresher refresher)
         {
             _http = http;
             _userRepo = userRepo;
+            _refresher = refresher;
         }
 
         public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
@@ -67,7 +69,7 @@ namespace MDRNJfitness.Services
             var token = result.AccessToken
                 ?? throw new InvalidOperationException("Google sign-in didn't return a token.");
 
-            await SecureStorage.SetAsync("access_token", token);
+            await TokenStore.SaveAsync(token, result.RefreshToken);
             var user = await _http.GetAsync<UserDto>("api/users/me");
             if (user is not null)
                 await _userRepo.CacheCurrentUserAsync(user);
@@ -77,8 +79,25 @@ namespace MDRNJfitness.Services
 
         public async Task LogoutAsync()
         {
-            SecureStorage.Remove("access_token");
+            // Revoke the refresh token so it can't be used again (best effort: still sign out offline)
+            var refreshToken = await TokenStore.GetRefreshTokenAsync();
+            if (!string.IsNullOrEmpty(refreshToken))
+            {
+                try { await _http.PostAsync("api/auth/logout", new RefreshTokenDto { RefreshToken = refreshToken }); }
+                catch (HttpRequestException) { }
+            }
+
+            TokenStore.Clear();
             await _userRepo.ClearAsync();
+        }
+
+        public async Task<bool> TryResumeSessionAsync()
+        {
+            if (string.IsNullOrEmpty(await TokenStore.GetRefreshTokenAsync()))
+                return false;
+            // Always refresh on launch: confirms the session is still valid and starts a fresh hour
+            return await _refresher.TryRefreshAsync(await TokenStore.GetAccessTokenAsync() ?? string.Empty)
+                && await _userRepo.GetCachedCurrentUserAsync() is not null;
         }
 
         public Task<UserDto?> GetCurrentUserAsync() =>
@@ -87,7 +106,7 @@ namespace MDRNJfitness.Services
         private async Task SaveSessionAsync(AuthResponseDto? response)
         {
             if (response is null) return;
-            await SecureStorage.SetAsync("access_token", response.AccessToken);
+            await TokenStore.SaveAsync(response.AccessToken, response.RefreshToken);
             if (response.User is not null)
                 await _userRepo.CacheCurrentUserAsync(response.User);
         }

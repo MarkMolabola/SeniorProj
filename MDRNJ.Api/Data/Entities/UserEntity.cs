@@ -37,5 +37,6 @@ namespace MDRNJ.Api.Data.Entities
         public ICollection<ChallengeEntity> ReceivedChallenges { get; set; } = new List<ChallengeEntity>();
         public ICollection<UserQuestEntity> UserQuests { get; set; } = new List<UserQuestEntity>();
         public ICollection<UserGearEntity> OwnedGear { get; set; } = new List<UserGearEntity>();
+        public ICollection<RefreshTokenEntity> RefreshTokens { get; set; } = new List<RefreshTokenEntity>();
     }
 }

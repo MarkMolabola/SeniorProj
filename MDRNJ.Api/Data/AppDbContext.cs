@@ -23,6 +23,7 @@ namespace MDRNJ.Api.Data
         public DbSet<QuestEntity> Quests => Set<QuestEntity>();
         public DbSet<UserQuestEntity> UserQuests => Set<UserQuestEntity>();
         public DbSet<UserGearEntity> UserGear => Set<UserGearEntity>();
+        public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -206,6 +207,18 @@ namespace MDRNJ.Api.Data
                 e.HasOne(uq => uq.Quest)
                  .WithMany(q => q.UserQuests)
                  .HasForeignKey(uq => uq.QuestId)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // RefreshTokenEntity — looked up by hash on every refresh
+            modelBuilder.Entity<RefreshTokenEntity>(e =>
+            {
+                e.HasKey(t => t.RefreshTokenId);
+                e.Property(t => t.TokenHash).HasMaxLength(32).IsRequired();
+                e.HasIndex(t => t.TokenHash).IsUnique();
+                e.HasOne(t => t.User)
+                 .WithMany(u => u.RefreshTokens)
+                 .HasForeignKey(t => t.UserId)
                  .OnDelete(DeleteBehavior.Cascade);
             });
 

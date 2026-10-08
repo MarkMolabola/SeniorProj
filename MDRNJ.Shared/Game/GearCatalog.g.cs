@@ -9,10 +9,20 @@ namespace MDRNJ.Shared.Game
         /// <summary>Everything the shop sells, from GearReferences/gear.json.</summary>
         public static readonly IReadOnlyList<GearItem> All = new GearItem[]
         {
+            new("hat1", "Black Cap", GearSlot.Head, 60),
+            new("hat2", "Gold Emblem Cap", GearSlot.Head, 90),
+            new("hat3", "Ranger Cap", GearSlot.Head, 50),
+            new("pink_hat", "Pink Cap", GearSlot.Head, 70),
             new("red_cap", "Red Cap", GearSlot.Head, 60),
             new("runner_tee", "Runner Tee", GearSlot.Top, 80),
+            new("black_shorts", "Black Gym Shorts", GearSlot.Bottom, 60),
+            new("red_shorts", "Red Shorts", GearSlot.Bottom, 55),
             new("track_shorts", "Track Shorts", GearSlot.Bottom, 70),
             new("red_sneakers", "Red Sneakers", GearSlot.Shoes, 90),
+            new("shoes1", "Pink Trainers", GearSlot.Shoes, 80),
+            new("shoes2", "Blaze Sneakers", GearSlot.Shoes, 120),
+            new("gloves", "Pink Boxing Gloves", GearSlot.Accessory, 75),
+            new("red_gloves", "Red Boxing Gloves", GearSlot.Accessory, 85),
             new("wristbands", "Wristbands", GearSlot.Accessory, 40),
         };
     }

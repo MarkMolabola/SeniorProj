@@ -14,6 +14,9 @@ namespace MDRNJ.Shared.Game
         /// <summary>Half the quest's XP reward.</summary>
         public static int ForQuest(int xpReward) => xpReward / 2;
 
+        /// <summary>Half the achievement's XP reward.</summary>
+        public static int ForAchievement(int xpReward) => xpReward / 2;
+
         /// <summary>Win 50 / tie 25 / loss 10; nothing if you never submitted.</summary>
         public static int ForDuel(string? outcome, bool competed) =>
             !competed ? 0 : outcome switch

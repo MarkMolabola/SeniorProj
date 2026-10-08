@@ -24,6 +24,10 @@ namespace MDRNJ.Api.Services
         private const int ResendCooldownSeconds = 60;
         private const int MaxVerificationAttempts = 5;
 
+        /// <summary>Access tokens are short-lived; the app renews them with a refresh token.</summary>
+        private static readonly TimeSpan AccessTokenLifetime = TimeSpan.FromHours(1);
+        private static readonly TimeSpan RefreshTokenLifetime = TimeSpan.FromDays(60);
+
         private readonly AppDbContext _db;
         private readonly IConfiguration _config;
         private readonly IEmailService _email;
@@ -80,7 +84,7 @@ namespace MDRNJ.Api.Services
                 throw new EmailNotVerifiedException("Please verify your email. We sent a 6-digit code to your inbox.");
             }
 
-            return BuildAuthResponse(user);
+            return await BuildAuthResponseAsync(user);
         }
 
         public async Task<AuthResponseDto> VerifyEmailAsync(VerifyEmailDto dto)
@@ -112,7 +116,7 @@ namespace MDRNJ.Api.Services
             ClearVerificationCode(user);
             await _db.SaveChangesAsync();
 
-            return BuildAuthResponse(user);
+            return await BuildAuthResponseAsync(user);
         }
 
         public async Task ResendVerificationAsync(ResendVerificationDto dto)
@@ -167,7 +171,7 @@ namespace MDRNJ.Api.Services
                 await _db.SaveChangesAsync();
             }
 
-            return BuildAuthResponse(user);
+            return await BuildAuthResponseAsync(user);
         }
 
         // ── Helpers ─────────────────────────────────────
@@ -238,11 +242,70 @@ namespace MDRNJ.Api.Services
 
         private static byte[] HashVerificationCode(string code) => SHA256.HashData(Encoding.UTF8.GetBytes(code));
 
-        private AuthResponseDto BuildAuthResponse(UserEntity user)
+        public async Task<AuthResponseDto> RefreshAsync(string refreshToken)
         {
+            var hash = HashRefreshToken(refreshToken);
+            var stored = await _db.RefreshTokens
+                .Include(t => t.User)
+                .FirstOrDefaultAsync(t => t.TokenHash == hash)
+                ?? throw new UnauthorizedAccessException("Your session has expired. Please sign in again.");
+
+            if (stored.RevokedAt is not null)
+            {
+                // A used or revoked token came back: it may have been stolen. End every session.
+                _logger.LogWarning("Refresh token reuse for user {UserId}; revoking all sessions", stored.UserId);
+                await RevokeAllAsync(stored.UserId);
+                throw new UnauthorizedAccessException("Your session has expired. Please sign in again.");
+            }
+            if (stored.ExpiresAt <= DateTime.UtcNow)
+                throw new UnauthorizedAccessException("Your session has expired. Please sign in again.");
+
+            stored.RevokedAt = DateTime.UtcNow; // rotated: the response carries a new one
+            return await BuildAuthResponseAsync(stored.User);
+        }
+
+        public async Task LogoutAsync(string refreshToken)
+        {
+            var hash = HashRefreshToken(refreshToken);
+            var stored = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.TokenHash == hash);
+            if (stored is null || stored.RevokedAt is not null) return;
+
+            stored.RevokedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync();
+        }
+
+        private async Task RevokeAllAsync(Guid userId)
+        {
+            var now = DateTime.UtcNow;
+            await _db.RefreshTokens
+                .Where(t => t.UserId == userId && t.RevokedAt == null)
+                .ExecuteUpdateAsync(u => u.SetProperty(t => t.RevokedAt, now));
+        }
+
+        private static byte[] HashRefreshToken(string token) => SHA256.HashData(Encoding.UTF8.GetBytes(token));
+
+        /// <summary>Signs an access token and issues (and saves) a new refresh token.</summary>
+        private async Task<AuthResponseDto> BuildAuthResponseAsync(UserEntity user)
+        {
+            // Housekeeping: drop this user's dead tokens. Revoked ones are kept a while so reuse is still detected.
+            var now = DateTime.UtcNow;
+            var revokedCutoff = now.AddDays(-30);
+            await _db.RefreshTokens
+                .Where(t => t.UserId == user.UserId && (t.ExpiresAt < now || t.RevokedAt < revokedCutoff))
+                .ExecuteDeleteAsync();
+
+            var refreshToken = Base64UrlEncoder.Encode(RandomNumberGenerator.GetBytes(48));
+            _db.RefreshTokens.Add(new RefreshTokenEntity
+            {
+                UserId = user.UserId,
+                TokenHash = HashRefreshToken(refreshToken),
+                ExpiresAt = DateTime.UtcNow.Add(RefreshTokenLifetime)
+            });
+            await _db.SaveChangesAsync();
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.UtcNow.AddDays(7);
+            var expires = DateTime.UtcNow.Add(AccessTokenLifetime);
 
             var token = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
@@ -260,7 +323,7 @@ namespace MDRNJ.Api.Services
             return new AuthResponseDto
             {
                 AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
-                RefreshToken = Guid.NewGuid().ToString(),
+                RefreshToken = refreshToken,
                 ExpiresAt = expires,
                 User = new UserDto
                 {

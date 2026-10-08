@@ -11,9 +11,13 @@ Hero avatars
 Shop gear
     SpriteReferences/GearReferences/<Slot>/<Name>.png, where <Slot> is Head,
     Top, Bottom, Shoes or Accessory. The item id is the snake_case file name
-    (RedCap.png -> "red_cap"). Draw it on the 32x32 hero canvas, only the
-    gear's own pixels. Optional per-hero versions: <Name>@<avatar_id>.png
-    (e.g. RedCap@starting_girl.png) is used instead when that hero is worn.
+    (RedCap.png -> "red_cap").
+      <Name>.png              the item's icon in the Shop / Collection / gear
+                              slots: draw the item itself, any size on the canvas
+      <Name>@<avatar_id>.png  how it looks WORN on that hero, drawn on the 32x32
+                              hero canvas with only the gear's own pixels
+                              (@classic = the Classic Hero, @starting_girl, ...)
+    An item with no worn version for the current hero is hidden on it.
     Every item needs a name and price in GearReferences/gear.json:
         { "Head/RedCap": { "name": "Red Cap", "price": 60 } }
     -> MDRNJfitness/Helpers/Sprites/GearSprites.g.cs (art)
