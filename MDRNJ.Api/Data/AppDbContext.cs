@@ -19,7 +19,7 @@ namespace MDRNJ.Api.Data
         public DbSet<ActivityScoreEntity> ActivityScores => Set<ActivityScoreEntity>();
         public DbSet<FriendshipEntity> Friendships => Set<FriendshipEntity>();
         public DbSet<ChallengeEntity> Challenges => Set<ChallengeEntity>();
-        public DbSet<ChallengeParticipantEntity> ChallengeParticipants => Set<ChallengeParticipantEntity>();
+        public DbSet<ChallengeAttemptEntity> ChallengeAttempts => Set<ChallengeAttemptEntity>();
         public DbSet<QuestEntity> Quests => Set<QuestEntity>();
         public DbSet<UserQuestEntity> UserQuests => Set<UserQuestEntity>();
 
@@ -151,30 +151,31 @@ namespace MDRNJ.Api.Data
                 e.HasIndex(f => new { f.RequesterId, f.AddresseeId }).IsUnique();
             });
 
-            // ChallengeEntity
+            // ChallengeEntity — 1v1 friend challenge
             modelBuilder.Entity<ChallengeEntity>(e =>
             {
                 e.HasKey(c => c.ChallengeId);
-                e.HasOne(c => c.Creator)
-                 .WithMany(u => u.CreatedChallenges)
-                 .HasForeignKey(c => c.CreatorId)
+                e.HasOne(c => c.Challenger)
+                 .WithMany(u => u.IssuedChallenges)
+                 .HasForeignKey(c => c.ChallengerId)
                  .OnDelete(DeleteBehavior.Restrict);
-                e.Property(c => c.Title).HasMaxLength(100).IsRequired();
-                e.Property(c => c.Description).HasMaxLength(500);
+                e.HasOne(c => c.Opponent)
+                 .WithMany(u => u.ReceivedChallenges)
+                 .HasForeignKey(c => c.OpponentId)
+                 .OnDelete(DeleteBehavior.Restrict);
+                e.HasIndex(c => new { c.ChallengerId, c.Status });
+                e.HasIndex(c => new { c.OpponentId, c.Status });
             });
 
-            // ChallengeParticipantEntity — composite key
-            modelBuilder.Entity<ChallengeParticipantEntity>(e =>
+            // ChallengeAttemptEntity
+            modelBuilder.Entity<ChallengeAttemptEntity>(e =>
             {
-                e.HasKey(cp => new { cp.ChallengeId, cp.UserId });
-                e.HasOne(cp => cp.Challenge)
-                 .WithMany(c => c.Participants)
-                 .HasForeignKey(cp => cp.ChallengeId)
+                e.HasKey(a => a.AttemptId);
+                e.HasOne(a => a.Challenge)
+                 .WithMany(c => c.Attempts)
+                 .HasForeignKey(a => a.ChallengeId)
                  .OnDelete(DeleteBehavior.Cascade);
-                e.HasOne(cp => cp.User)
-                 .WithMany(u => u.ChallengeParticipations)
-                 .HasForeignKey(cp => cp.UserId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                e.HasIndex(a => new { a.ChallengeId, a.UserId });
             });
 
             // QuestEntity

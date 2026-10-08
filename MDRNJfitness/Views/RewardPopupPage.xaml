@@ -26,6 +26,19 @@
                        HorizontalTextAlignment="Center"
                        HorizontalOptions="Center" />
 
+                <!-- Account level up: LV 3 ▶ LV 4 -->
+                <Border x:Name="LevelUpBanner"
+                        Style="{StaticResource PxChip}"
+                        HorizontalOptions="Center"
+                        Padding="18,10"
+                        IsVisible="False">
+                    <Label x:Name="LevelUpLabel"
+                           Style="{StaticResource PxTitle}"
+                           FontSize="18"
+                           TextColor="{StaticResource PxGoldInk}"
+                           HorizontalTextAlignment="Center" />
+                </Border>
+
                 <!-- Evolution: before → after -->
                 <Grid x:Name="EvolutionRow"
                       ColumnDefinitions="*,Auto,*"

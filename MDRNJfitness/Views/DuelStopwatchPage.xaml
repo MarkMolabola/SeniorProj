@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Modal stopwatch for timed challenge attempts (plank hold, timed race).
+    Await DuelStopwatchPage.Result for the time in seconds, or null if cancelled.
+-->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             x:Class="MDRNJfitness.Views.DuelStopwatchPage"
+             ios:Page.ModalPresentationStyle="OverFullScreen"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#E60B0918">
+
+    <Grid Padding="24">
+        <Border Style="{StaticResource PxPanel}" Padding="22,28,22,24" VerticalOptions="Center">
+            <VerticalStackLayout Spacing="20">
+
+                <Label x:Name="TitleLabel"
+                       Style="{StaticResource PxTitle}"
+                       FontSize="18"
+                       TextColor="{StaticResource PxGold}"
+                       HorizontalOptions="Center" />
+
+                <Label x:Name="HintLabel"
+                       Style="{StaticResource PxMuted}"
+                       HorizontalTextAlignment="Center" />
+
+                <Border Style="{StaticResource PxSunken}" Padding="16,22">
+                    <Label x:Name="TimeLabel"
+                           Style="{StaticResource PxTitle}"
+                           FontSize="34"
+                           Text="0:00.0"
+                           TextColor="{StaticResource PxTeal}"
+                           HorizontalOptions="Center" />
+                </Border>
+
+                <Button x:Name="StartStopButton"
+                        Style="{StaticResource PxButton}"
+                        Text="START"
+                        Clicked="OnStartStopClicked" />
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <Button x:Name="RetryButton"
+                            Grid.Column="0"
+                            Style="{StaticResource PxButtonSecondary}"
+                            Text="RETRY"
+                            IsEnabled="False"
+                            Clicked="OnRetryClicked" />
+                    <Button x:Name="SubmitButton"
+                            Grid.Column="1"
+                            Style="{StaticResource PxButtonSecondary}"
+                            Text="SUBMIT"
+                            IsEnabled="False"
+                            Clicked="OnSubmitClicked" />
+                </Grid>
+
+                <Button Style="{StaticResource PxButtonSecondary}"
+                        Text="CANCEL"
+                        Clicked="OnCancelClicked" />
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>

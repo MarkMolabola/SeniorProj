@@ -11,9 +11,12 @@ namespace MDRNJ.Api.Services
     public readonly record struct StatGain(float Strength, float Cardio, float Flexibility, float Bonus = 0)
     {
         public bool IsEmpty => Strength <= 0 && Cardio <= 0 && Flexibility <= 0 && Bonus <= 0;
+
+        public static StatGain operator +(StatGain a, StatGain b) => new(
+            a.Strength + b.Strength, a.Cardio + b.Cardio, a.Flexibility + b.Flexibility, a.Bonus + b.Bonus);
     }
 
-    /// <summary>How workouts, quests and challenges turn into stat points.</summary>
+    /// <summary>How workouts, quests and friend challenges turn into stat points.</summary>
     public static class StatRules
     {
         /// <summary>Stat points per minute of fully-weighted training (30 min run ≈ +3 END).</summary>
@@ -51,7 +54,22 @@ namespace MDRNJ.Api.Services
         }
 
         /// <summary>
-        /// Quest / challenge completion reward: XPReward / 25 points (2–10).
+        /// Friend challenge reward: XP earned / 25 points (win 6, tie 3, loss 1),
+        /// into the stats the contest trains.
+        /// </summary>
+        public static StatGain ForDuel(DuelContest contest, int xpEarned)
+        {
+            var points = xpEarned / 25f;
+            return contest switch
+            {
+                DuelContest.PushUps or DuelContest.PullUps => new StatGain(points, 0, 0),
+                DuelContest.Plank => new StatGain(points / 2, points / 2, 0),
+                _ => new StatGain(0, points, 0)
+            };
+        }
+
+        /// <summary>
+        /// Quest completion reward: XPReward / 25 points (2–10).
         /// Distance goals are cardio; everything else is a balanced bonus.
         /// </summary>
         public static StatGain ForCompletion(ChallengeType type, int xpReward)

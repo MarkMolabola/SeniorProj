@@ -122,7 +122,7 @@ namespace MDRNJfitness.ViewModels
                 if (cell is not null)
                     cell.HasWorkout = true;
 
-                await _progress.PresentAsync(added.CharacterProgress, "WORKOUT LOGGED");
+                await _progress.PresentAsync(added.CharacterProgress, added.AccountProgress, "WORKOUT LOGGED");
             });
         }
 

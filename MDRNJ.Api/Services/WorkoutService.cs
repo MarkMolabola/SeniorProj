@@ -2,6 +2,7 @@
 using MDRNJ.Api.Data;
 using MDRNJ.Api.Data.Entities;
 using MDRNJ.Api.Services.Interfaces;
+using MDRNJ.Shared.DTOs.Game;
 using MDRNJ.Shared.DTOs.Workout;
 using MDRNJ.Shared.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -18,13 +19,16 @@ namespace MDRNJ.Api.Services
         private readonly IMapper _mapper;
         private readonly IAchievementService _achievements;
         private readonly ICharacterService _character;
+        private readonly IGoalProgressService _goals;
 
-        public WorkoutService(AppDbContext db, IMapper mapper, IAchievementService achievements, ICharacterService character)
+        public WorkoutService(AppDbContext db, IMapper mapper, IAchievementService achievements,
+            ICharacterService character, IGoalProgressService goals)
         {
             _db = db;
             _mapper = mapper;
             _achievements = achievements;
             _character = character;
+            _goals = goals;
         }
 
         public async Task<WorkoutDto> StartWorkoutAsync(Guid userId, CreateWorkoutDto dto)
@@ -57,54 +61,9 @@ namespace MDRNJ.Api.Services
 
             session.EndTime = DateTime.UtcNow;
             session.DurationMins = (int)(session.EndTime.Value - session.StartTime).TotalMinutes;
+            session.XPAwarded = Math.Max(10, session.DurationMins * 2);
 
-            int xp = Math.Max(10, session.DurationMins * 2);
-            session.XPAwarded = xp;
-
-            // Update game stats in the same unit of work so one SaveChangesAsync
-            // covers the workout + stats + XP transaction atomically.
-            var stats = await _db.GameStats.FirstOrDefaultAsync(g => g.UserId == userId);
-            if (stats is null)
-            {
-                stats = new GameStatsEntity { UserId = userId };
-                _db.GameStats.Add(stats);
-            }
-
-            stats.TotalXP += xp;
-            stats.CurrentLevel = LevelFromXP(stats.TotalXP);
-            stats.TotalWorkouts++;
-
-            var today = DateTime.UtcNow.Date;
-            if (stats.LastWorkoutDate?.Date == today.AddDays(-1))
-            {
-                stats.CurrentStreak++;
-                if (stats.CurrentStreak > stats.LongestStreak)
-                    stats.LongestStreak = stats.CurrentStreak;
-            }
-            else if (stats.LastWorkoutDate?.Date != today)
-            {
-                stats.CurrentStreak = 1;
-            }
-            stats.LastWorkoutDate = DateTime.UtcNow;
-
-            _db.XPTransactions.Add(new XPTransactionEntity
-            {
-                UserId = userId,
-                Amount = xp,
-                Reason = XPReason.WorkoutCompleted
-            });
-
-            await _db.SaveChangesAsync();
-            await _achievements.CheckAndUnlockAsync(userId);
-
-            return await WithCharacterProgressAsync(userId, session);
-        }
-
-        private static int LevelFromXP(int xp)
-        {
-            int level = 1;
-            while (xp >= level * level * 100) level++;
-            return level;
+            return await RecordCompletedAsync(userId, session);
         }
 
         public async Task<WorkoutDto> BacklogWorkoutAsync(Guid userId, BacklogWorkoutDto dto)
@@ -127,49 +86,48 @@ namespace MDRNJ.Api.Services
             };
 
             _db.WorkoutSessions.Add(session);
+            return await RecordCompletedAsync(userId, session);
+        }
 
-            var stats = await _db.GameStats.FirstOrDefaultAsync(g => g.UserId == userId);
-            if (stats is null)
-            {
-                stats = new GameStatsEntity { UserId = userId };
-                _db.GameStats.Add(stats);
-            }
+        /// <summary>
+        /// Rewards a finished workout: XP, streak, quest / challenge progress
+        /// (and their XP) in one save, then achievements and stat points.
+        /// </summary>
+        private async Task<WorkoutDto> RecordCompletedAsync(Guid userId, WorkoutSessionEntity session)
+        {
+            var stats = await _goals.GetOrCreateStatsAsync(userId);
+            var xpBefore = stats.TotalXP;
+            var levelBefore = stats.CurrentLevel;
 
-            stats.TotalXP += session.XPAwarded;
-            stats.CurrentLevel = LevelFromXP(stats.TotalXP);
+            _goals.GrantXP(stats, session.XPAwarded, XPReason.WorkoutCompleted);
             stats.TotalWorkouts++;
 
             var today = DateTime.UtcNow.Date;
             if (stats.LastWorkoutDate?.Date == today.AddDays(-1))
-            {
                 stats.CurrentStreak++;
-                if (stats.CurrentStreak > stats.LongestStreak)
-                    stats.LongestStreak = stats.CurrentStreak;
-            }
             else if (stats.LastWorkoutDate?.Date != today)
-            {
                 stats.CurrentStreak = 1;
-            }
+            stats.LongestStreak = Math.Max(stats.LongestStreak, stats.CurrentStreak);
             stats.LastWorkoutDate = DateTime.UtcNow;
 
-            _db.XPTransactions.Add(new XPTransactionEntity
-            {
-                UserId = userId,
-                Amount = session.XPAwarded,
-                Reason = XPReason.WorkoutCompleted
-            });
+            var completions = await _goals.AdvanceForWorkoutAsync(stats, session);
 
             await _db.SaveChangesAsync();
             await _achievements.CheckAndUnlockAsync(userId);
-            return await WithCharacterProgressAsync(userId, session);
-        }
 
-        /// <summary>Grants the workout's stat points and attaches what changed on the character.</summary>
-        private async Task<WorkoutDto> WithCharacterProgressAsync(Guid userId, WorkoutSessionEntity session)
-        {
+            var gain = StatRules.ForWorkout(session.WorkoutType, session.DurationMins);
+            foreach (var completion in completions)
+                gain += StatRules.ForCompletion(completion.Type, completion.Goal.XPReward);
+
             var dto = _mapper.Map<WorkoutDto>(session);
-            dto.CharacterProgress = await _character.ApplyActivityAsync(
-                userId, StatRules.ForWorkout(session.WorkoutType, session.DurationMins));
+            dto.CharacterProgress = await _character.ApplyActivityAsync(userId, gain);
+            dto.AccountProgress = new AccountProgressDto
+            {
+                XPGained = stats.TotalXP - xpBefore,
+                PreviousLevel = levelBefore,
+                NewLevel = stats.CurrentLevel,
+                CompletedGoals = completions.Select(c => c.Goal).ToList()
+            };
             return dto;
         }
 

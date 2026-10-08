@@ -64,7 +64,7 @@ namespace MDRNJfitness.ViewModels
                 HasActiveWorkout = false;
                 ElapsedTime = "0:00:00";
 
-                await _progress.PresentAsync(completed?.CharacterProgress, "WORKOUT COMPLETE");
+                await _progress.PresentAsync(completed?.CharacterProgress, completed?.AccountProgress, "WORKOUT COMPLETE");
             });
 
         private void StartStopwatch()

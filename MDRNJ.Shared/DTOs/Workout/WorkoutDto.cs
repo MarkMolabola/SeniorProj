@@ -20,5 +20,8 @@ namespace MDRNJ.Shared.DTOs.Workout
 
         /// <summary>Set when completing the workout changed the character.</summary>
         public CharacterProgressDto? CharacterProgress { get; set; }
+
+        /// <summary>Set when completing the workout: XP, level and quests / challenges it completed.</summary>
+        public MDRNJ.Shared.DTOs.Game.AccountProgressDto? AccountProgress { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using MDRNJ.Api.Data.Entities;
 using MDRNJ.Api.Services.Interfaces;
 using MDRNJ.Shared.DTOs.Game;
 using MDRNJ.Shared.Enums;
+using MDRNJ.Shared.Game;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -101,13 +102,8 @@ namespace MDRNJ.Api.Services
             return _mapper.Map<List<XPTransactionDto>>(transactions);
         }
 
-        private static int LevelFromXP(int xp)
-        {
-            int level = 1;
-            while (xp >= XPForNextLevel(level)) level++;
-            return level;
-        }
+        private static int LevelFromXP(int xp) => AccountProgression.LevelFor(xp);
 
-        private static int XPForNextLevel(int level) => level * level * 100;
+        private static int XPForNextLevel(int level) => AccountProgression.XPForNextLevel(level);
     }
 }

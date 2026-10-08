@@ -93,71 +93,92 @@ namespace MDRNJ.Api.Migrations
                     b.ToTable("ActivityScores");
                 });
 
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChallengeAttemptEntity", b =>
+                {
+                    b.Property<Guid>("AttemptId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ChallengeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<float>("Value")
+                        .HasColumnType("real");
+
+                    b.HasKey("AttemptId");
+
+                    b.HasIndex("ChallengeId", "UserId");
+
+                    b.ToTable("ChallengeAttempts");
+                });
+
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChallengeEntity", b =>
                 {
                     b.Property<Guid>("ChallengeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("ChallengeType")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("CreatorId")
+                    b.Property<Guid>("ChallengerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                    b.Property<float?>("ChallengerScore")
+                        .HasColumnType("real");
 
-                    b.Property<DateTime>("EndDate")
+                    b.Property<bool>("ChallengerSeenResult")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ChallengerXP")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Contest")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("StartDate")
+                    b.Property<DateTime>("Deadline")
                         .HasColumnType("datetime2");
+
+                    b.Property<float?>("DistanceKm")
+                        .HasColumnType("real");
+
+                    b.Property<Guid>("OpponentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<float?>("OpponentScore")
+                        .HasColumnType("real");
+
+                    b.Property<bool>("OpponentSeenResult")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("OpponentXP")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Scoring")
+                        .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<float>("TargetValue")
-                        .HasColumnType("real");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("XPReward")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("WinnerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ChallengeId");
 
-                    b.HasIndex("CreatorId");
+                    b.HasIndex("ChallengerId", "Status");
+
+                    b.HasIndex("OpponentId", "Status");
 
                     b.ToTable("Challenges");
-                });
-
-            modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChallengeParticipantEntity", b =>
-                {
-                    b.Property<Guid>("ChallengeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("JoinedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<float>("Progress")
-                        .HasColumnType("real");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.HasKey("ChallengeId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ChallengeParticipants");
                 });
 
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.CharacterStateEntity", b =>
@@ -558,34 +579,34 @@ namespace MDRNJ.Api.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChallengeEntity", b =>
-                {
-                    b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "Creator")
-                        .WithMany("CreatedChallenges")
-                        .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Creator");
-                });
-
-            modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChallengeParticipantEntity", b =>
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChallengeAttemptEntity", b =>
                 {
                     b.HasOne("MDRNJ.Api.Data.Entities.ChallengeEntity", "Challenge")
-                        .WithMany("Participants")
+                        .WithMany("Attempts")
                         .HasForeignKey("ChallengeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "User")
-                        .WithMany("ChallengeParticipations")
-                        .HasForeignKey("UserId")
+                    b.Navigation("Challenge");
+                });
+
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChallengeEntity", b =>
+                {
+                    b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "Challenger")
+                        .WithMany("IssuedChallenges")
+                        .HasForeignKey("ChallengerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Challenge");
+                    b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "Opponent")
+                        .WithMany("ReceivedChallenges")
+                        .HasForeignKey("OpponentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Challenger");
+
+                    b.Navigation("Opponent");
                 });
 
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.CharacterStateEntity", b =>
@@ -718,7 +739,7 @@ namespace MDRNJ.Api.Migrations
 
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChallengeEntity", b =>
                 {
-                    b.Navigation("Participants");
+                    b.Navigation("Attempts");
                 });
 
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.QuestEntity", b =>
@@ -730,15 +751,15 @@ namespace MDRNJ.Api.Migrations
                 {
                     b.Navigation("ActivityScore");
 
-                    b.Navigation("ChallengeParticipations");
-
                     b.Navigation("CharacterState");
-
-                    b.Navigation("CreatedChallenges");
 
                     b.Navigation("GameStats");
 
+                    b.Navigation("IssuedChallenges");
+
                     b.Navigation("Profile");
+
+                    b.Navigation("ReceivedChallenges");
 
                     b.Navigation("ReceivedFriendRequests");
 

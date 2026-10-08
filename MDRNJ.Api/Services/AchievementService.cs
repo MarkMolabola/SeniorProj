@@ -66,6 +66,11 @@ namespace MDRNJ.Api.Services
                 (f.RequesterId == userId || f.AddresseeId == userId) &&
                 f.Status == MDRNJ.Shared.Enums.FriendshipStatus.Accepted);
 
+            var duelsCompleted = await _db.Challenges.CountAsync(c =>
+                c.Status == MDRNJ.Shared.Enums.ChallengeStatus.Completed &&
+                (c.ChallengerId == userId || c.OpponentId == userId));
+            var duelsWon = await _db.Challenges.CountAsync(c => c.WinnerId == userId);
+
             var alreadyUnlocked = await _db.UserAchievements
                 .Where(ua => ua.UserId == userId)
                 .Select(ua => ua.AchievementId)
@@ -95,6 +100,8 @@ namespace MDRNJ.Api.Services
                     "Legend"           => stats.CurrentLevel >= 100,
                     "Social Butterfly" => friendCount >= 1,
                     "Squad Goals"      => friendCount >= 10,
+                    "Challenge Accepted" => duelsCompleted >= 1,
+                    "Challenger"       => duelsWon >= 10,
                     _                  => false
                 };
 

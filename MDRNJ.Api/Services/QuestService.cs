@@ -1,6 +1,7 @@
 ﻿using MDRNJ.Api.Data;
 using MDRNJ.Api.Data.Entities;
 using MDRNJ.Api.Services.Interfaces;
+using MDRNJ.Shared.DTOs.Game;
 using MDRNJ.Shared.DTOs.Quest;
 using MDRNJ.Shared.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -11,11 +12,13 @@ namespace MDRNJ.Api.Services
     {
         private readonly AppDbContext _db;
         private readonly ICharacterService _character;
+        private readonly IGoalProgressService _goals;
 
-        public QuestService(AppDbContext db, ICharacterService character)
+        public QuestService(AppDbContext db, ICharacterService character, IGoalProgressService goals)
         {
             _db = db;
             _character = character;
+            _goals = goals;
         }
 
         public async Task<QuestDto> CreateAsync(CreateQuestDto dto)
@@ -144,21 +147,32 @@ namespace MDRNJ.Api.Services
                 .FirstOrDefaultAsync(uq => uq.UserId == userId && uq.QuestId == questId)
                 ?? throw new KeyNotFoundException("Quest assignment not found.");
 
+            var quest = userQuest.Quest;
             userQuest.Progress = progress;
-            var completedNow = false;
-            if (progress >= userQuest.Quest.TargetValue && userQuest.Status == QuestStatus.Active)
+            if (progress < quest.TargetValue || userQuest.Status != QuestStatus.Active)
             {
-                userQuest.Status = QuestStatus.Completed;
-                userQuest.CompletedAt = DateTime.UtcNow;
-                completedNow = true;
+                await _db.SaveChangesAsync();
+                return ToUserQuestDto(userQuest);
             }
 
+            userQuest.Status = QuestStatus.Completed;
+            userQuest.CompletedAt = DateTime.UtcNow;
+
+            var stats = await _goals.GetOrCreateStatsAsync(userId);
+            var levelBefore = stats.CurrentLevel;
+            var completion = _goals.CompleteQuest(stats, quest);
             await _db.SaveChangesAsync();
 
             var dto = ToUserQuestDto(userQuest);
-            if (completedNow)
-                dto.CharacterProgress = await _character.ApplyActivityAsync(
-                    userId, StatRules.ForCompletion(userQuest.Quest.QuestType, userQuest.Quest.XPReward));
+            dto.CharacterProgress = await _character.ApplyActivityAsync(
+                userId, StatRules.ForCompletion(quest.QuestType, quest.XPReward));
+            dto.AccountProgress = new AccountProgressDto
+            {
+                XPGained = quest.XPReward,
+                PreviousLevel = levelBefore,
+                NewLevel = stats.CurrentLevel,
+                CompletedGoals = { completion.Goal }
+            };
             return dto;
         }
 

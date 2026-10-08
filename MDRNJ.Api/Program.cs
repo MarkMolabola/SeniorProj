@@ -126,6 +126,7 @@ builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
 builder.Services.AddScoped<IFriendService, FriendService>();
 builder.Services.AddScoped<IAchievementService, AchievementService>();
 builder.Services.AddScoped<IQuestService, QuestService>();
+builder.Services.AddScoped<IGoalProgressService, GoalProgressService>();
 builder.Services.AddSingleton<CharacterClassifierService>();
 
 // ── CORS (allows MAUI app to call the API) ─────────

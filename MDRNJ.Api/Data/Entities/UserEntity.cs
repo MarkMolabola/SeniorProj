@@ -33,8 +33,8 @@ namespace MDRNJ.Api.Data.Entities
         public ICollection<UserAchievementEntity> UserAchievements { get; set; } = new List<UserAchievementEntity>();
         public ICollection<FriendshipEntity> SentFriendRequests { get; set; } = new List<FriendshipEntity>();
         public ICollection<FriendshipEntity> ReceivedFriendRequests { get; set; } = new List<FriendshipEntity>();
-        public ICollection<ChallengeEntity> CreatedChallenges { get; set; } = new List<ChallengeEntity>();
-        public ICollection<ChallengeParticipantEntity> ChallengeParticipations { get; set; } = new List<ChallengeParticipantEntity>();
+        public ICollection<ChallengeEntity> IssuedChallenges { get; set; } = new List<ChallengeEntity>();
+        public ICollection<ChallengeEntity> ReceivedChallenges { get; set; } = new List<ChallengeEntity>();
         public ICollection<UserQuestEntity> UserQuests { get; set; } = new List<UserQuestEntity>();
     }
 }

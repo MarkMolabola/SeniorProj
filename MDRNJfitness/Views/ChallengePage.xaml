@@ -1,131 +1,188 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- 1v1 friend challenges: incoming, active, sent, and finished. -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MDRNJfitness.ViewModels"
              x:Class="MDRNJfitness.Views.ChallengePage"
              Title="{Binding Title}"
-             BackgroundColor="#F4FFF7">
+             Style="{StaticResource PxPage}">
+
+    <ContentPage.Resources>
+        <DataTemplate x:Key="ChallengeCardTemplate">
+            <Border Style="{StaticResource PxPanel}">
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsFinished}" Value="True">
+                        <Setter Property="Opacity" Value="0.7" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsWon}" Value="True">
+                        <Setter Property="Stroke" Value="{StaticResource PxGold}" />
+                        <Setter Property="Opacity" Value="1" />
+                    </DataTrigger>
+                </Border.Triggers>
+
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <Label Grid.Column="0" Style="{StaticResource PxHeading}" Text="{Binding Title}" />
+                        <Label Grid.Column="1"
+                               Style="{StaticResource PxXp}"
+                               FontSize="18"
+                               VerticalOptions="Start"
+                               Text="{Binding StatusText}" />
+                    </Grid>
+
+                    <Label Style="{StaticResource PxBody}" Text="{Binding VersusText}" />
+                    <Label Style="{StaticResource PxMuted}" Text="{Binding ModeText}" />
+
+                    <Border Style="{StaticResource PxSunken}" Padding="14,10" IsVisible="{Binding ShowScores}">
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+                            <Label Grid.Column="0" Style="{StaticResource PxCaption}" Text="YOU" />
+                            <Label Grid.Column="1" Style="{StaticResource PxCaption}" Text="{Binding Dto.OpponentUsername}" TextTransform="Uppercase" />
+                            <Label Grid.Row="1" Grid.Column="0" Style="{StaticResource PxStatValue}" FontSize="28"
+                                   TextColor="{StaticResource PxTeal}" Text="{Binding MyScoreText}" />
+                            <Label Grid.Row="1" Grid.Column="1" Style="{StaticResource PxStatValue}" FontSize="28"
+                                   TextColor="{StaticResource PxStr}" Text="{Binding TheirScoreText}" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Opponent answering an invite -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12" IsVisible="{Binding Dto.CanRespond}">
+                        <Button Grid.Column="0"
+                                Style="{StaticResource PxButtonSecondary}"
+                                Text="DECLINE"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChallengeViewModel}}, Path=DeclineCommand}"
+                                CommandParameter="{Binding .}" />
+                        <Button Grid.Column="1"
+                                Style="{StaticResource PxButton}"
+                                Text="ACCEPT"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChallengeViewModel}}, Path=AcceptCommand}"
+                                CommandParameter="{Binding .}" />
+                    </Grid>
+
+                    <Button Style="{StaticResource PxButtonSecondary}"
+                            Text="WITHDRAW"
+                            IsVisible="{Binding Dto.CanCancel}"
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChallengeViewModel}}, Path=CancelCommand}"
+                            CommandParameter="{Binding .}" />
+
+                    <Button Style="{StaticResource PxButton}"
+                            Text="{Binding SubmitText}"
+                            IsVisible="{Binding Dto.CanSubmit}"
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChallengeViewModel}}, Path=SubmitCommand}"
+                            CommandParameter="{Binding .}" />
+                </VerticalStackLayout>
+            </Border>
+        </DataTemplate>
+    </ContentPage.Resources>
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="18">
+        <VerticalStackLayout Padding="20,24,20,32" Spacing="20">
 
-            <Label Text="Challenges"
-                   FontSize="30"
-                   FontAttributes="Bold"
-                   TextColor="#1F2937" />
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Grid.Column="0"
+                       Style="{StaticResource PxTitle}"
+                       Text="CHALLENGES"
+                       VerticalOptions="Center" />
+                <Button Grid.Column="1"
+                        Style="{StaticResource PxButtonSecondary}"
+                        Text="+ NEW"
+                        Command="{Binding OpenFormCommand}" />
+            </Grid>
 
-            <!-- Available Challenges -->
-            <Border BackgroundColor="White"
-                    Stroke="#D9EAD3"
-                    StrokeShape="RoundRectangle 16"
-                    Padding="14">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Available Challenges"
-                           FontSize="20"
-                           FontAttributes="Bold"
-                           TextColor="#1F2937" />
+            <!-- ── New challenge form ─────────────────────────────────── -->
+            <Border Style="{StaticResource PxPanelHighlight}" IsVisible="{Binding IsFormOpen}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Style="{StaticResource PxHeading}" Text="ISSUE A CHALLENGE" />
 
-                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding ActiveChallenges}">
-                        <BindableLayout.EmptyView>
-                            <Label Text="No active challenges."
-                                   FontSize="13"
-                                   TextColor="#6B7280" />
-                        </BindableLayout.EmptyView>
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate>
-                                <Border BackgroundColor="#F9FAFB"
-                                        Stroke="#E5E7EB"
-                                        StrokeShape="RoundRectangle 12"
-                                        Padding="12"
-                                        Margin="0,0,0,8">
-                                    <VerticalStackLayout Spacing="6">
-                                        <Grid ColumnDefinitions="*,Auto">
-                                            <Label Grid.Column="0"
-                                                   Text="{Binding Title}"
-                                                   FontAttributes="Bold"
-                                                   FontSize="15"
-                                                   TextColor="#1F2937" />
-                                            <Label Grid.Column="1"
-                                                   Text="{Binding XPReward, StringFormat='+{0} XP'}"
-                                                   FontAttributes="Bold"
-                                                   FontSize="14"
-                                                   TextColor="#16A34A" />
-                                        </Grid>
-                                        <Label Text="{Binding Description}"
-                                               FontSize="13"
-                                               TextColor="#4B5563" />
-                                        <Grid ColumnDefinitions="*,Auto">
-                                            <Label Grid.Column="0"
-                                                   Text="{Binding EndDate, StringFormat='Ends: {0:MMM d}'}"
-                                                   FontSize="12"
-                                                   TextColor="#6B7280" />
-                                            <Button Grid.Column="1"
-                                                    Text="Join"
-                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.JoinCommand}"
-                                                    CommandParameter="{Binding .}"
-                                                    BackgroundColor="#2563EB"
-                                                    TextColor="White"
-                                                    CornerRadius="8"
-                                                    Padding="12,4"
-                                                    HeightRequest="34" />
-                                        </Grid>
-                                    </VerticalStackLayout>
-                                </Border>
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
+                    <Label Style="{StaticResource PxCaption}" Text="OPPONENT" />
+                    <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                        <Picker Style="{StaticResource PxPicker}"
+                                Title="Pick a friend"
+                                ItemsSource="{Binding Friends}"
+                                ItemDisplayBinding="{Binding Username}"
+                                SelectedItem="{Binding FormFriend}" />
+                    </Border>
+
+                    <Label Style="{StaticResource PxCaption}" Text="CONTEST" />
+                    <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                        <Picker Style="{StaticResource PxPicker}"
+                                ItemsSource="{Binding Contests}"
+                                SelectedIndex="{Binding FormContestIndex}" />
+                    </Border>
+
+                    <Label Style="{StaticResource PxCaption}" Text="SCORING" />
+                    <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                        <Picker Style="{StaticResource PxPicker}"
+                                ItemsSource="{Binding ScoringModes}"
+                                SelectedIndex="{Binding FormScoringIndex}" />
+                    </Border>
+
+                    <VerticalStackLayout Spacing="12" IsVisible="{Binding FormNeedsDistance}">
+                        <Label Style="{StaticResource PxCaption}" Text="RACE DISTANCE (KM)" />
+                        <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                            <Entry Style="{StaticResource PxEntry}"
+                                   Keyboard="Numeric"
+                                   Placeholder="1.6"
+                                   Text="{Binding FormDistanceKm}" />
+                        </Border>
                     </VerticalStackLayout>
+
+                    <Label Style="{StaticResource PxCaption}" Text="DEADLINE" />
+                    <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                        <Picker Style="{StaticResource PxPicker}"
+                                ItemsSource="{Binding Durations}"
+                                SelectedIndex="{Binding FormDurationIndex}" />
+                    </Border>
+
+                    <Label Style="{StaticResource PxMuted}" Text="{Binding FormRulesText}" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <Button Grid.Column="0"
+                                Style="{StaticResource PxButtonSecondary}"
+                                Text="CANCEL"
+                                Command="{Binding CloseFormCommand}" />
+                        <Button Grid.Column="1"
+                                Style="{StaticResource PxButton}"
+                                Text="SEND"
+                                Command="{Binding SendChallengeCommand}" />
+                    </Grid>
                 </VerticalStackLayout>
             </Border>
 
-            <!-- My Challenges -->
-            <Border BackgroundColor="White"
-                    Stroke="#D9EAD3"
-                    StrokeShape="RoundRectangle 16"
-                    Padding="14">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="My Challenges"
-                           FontSize="20"
-                           FontAttributes="Bold"
-                           TextColor="#1F2937" />
-
-                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding MyChallenges}">
-                        <BindableLayout.EmptyView>
-                            <Label Text="You haven't joined any challenges."
-                                   FontSize="13"
-                                   TextColor="#6B7280" />
-                        </BindableLayout.EmptyView>
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate>
-                                <Border BackgroundColor="#F9FAFB"
-                                        Stroke="#E5E7EB"
-                                        StrokeShape="RoundRectangle 12"
-                                        Padding="12"
-                                        Margin="0,0,0,8">
-                                    <VerticalStackLayout Spacing="6">
-                                        <Grid ColumnDefinitions="*,Auto">
-                                            <Label Grid.Column="0"
-                                                   Text="{Binding Title}"
-                                                   FontAttributes="Bold"
-                                                   FontSize="15"
-                                                   TextColor="#1F2937" />
-                                            <Label Grid.Column="1"
-                                                   Text="{Binding Status}"
-                                                   FontSize="13"
-                                                   TextColor="#2563EB" />
-                                        </Grid>
-                                        <ProgressBar Progress="{Binding Progress}"
-                                                     ProgressColor="#2563EB"
-                                                     BackgroundColor="#E5E7EB" />
-                                        <Label Text="{Binding Progress, StringFormat='{0:P0} complete'}"
-                                               FontSize="12"
-                                               TextColor="#6B7280" />
-                                    </VerticalStackLayout>
-                                </Border>
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
-                    </VerticalStackLayout>
-                </VerticalStackLayout>
+            <Border Style="{StaticResource PxPanel}" IsVisible="{Binding HasNothing}">
+                <Label Style="{StaticResource PxMuted}"
+                       Text="No challenges yet. Tap + NEW to challenge a friend to push-ups, pull-ups, a plank or a run!" />
             </Border>
+
+            <!-- ── Sections ───────────────────────────────────────────── -->
+            <VerticalStackLayout Spacing="14" IsVisible="{Binding HasIncoming}">
+                <Label Style="{StaticResource PxCaption}" Text="INCOMING" />
+                <VerticalStackLayout Spacing="14"
+                                     BindableLayout.ItemsSource="{Binding Incoming}"
+                                     BindableLayout.ItemTemplate="{StaticResource ChallengeCardTemplate}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="14" IsVisible="{Binding HasActive}">
+                <Label Style="{StaticResource PxCaption}" Text="IN PROGRESS" />
+                <VerticalStackLayout Spacing="14"
+                                     BindableLayout.ItemsSource="{Binding Active}"
+                                     BindableLayout.ItemTemplate="{StaticResource ChallengeCardTemplate}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="14" IsVisible="{Binding HasOutgoing}">
+                <Label Style="{StaticResource PxCaption}" Text="SENT" />
+                <VerticalStackLayout Spacing="14"
+                                     BindableLayout.ItemsSource="{Binding Outgoing}"
+                                     BindableLayout.ItemTemplate="{StaticResource ChallengeCardTemplate}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="14" IsVisible="{Binding HasHistory}">
+                <Label Style="{StaticResource PxCaption}" Text="HISTORY" />
+                <VerticalStackLayout Spacing="14"
+                                     BindableLayout.ItemsSource="{Binding History}"
+                                     BindableLayout.ItemTemplate="{StaticResource ChallengeCardTemplate}" />
+            </VerticalStackLayout>
 
         </VerticalStackLayout>
     </ScrollView>
+
 </ContentPage>

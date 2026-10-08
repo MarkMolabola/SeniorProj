@@ -1,4 +1,5 @@
 using MDRNJ.Shared.DTOs.Character;
+using MDRNJ.Shared.DTOs.Game;
 using MDRNJ.Shared.Enums;
 
 namespace MDRNJfitness.Views;
@@ -8,16 +9,30 @@ public partial class RewardPopupPage : ContentPage
     /// <summary>Gains below this (e.g. a workout ended after a few seconds) aren't worth a popup.</summary>
     private const float MinGainToShow = 0.05f;
 
-    public RewardPopupPage(CharacterProgressDto progress, string headline)
+    private readonly bool _leveledUp;
+
+    public RewardPopupPage(CharacterProgressDto? progress, AccountProgressDto? account, string headline)
     {
         InitializeComponent();
 
-        HeadlineLabel.Text = progress.Evolved ? "EVOLVED!"
-            : progress.LevelUps.Count > 0 ? "STAT UP!"
+        _leveledUp = account?.LeveledUp == true;
+        var completedGoals = account?.CompletedGoals ?? new List<CompletedGoalDto>();
+
+        HeadlineLabel.Text = _leveledUp ? "LEVEL UP!"
+            : progress?.Evolved == true ? "EVOLVED!"
+            : completedGoals.Any(g => g.Kind == "Quest") ? "QUEST COMPLETE!"
+            : completedGoals.Count > 0 ? headline // duel results pass VICTORY! / DEFEAT
+            : progress?.LevelUps.Count > 0 ? "STAT UP!"
             : headline;
 
-        var outfit = progress.Character?.OutfitSlot ?? "default";
-        if (progress.Evolved)
+        if (_leveledUp)
+        {
+            LevelUpBanner.IsVisible = true;
+            LevelUpLabel.Text = $"LV {account!.PreviousLevel} ▶ LV {account.NewLevel}";
+        }
+
+        var outfit = progress?.Character?.OutfitSlot ?? "default";
+        if (progress?.Evolved == true)
         {
             EvolutionRow.IsVisible = true;
             HeroBox.IsVisible = false;
@@ -32,17 +47,38 @@ public partial class RewardPopupPage : ContentPage
             HeroAvatar.AvatarType = outfit;
         }
 
-        AddGain("STR", progress.StrengthGained, "PxStr");
-        AddGain("END", progress.CardioGained, "PxTeal");
-        AddGain("FLX", progress.FlexibilityGained, "PxFlx");
-        foreach (var levelUp in progress.LevelUps)
-            AddLine($"★ {levelUp.Stat} reached Lv {levelUp.NewLevel}!", "PxGold");
+        if (account?.XPGained > 0)
+            AddLine($"+{account.XPGained} XP", "PxGold");
+        foreach (var goal in completedGoals)
+            AddLine($"✔ {goal.Kind}: {goal.Title} (+{goal.XPReward} XP)", "PxTeal");
+
+        if (progress is not null)
+        {
+            AddGain("STR", progress.StrengthGained, "PxStr");
+            AddGain("END", progress.CardioGained, "PxTeal");
+            AddGain("FLX", progress.FlexibilityGained, "PxFlx");
+            foreach (var levelUp in progress.LevelUps)
+                AddLine($"★ {levelUp.Stat} reached Lv {levelUp.NewLevel}!", "PxGold");
+        }
     }
 
-    public static bool HasSomethingToShow(CharacterProgressDto progress) =>
-        progress.Evolved
-        || progress.LevelUps.Count > 0
-        || progress.StrengthGained + progress.CardioGained + progress.FlexibilityGained >= MinGainToShow;
+    public static bool HasSomethingToShow(CharacterProgressDto? progress, AccountProgressDto? account) =>
+        account?.LeveledUp == true
+        || account?.CompletedGoals.Count > 0
+        || progress?.Evolved == true
+        || progress?.LevelUps.Count > 0
+        || progress?.StrengthGained + progress?.CardioGained + progress?.FlexibilityGained >= MinGainToShow;
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        if (!_leveledUp) return;
+
+        // Pop the level banner in, then give it a little bounce
+        LevelUpBanner.Scale = 0.2;
+        await LevelUpBanner.ScaleToAsync(1.2, 250, Easing.CubicOut);
+        await LevelUpBanner.ScaleToAsync(1.0, 150, Easing.CubicIn);
+    }
 
     private void AddGain(string stat, float gained, string colorKey)
     {

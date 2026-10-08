@@ -17,5 +17,8 @@
 
         /// <summary>Set when this update completed the quest.</summary>
         public MDRNJ.Shared.DTOs.Character.CharacterProgressDto? CharacterProgress { get; set; }
+
+        /// <summary>Set when this update completed the quest.</summary>
+        public MDRNJ.Shared.DTOs.Game.AccountProgressDto? AccountProgress { get; set; }
     }
 }

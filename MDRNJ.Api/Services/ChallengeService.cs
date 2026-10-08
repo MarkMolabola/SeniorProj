@@ -1,9 +1,10 @@
-﻿using AutoMapper;
 using MDRNJ.Api.Data;
 using MDRNJ.Api.Data.Entities;
 using MDRNJ.Api.Services.Interfaces;
 using MDRNJ.Shared.DTOs.Challenge;
+using MDRNJ.Shared.DTOs.Game;
 using MDRNJ.Shared.Enums;
+using MDRNJ.Shared.Game;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -14,161 +15,318 @@ namespace MDRNJ.Api.Services
 {
     public class ChallengeService : IChallengeService
     {
-        private readonly AppDbContext _db;
-        private readonly IMapper _mapper;
-        private readonly ICharacterService _character;
+        public const string DuelKind = "Duel";
 
-        public ChallengeService(AppDbContext db, IMapper mapper, ICharacterService character)
+        private readonly AppDbContext _db;
+        private readonly ICharacterService _character;
+        private readonly IGoalProgressService _goals;
+        private readonly IAchievementService _achievements;
+
+        public ChallengeService(AppDbContext db, ICharacterService character,
+            IGoalProgressService goals, IAchievementService achievements)
         {
             _db = db;
-            _mapper = mapper;
             _character = character;
+            _goals = goals;
+            _achievements = achievements;
         }
 
         public async Task<ChallengeDto> CreateAsync(Guid userId, CreateChallengeDto dto)
         {
-            if (!Enum.TryParse<ChallengeType>(dto.ChallengeType, true, out var challengeType))
-                throw new ArgumentException($"Unknown challenge type: {dto.ChallengeType}");
+            if (!TryParseEnum<DuelContest>(dto.Contest, out var contest))
+                throw new ArgumentException($"Unknown contest: {dto.Contest}");
+            if (!TryParseEnum<DuelScoring>(dto.Scoring, out var scoring))
+                throw new ArgumentException($"Unknown scoring: {dto.Scoring}");
+            if (!DuelRules.DurationHours.Contains(dto.DurationHours))
+                throw new ArgumentException("Pick a challenge length of 1, 3 or 7 days.");
+            if (dto.OpponentId == userId)
+                throw new ArgumentException("You can't challenge yourself.");
+
+            var isTimedRace = DuelRules.IsTimedRace(contest, scoring);
+            if (isTimedRace && dto.DistanceKm is not > 0)
+                throw new ArgumentException("Pick a race distance.");
+
+            var areFriends = await _db.Friendships.AnyAsync(f =>
+                f.Status == FriendshipStatus.Accepted &&
+                ((f.RequesterId == userId && f.AddresseeId == dto.OpponentId) ||
+                 (f.RequesterId == dto.OpponentId && f.AddresseeId == userId)));
+            if (!areFriends)
+                throw new InvalidOperationException("You can only challenge friends.");
 
             var challenge = new ChallengeEntity
             {
-                CreatorId = userId,
-                Title = dto.Title,
-                Description = dto.Description,
-                ChallengeType = challengeType,
-                TargetValue = dto.TargetValue,
-                XPReward = dto.XPReward,
-                StartDate = dto.StartDate,
-                EndDate = dto.EndDate,
-                Status = ChallengeStatus.Active
+                ChallengerId = userId,
+                OpponentId = dto.OpponentId,
+                Contest = contest,
+                Scoring = scoring,
+                DistanceKm = isTimedRace ? dto.DistanceKm : null,
+                Deadline = DateTime.UtcNow.AddHours(dto.DurationHours)
             };
 
             _db.Challenges.Add(challenge);
-
-            _db.ChallengeParticipants.Add(new ChallengeParticipantEntity
-            {
-                ChallengeId = challenge.ChallengeId,
-                UserId = userId,
-                Status = ChallengeStatus.Active
-            });
-
             await _db.SaveChangesAsync();
-
-            return await GetChallengeDto(challenge.ChallengeId, userId);
+            return ToDto(await LoadAsync(userId, challenge.ChallengeId), userId);
         }
 
-        public async Task<ChallengeDto> JoinAsync(Guid userId, Guid challengeId)
+        public async Task<List<ChallengeDto>> GetMyAsync(Guid userId)
         {
-            var challenge = await _db.Challenges.FirstOrDefaultAsync(c => c.ChallengeId == challengeId)
-                ?? throw new KeyNotFoundException("Challenge not found.");
+            await ResolveDueAsync(userId);
 
-            var alreadyJoined = await _db.ChallengeParticipants
-                .AnyAsync(cp => cp.ChallengeId == challengeId && cp.UserId == userId);
+            var challenges = await Query()
+                .Where(c => c.ChallengerId == userId || c.OpponentId == userId)
+                .OrderByDescending(c => c.CreatedAt)
+                .Take(50)
+                .ToListAsync();
 
-            if (alreadyJoined)
-                throw new InvalidOperationException("Already joined this challenge.");
+            return challenges.Select(c => ToDto(c, userId)).ToList();
+        }
 
-            _db.ChallengeParticipants.Add(new ChallengeParticipantEntity
-            {
-                ChallengeId = challengeId,
-                UserId = userId,
-                Status = ChallengeStatus.Active
-            });
+        public async Task<ChallengeDto> AcceptAsync(Guid userId, Guid challengeId)
+        {
+            var challenge = await LoadOpenAsync(userId, challengeId);
+            if (challenge.OpponentId != userId || challenge.Status != ChallengeStatus.Pending)
+                throw new InvalidOperationException("This challenge can't be accepted.");
 
+            challenge.Status = ChallengeStatus.Active;
             await _db.SaveChangesAsync();
-            return await GetChallengeDto(challengeId, userId);
+            return ToDto(challenge, userId);
         }
 
-        public async Task<List<ChallengeDto>> GetActiveAsync(Guid userId)
+        public async Task<ChallengeDto> DeclineAsync(Guid userId, Guid challengeId)
         {
-            var joinedIds = await _db.ChallengeParticipants
-                .Where(cp => cp.UserId == userId)
-                .Select(cp => cp.ChallengeId)
-                .ToListAsync();
+            var challenge = await LoadOpenAsync(userId, challengeId);
+            if (challenge.OpponentId != userId || challenge.Status != ChallengeStatus.Pending)
+                throw new InvalidOperationException("This challenge can't be declined.");
 
-            var challenges = await _db.Challenges
-                .Where(c => c.Status == ChallengeStatus.Active && !joinedIds.Contains(c.ChallengeId))
-                .Select(c => c.ChallengeId)
-                .ToListAsync();
-
-            var result = new List<ChallengeDto>();
-            foreach (var id in challenges)
-                result.Add(await GetChallengeDto(id, userId));
-
-            return result;
+            challenge.Status = ChallengeStatus.Declined;
+            challenge.ResolvedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync();
+            return ToDto(challenge, userId);
         }
 
-        public async Task<List<ChallengeDto>> GetUserChallengesAsync(Guid userId)
+        public async Task<ChallengeDto> CancelAsync(Guid userId, Guid challengeId)
         {
-            var challengeIds = await _db.ChallengeParticipants
-                .Where(cp => cp.UserId == userId)
-                .Select(cp => cp.ChallengeId)
-                .ToListAsync();
+            var challenge = await LoadOpenAsync(userId, challengeId);
+            if (challenge.ChallengerId != userId || challenge.Status != ChallengeStatus.Pending)
+                throw new InvalidOperationException("Only a challenge that hasn't been accepted can be cancelled.");
 
-            var result = new List<ChallengeDto>();
-            foreach (var id in challengeIds)
-                result.Add(await GetChallengeDto(id, userId));
-
-            return result;
+            challenge.Status = ChallengeStatus.Cancelled;
+            challenge.ResolvedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync();
+            return ToDto(challenge, userId);
         }
 
-        public async Task<ChallengeDto> UpdateProgressAsync(Guid userId, Guid challengeId, float progress)
+        public async Task<ChallengeDto> SubmitAttemptAsync(Guid userId, Guid challengeId, float value)
         {
-            var participant = await _db.ChallengeParticipants
-                .FirstOrDefaultAsync(cp => cp.ChallengeId == challengeId && cp.UserId == userId)
-                ?? throw new KeyNotFoundException("Challenge participation not found.");
+            if (value <= 0)
+                throw new ArgumentException("Enter a result greater than zero.");
 
-            var challenge = await _db.Challenges.FirstOrDefaultAsync(c => c.ChallengeId == challengeId)
-                ?? throw new KeyNotFoundException("Challenge not found.");
+            var challenge = await LoadOpenAsync(userId, challengeId);
+            if (challenge.Status != ChallengeStatus.Active)
+                throw new InvalidOperationException("This challenge isn't running.");
 
-            participant.Progress = progress;
-            var completedNow = false;
-            if (progress >= challenge.TargetValue && participant.Status != ChallengeStatus.Completed)
+            var isChallenger = challenge.ChallengerId == userId;
+            if (challenge.Scoring == DuelScoring.BestAttempt
+                && challenge.Attempts.Any(a => a.UserId == userId))
+                throw new InvalidOperationException("You already locked in your attempt.");
+
+            // Added via the DbSet: the attempt's preset key would otherwise make EF treat it as existing
+            _db.ChallengeAttempts.Add(new ChallengeAttemptEntity { ChallengeId = challengeId, UserId = userId, Value = value });
+            if (isChallenger)
+                challenge.ChallengerScore = DuelRules.Combine(challenge.ChallengerScore, value, challenge.Contest, challenge.Scoring);
+            else
+                challenge.OpponentScore = DuelRules.Combine(challenge.OpponentScore, value, challenge.Contest, challenge.Scoring);
+
+            // Best attempt: done as soon as both have locked in. Total runs to the deadline.
+            var bothIn = challenge.ChallengerScore is not null && challenge.OpponentScore is not null;
+            if (challenge.Scoring == DuelScoring.Total || !bothIn)
             {
-                participant.Status = ChallengeStatus.Completed;
-                completedNow = true;
+                await _db.SaveChangesAsync();
+                return ToDto(challenge, userId);
             }
 
+            var stats = await _goals.GetOrCreateStatsAsync(userId);
+            var levelBefore = stats.CurrentLevel;
+
+            await ResolveAndSaveAsync(new[] { challenge });
+
+            // The submitter sees the result right away in the response
+            if (isChallenger) challenge.ChallengerSeenResult = true;
+            else challenge.OpponentSeenResult = true;
             await _db.SaveChangesAsync();
 
-            var dto = await GetChallengeDto(challengeId, userId);
-            if (completedNow)
-                dto.CharacterProgress = await _character.ApplyActivityAsync(
-                    userId, StatRules.ForCompletion(challenge.ChallengeType, challenge.XPReward));
+            var dto = ToDto(challenge, userId);
+            dto.CharacterProgress = await _character.ApplyActivityAsync(
+                userId, StatRules.ForDuel(challenge.Contest, dto.XPEarned));
+            dto.AccountProgress = new AccountProgressDto
+            {
+                XPGained = dto.XPEarned,
+                PreviousLevel = levelBefore,
+                NewLevel = stats.CurrentLevel,
+                CompletedGoals = { ToGoal(challenge, dto) }
+            };
+            await ApplyOpponentStatsAsync(challenge, exceptUserId: userId);
             return dto;
         }
 
-        private async Task<ChallengeDto> GetChallengeDto(Guid challengeId, Guid userId)
+        public async Task MarkResultSeenAsync(Guid userId, Guid challengeId)
         {
-            var challenge = await _db.Challenges
-                .Include(c => c.Participants)
-                    .ThenInclude(cp => cp.User)
-                .FirstOrDefaultAsync(c => c.ChallengeId == challengeId)
+            var challenge = await _db.Challenges.FirstOrDefaultAsync(c => c.ChallengeId == challengeId
+                    && (c.ChallengerId == userId || c.OpponentId == userId))
                 ?? throw new KeyNotFoundException("Challenge not found.");
 
-            var userParticipant = challenge.Participants.FirstOrDefault(cp => cp.UserId == userId);
+            if (challenge.ChallengerId == userId) challenge.ChallengerSeenResult = true;
+            else challenge.OpponentSeenResult = true;
+            await _db.SaveChangesAsync();
+        }
+
+        // ── Resolution ──────────────────────────────────────────────────────
+
+        /// <summary>Expires unanswered challenges and resolves running ones past their deadline.</summary>
+        private async Task ResolveDueAsync(Guid userId)
+        {
+            var now = DateTime.UtcNow;
+            var due = await Query()
+                .Where(c => (c.ChallengerId == userId || c.OpponentId == userId)
+                         && (c.Status == ChallengeStatus.Pending || c.Status == ChallengeStatus.Active)
+                         && c.Deadline <= now)
+                .ToListAsync();
+            if (due.Count == 0) return;
+
+            await ResolveAndSaveAsync(due);
+            foreach (var challenge in due)
+                await ApplyOpponentStatsAsync(challenge, exceptUserId: null);
+        }
+
+        /// <summary>
+        /// Settles challenges: winner, XP for both sides, achievements. Unanswered
+        /// challenges and ones nobody submitted to just expire.
+        /// </summary>
+        private async Task ResolveAndSaveAsync(IEnumerable<ChallengeEntity> challenges)
+        {
+            var now = DateTime.UtcNow;
+            var touchedUsers = new HashSet<Guid>();
+
+            foreach (var c in challenges)
+            {
+                c.ResolvedAt = now;
+                if (c.Status == ChallengeStatus.Pending
+                    || (c.ChallengerScore is null && c.OpponentScore is null))
+                {
+                    c.Status = ChallengeStatus.Expired;
+                    c.ChallengerSeenResult = c.OpponentSeenResult = true; // nothing to celebrate
+                    continue;
+                }
+
+                c.Status = ChallengeStatus.Completed;
+                var result = DuelRules.Compare(c.ChallengerScore, c.OpponentScore, c.Contest, c.Scoring);
+                c.WinnerId = result > 0 ? c.ChallengerId : result < 0 ? c.OpponentId : null;
+                c.ChallengerXP = XPFor(result, c.ChallengerScore);
+                c.OpponentXP = XPFor(-result, c.OpponentScore);
+
+                await GrantAsync(c.ChallengerId, c.ChallengerXP, result > 0);
+                await GrantAsync(c.OpponentId, c.OpponentXP, result < 0);
+                touchedUsers.Add(c.ChallengerId);
+                touchedUsers.Add(c.OpponentId);
+            }
+
+            await _db.SaveChangesAsync();
+            foreach (var user in touchedUsers)
+                await _achievements.CheckAndUnlockAsync(user);
+        }
+
+        /// <summary>No-shows (no score) get nothing; everyone who competed gets something.</summary>
+        private static int XPFor(int result, float? score) =>
+            score is null ? 0 : result > 0 ? DuelRules.WinXP : result == 0 ? DuelRules.TieXP : DuelRules.LossXP;
+
+        private async Task GrantAsync(Guid userId, int xp, bool won)
+        {
+            if (xp <= 0) return;
+            var stats = await _goals.GetOrCreateStatsAsync(userId);
+            _goals.GrantXP(stats, xp, won ? XPReason.FriendChallengeWon : XPReason.DuelPlayed);
+        }
+
+        /// <summary>Stat points for participants not already handled by the caller.</summary>
+        private async Task ApplyOpponentStatsAsync(ChallengeEntity c, Guid? exceptUserId)
+        {
+            if (c.Status != ChallengeStatus.Completed) return;
+            if (c.ChallengerId != exceptUserId && c.ChallengerXP > 0)
+                await _character.ApplyActivityAsync(c.ChallengerId, StatRules.ForDuel(c.Contest, c.ChallengerXP));
+            if (c.OpponentId != exceptUserId && c.OpponentXP > 0)
+                await _character.ApplyActivityAsync(c.OpponentId, StatRules.ForDuel(c.Contest, c.OpponentXP));
+        }
+
+        // ── Loading / mapping ───────────────────────────────────────────────
+
+        private IQueryable<ChallengeEntity> Query() => _db.Challenges
+            .Include(c => c.Challenger)
+            .Include(c => c.Opponent)
+            .Include(c => c.Attempts);
+
+        private async Task<ChallengeEntity> LoadAsync(Guid userId, Guid challengeId) =>
+            await Query().FirstOrDefaultAsync(c => c.ChallengeId == challengeId
+                    && (c.ChallengerId == userId || c.OpponentId == userId))
+                ?? throw new KeyNotFoundException("Challenge not found.");
+
+        /// <summary>Loads a challenge, settling it first if its deadline has passed.</summary>
+        private async Task<ChallengeEntity> LoadOpenAsync(Guid userId, Guid challengeId)
+        {
+            var challenge = await LoadAsync(userId, challengeId);
+            if (challenge.Deadline <= DateTime.UtcNow
+                && challenge.Status is ChallengeStatus.Pending or ChallengeStatus.Active)
+            {
+                await ResolveAndSaveAsync(new[] { challenge });
+                await ApplyOpponentStatsAsync(challenge, exceptUserId: null);
+                throw new InvalidOperationException("This challenge has ended.");
+            }
+            return challenge;
+        }
+
+        private static ChallengeDto ToDto(ChallengeEntity c, Guid userId)
+        {
+            var me = c.ChallengerId == userId;
+            var them = me ? c.Opponent : c.Challenger;
+            var myAttempts = c.Attempts.Count(a => a.UserId == userId);
+            var open = c.Deadline > DateTime.UtcNow;
 
             return new ChallengeDto
             {
-                ChallengeId = challenge.ChallengeId,
-                CreatorId = challenge.CreatorId,
-                Title = challenge.Title,
-                Description = challenge.Description,
-                ChallengeType = challenge.ChallengeType.ToString(),
-                TargetValue = challenge.TargetValue,
-                XPReward = challenge.XPReward,
-                StartDate = challenge.StartDate,
-                EndDate = challenge.EndDate,
-                Status = challenge.Status.ToString(),
-                Progress = userParticipant?.Progress ?? 0,
-                Participants = challenge.Participants.Select(cp => new MDRNJ.Shared.DTOs.Challenge.ChallengeParticipantDto
-                {
-                    UserId = cp.UserId,
-                    Username = cp.User.Username,
-                    Progress = cp.Progress,
-                    IsCompleted = cp.Status == ChallengeStatus.Completed
-                }).ToList()
+                ChallengeId = c.ChallengeId,
+                Contest = c.Contest.ToString(),
+                Scoring = c.Scoring.ToString(),
+                DistanceKm = c.DistanceKm,
+                Status = c.Status.ToString(),
+                CreatedAt = c.CreatedAt,
+                Deadline = c.Deadline,
+                IsChallenger = me,
+                OpponentUserId = them.UserId,
+                OpponentUsername = them.Username,
+                MyScore = me ? c.ChallengerScore : c.OpponentScore,
+                TheirScore = me ? c.OpponentScore : c.ChallengerScore,
+                MyAttempts = myAttempts,
+                TheirAttempts = c.Attempts.Count - myAttempts,
+                Outcome = c.Status != ChallengeStatus.Completed ? null
+                    : c.WinnerId is null ? "Tie"
+                    : c.WinnerId == userId ? "Won" : "Lost",
+                XPEarned = me ? c.ChallengerXP : c.OpponentXP,
+                ResultSeen = c.Status != ChallengeStatus.Completed
+                    || (me ? c.ChallengerSeenResult : c.OpponentSeenResult),
+                CanRespond = !me && open && c.Status == ChallengeStatus.Pending,
+                CanCancel = me && open && c.Status == ChallengeStatus.Pending,
+                CanSubmit = open && c.Status == ChallengeStatus.Active
+                    && (c.Scoring == DuelScoring.Total || myAttempts == 0)
             };
         }
+
+        private static CompletedGoalDto ToGoal(ChallengeEntity c, ChallengeDto dto) => new()
+        {
+            Kind = DuelKind,
+            Id = c.ChallengeId,
+            Title = $"{DuelRules.ContestName(c.Contest)} vs {dto.OpponentUsername} — {dto.Outcome}",
+            XPReward = dto.XPEarned
+        };
+
+        private static bool TryParseEnum<T>(string value, out T result) where T : struct, Enum =>
+            Enum.TryParse(value, true, out result) && Enum.IsDefined(result);
     }
 }

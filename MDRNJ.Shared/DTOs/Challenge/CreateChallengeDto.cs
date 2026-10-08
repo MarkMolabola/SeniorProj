@@ -1,37 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace MDRNJ.Shared.DTOs.Challenge
 {
+    /// <summary>Challenge a friend to a 1v1 contest.</summary>
     public class CreateChallengeDto
     {
         [Required]
-        [MinLength(3)]
-        [MaxLength(100)]
-        public required string Title { get; set; }
+        public required Guid OpponentId { get; set; }
 
-        [MaxLength(500)]
-        public string? Description { get; set; }
-
+        /// <summary>A <see cref="MDRNJ.Shared.Enums.DuelContest"/> name, e.g. "PushUps".</summary>
         [Required]
-        [MaxLength(50)]
-        public required string ChallengeType { get; set; }
+        [MaxLength(20)]
+        public required string Contest { get; set; }
 
+        /// <summary>A <see cref="MDRNJ.Shared.Enums.DuelScoring"/> name, e.g. "BestAttempt".</summary>
         [Required]
+        [MaxLength(20)]
+        public required string Scoring { get; set; }
+
+        /// <summary>Race distance; required for a best-attempt run.</summary>
+        [Range(0.1, 100)]
+        public float? DistanceKm { get; set; }
+
+        /// <summary>One of <see cref="MDRNJ.Shared.Game.DuelRules.DurationHours"/>.</summary>
+        public int DurationHours { get; set; } = 72;
+    }
+
+    public class SubmitAttemptDto
+    {
+        /// <summary>Reps, seconds, or km, per <see cref="MDRNJ.Shared.Game.DuelRules.Unit"/>.</summary>
         [Range(0.01, 100000)]
-        public required float TargetValue { get; set; }
-
-        [Range(0, 10000)]
-        public int XPReward { get; set; }
-
-        [Required]
-        public required DateTime StartDate { get; set; }
-
-        [Required]
-        public required DateTime EndDate { get; set; }
-
-        public List<Guid>? InvitedUserIds { get; set; }
+        public float Value { get; set; }
     }
 }
