@@ -18,6 +18,8 @@ namespace MDRNJfitness.ViewModels
                 .Select(i => new ShopItemCard(i)));
 
         [ObservableProperty] private int _gold;
+        [ObservableProperty] private string _goldText = "0";
+        private bool _unlimited;
         public bool HasNothingForSale => Items.Count == 0;
 
         public ShopViewModel(IGearService gear)
@@ -33,10 +35,12 @@ namespace MDRNJfitness.ViewModels
         private void Show(InventoryDto inventory)
         {
             Gold = inventory.Gold;
+            _unlimited = inventory.UnlimitedGold;
+            GoldText = _unlimited ? "∞" : Gold.ToString();
             foreach (var card in Items)
             {
                 card.Owned = inventory.OwnedItemIds.Contains(card.Item.Id);
-                card.CanAfford = !card.Owned && Gold >= card.Item.Price;
+                card.CanAfford = !card.Owned && (_unlimited || Gold >= card.Item.Price);
             }
         }
 
@@ -52,7 +56,8 @@ namespace MDRNJfitness.ViewModels
             }
 
             var sure = await Shell.Current.DisplayAlertAsync("Buy item?",
-                $"Buy the {card.Item.Name} for {card.Item.Price} gold?", "Buy", "Cancel");
+                _unlimited ? $"Add the {card.Item.Name} to your Collection? (Free for admins)"
+                           : $"Buy the {card.Item.Name} for {card.Item.Price} gold?", "Buy", "Cancel");
             if (!sure) return;
 
             await RunSafeAsync(async () =>

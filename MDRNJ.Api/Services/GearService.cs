@@ -43,11 +43,12 @@ namespace MDRNJ.Api.Services
                 throw new InvalidOperationException($"You already own the {item.Name}.");
 
             var stats = await _goals.GetOrCreateStatsAsync(userId);
-            if (stats.Gold < item.Price)
+            var price = await IsAdminAsync(userId) ? 0 : item.Price;
+            if (stats.Gold < price)
                 throw new InvalidOperationException($"Not enough gold: the {item.Name} costs {item.Price}, you have {stats.Gold}.");
 
-            stats.Gold -= item.Price;
-            _db.UserGear.Add(new UserGearEntity { UserId = userId, ItemId = item.Id, PricePaid = item.Price });
+            stats.Gold -= price;
+            _db.UserGear.Add(new UserGearEntity { UserId = userId, ItemId = item.Id, PricePaid = price });
             await _db.SaveChangesAsync();
             return await BuildAsync(userId, stats);
         }
@@ -75,6 +76,10 @@ namespace MDRNJ.Api.Services
             return await BuildAsync(userId, await _goals.GetOrCreateStatsAsync(userId), character);
         }
 
+        /// <summary>Admins have unlimited gold: shop items are free for them.</summary>
+        private Task<bool> IsAdminAsync(Guid userId) =>
+            _db.Users.Where(u => u.UserId == userId).Select(u => u.IsAdmin).FirstOrDefaultAsync();
+
         private async Task<InventoryDto> BuildAsync(Guid userId, GameStatsEntity stats, CharacterStateEntity? character = null)
         {
             character ??= await _db.CharacterStates.FirstOrDefaultAsync(c => c.UserId == userId)
@@ -89,6 +94,7 @@ namespace MDRNJ.Api.Services
             return new InventoryDto
             {
                 Gold = stats.Gold,
+                UnlimitedGold = await IsAdminAsync(userId),
                 OwnedItemIds = owned,
                 Character = _mapper.Map<CharacterStateDto>(character)
             };

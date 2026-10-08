@@ -36,6 +36,7 @@ namespace MDRNJ.Api.Services
 
             var dto = _mapper.Map<GameStatsDto>(stats);
             dto.XPToNextLevel = XPForNextLevel(stats.CurrentLevel) - stats.TotalXP;
+            dto.UnlimitedGold = await _db.Users.Where(u => u.UserId == userId).Select(u => u.IsAdmin).FirstOrDefaultAsync();
 
             // Streak is stale if the last workout was 2+ days ago (missed yesterday)
             var today = DateTime.UtcNow.Date;

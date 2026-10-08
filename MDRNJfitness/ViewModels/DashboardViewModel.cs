@@ -34,7 +34,14 @@ namespace MDRNJfitness.ViewModels
             }
         }
 
-        partial void OnStatsChanged(GameStatsDto? value) => OnPropertyChanged(nameof(XPProgress));
+        partial void OnStatsChanged(GameStatsDto? value)
+        {
+            OnPropertyChanged(nameof(XPProgress));
+            OnPropertyChanged(nameof(GoldText));
+        }
+
+        /// <summary>Gold balance, or ∞ for admins (who shop for free).</summary>
+        public string GoldText => Stats is null ? "0" : Stats.UnlimitedGold ? "∞" : Stats.Gold.ToString();
         public ObservableCollection<WorkoutDto> RecentWorkouts { get; } = new();
         public ObservableCollection<AchievementDto> Achievements { get; } = new();
 

@@ -15,5 +15,8 @@ namespace MDRNJ.Shared.DTOs.Game
         public DateTime? LastWorkoutDate { get; set; }
         public int XPToNextLevel { get; set; }
         public int Gold { get; set; }
+
+        /// <summary>Admins shop for free; the app shows their gold as ∞.</summary>
+        public bool UnlimitedGold { get; set; }
     }
 }

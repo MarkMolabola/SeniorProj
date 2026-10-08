@@ -6,6 +6,9 @@ namespace MDRNJ.Shared.DTOs.Game
     public class InventoryDto
     {
         public int Gold { get; set; }
+
+        /// <summary>Admins shop for free; the app shows their gold as ∞.</summary>
+        public bool UnlimitedGold { get; set; }
         public List<string> OwnedItemIds { get; set; } = new();
         public CharacterStateDto Character { get; set; } = null!;
     }
