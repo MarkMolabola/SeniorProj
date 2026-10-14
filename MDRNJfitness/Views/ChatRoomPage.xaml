@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- One chat: header, messages (newest at the bottom) and the input bar. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MDRNJfitness.Views.ChatRoomPage"
+             Title="{Binding Title}"
+             Style="{StaticResource PxPage}">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="16,12,16,12" RowSpacing="12">
+
+        <!-- ── Header ──────────────────────────────────────────── -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+            <Button Grid.Column="0"
+                    Style="{StaticResource PxButtonSecondary}"
+                    Text="◀"
+                    Clicked="OnBackClicked" />
+            <VerticalStackLayout Grid.Column="1" Spacing="0" VerticalOptions="Center">
+                <Label Style="{StaticResource PxHeading}"
+                       Text="{Binding Title}"
+                       TextTransform="Uppercase"
+                       LineBreakMode="TailTruncation" />
+                <Label Style="{StaticResource PxMuted}" Text="{Binding Subtitle}" />
+            </VerticalStackLayout>
+            <Button Grid.Column="2"
+                    Style="{StaticResource PxButtonSecondary}"
+                    Text="MEMBERS"
+                    IsVisible="{Binding IsGroup}"
+                    Command="{Binding GroupMenuCommand}" />
+            <Button Grid.Column="2"
+                    Style="{StaticResource PxButtonSecondary}"
+                    Text="PROFILE"
+                    IsVisible="{Binding IsDirect}"
+                    Command="{Binding OpenOtherProfileCommand}" />
+        </Grid>
+
+        <!-- ── Messages ────────────────────────────────────────── -->
+        <CollectionView x:Name="MessageList"
+                        Grid.Row="1"
+                        ItemsSource="{Binding Messages}"
+                        SelectionMode="None">
+            <CollectionView.Header>
+                <Button Style="{StaticResource PxLinkButton}"
+                        Text="LOAD OLDER MESSAGES"
+                        HorizontalOptions="Center"
+                        IsVisible="{Binding HasOlder}"
+                        Command="{Binding LoadOlderCommand}" />
+            </CollectionView.Header>
+            <CollectionView.EmptyView>
+                <Label Style="{StaticResource PxMuted}"
+                       Text="No messages yet. Say hi!"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <VerticalStackLayout Padding="0,4" Spacing="2" HorizontalOptions="{Binding Alignment}" MaximumWidthRequest="300">
+                        <Label Style="{StaticResource PxCaption}"
+                               Text="{Binding SenderName}"
+                               TextColor="{StaticResource PxTeal}"
+                               IsVisible="{Binding ShowSender}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.OpenSenderProfileCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Border Style="{StaticResource PxPanel}" Padding="12,8" HorizontalOptions="{Binding Alignment}">
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsMine}" Value="True">
+                                    <Setter Property="BackgroundColor" Value="{StaticResource PxTrack}" />
+                                    <Setter Property="Stroke" Value="{StaticResource PxTeal}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Label Style="{StaticResource PxBody}" Text="{Binding Body}" LineBreakMode="WordWrap" />
+                        </Border>
+                        <Label Style="{StaticResource PxMuted}"
+                               FontSize="15"
+                               Text="{Binding TimeText}"
+                               HorizontalOptions="{Binding Alignment}" />
+                    </VerticalStackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- ── Input bar ───────────────────────────────────────── -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="10">
+            <Border Grid.Column="0" Style="{StaticResource PxSunken}" Padding="10,0">
+                <Entry Style="{StaticResource PxEntry}"
+                       Placeholder="Message..."
+                       Text="{Binding Draft}"
+                       MaxLength="{Binding MaxMessageLength}"
+                       ReturnType="Send"
+                       ReturnCommand="{Binding SendCommand}" />
+            </Border>
+            <Button Grid.Column="1"
+                    Style="{StaticResource PxButton}"
+                    Text="SEND"
+                    Command="{Binding SendCommand}" />
+        </Grid>
+    </Grid>
+</ContentPage>

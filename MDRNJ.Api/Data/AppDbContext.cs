@@ -24,6 +24,9 @@ namespace MDRNJ.Api.Data
         public DbSet<UserQuestEntity> UserQuests => Set<UserQuestEntity>();
         public DbSet<UserGearEntity> UserGear => Set<UserGearEntity>();
         public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>();
+        public DbSet<ChatChannelEntity> ChatChannels => Set<ChatChannelEntity>();
+        public DbSet<ChatMemberEntity> ChatMembers => Set<ChatMemberEntity>();
+        public DbSet<ChatMessageEntity> ChatMessages => Set<ChatMessageEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -231,6 +234,56 @@ namespace MDRNJ.Api.Data
                  .WithMany(u => u.OwnedGear)
                  .HasForeignKey(g => g.UserId)
                  .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ChatChannelEntity — the global room is seeded
+            modelBuilder.Entity<ChatChannelEntity>(e =>
+            {
+                e.HasKey(c => c.ChannelId);
+                e.Property(c => c.Name).HasMaxLength(MDRNJ.Shared.Game.ChatRules.MaxGroupNameLength);
+                e.Property(c => c.DirectKey).HasMaxLength(80);
+                e.HasIndex(c => c.DirectKey).IsUnique();
+                e.Property(c => c.LastMessagePreview).HasMaxLength(120);
+                e.Property(c => c.LastSenderName).HasMaxLength(30);
+                e.HasData(new ChatChannelEntity
+                {
+                    ChannelId = MDRNJ.Shared.Game.ChatRules.GlobalChannelId,
+                    Kind = MDRNJ.Shared.Enums.ChatChannelKind.Global,
+                    Name = "Global",
+                    CreatedAt = new DateTime(2026, 10, 14, 0, 0, 0, DateTimeKind.Utc)
+                });
+            });
+
+            // ChatMemberEntity — composite key
+            modelBuilder.Entity<ChatMemberEntity>(e =>
+            {
+                e.HasKey(m => new { m.ChannelId, m.UserId });
+                e.HasOne(m => m.Channel)
+                 .WithMany(c => c.Members)
+                 .HasForeignKey(m => m.ChannelId)
+                 .OnDelete(DeleteBehavior.Cascade);
+                e.HasOne(m => m.User)
+                 .WithMany()
+                 .HasForeignKey(m => m.UserId)
+                 .OnDelete(DeleteBehavior.Cascade);
+                e.HasIndex(m => m.UserId);
+            });
+
+            // ChatMessageEntity — paged newest-first per channel
+            modelBuilder.Entity<ChatMessageEntity>(e =>
+            {
+                e.HasKey(m => m.MessageId);
+                e.Property(m => m.Body).HasMaxLength(MDRNJ.Shared.Game.ChatRules.MaxMessageLength).IsRequired();
+                e.HasOne(m => m.Channel)
+                 .WithMany(c => c.Messages)
+                 .HasForeignKey(m => m.ChannelId)
+                 .OnDelete(DeleteBehavior.Cascade);
+                e.HasOne(m => m.Sender)
+                 .WithMany()
+                 .HasForeignKey(m => m.SenderId)
+                 .OnDelete(DeleteBehavior.Cascade);
+                e.HasIndex(m => new { m.ChannelId, m.SentAt });
+                e.HasIndex(m => new { m.SenderId, m.SentAt });
             });
         }
     }

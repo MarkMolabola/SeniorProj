@@ -70,6 +70,10 @@
                 Title="Ranks"
                 Route="LeaderboardPage"
                 ContentTemplate="{DataTemplate views:LeaderboardPage}" />
+            <ShellContent
+                Title="Chat"
+                Route="ChatPage"
+                ContentTemplate="{DataTemplate views:ChatPage}" />
         </Tab>
     </TabBar>
 

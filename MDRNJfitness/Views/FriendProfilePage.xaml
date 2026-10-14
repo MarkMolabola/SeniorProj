@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- A friend's hero, stats and recent training. -->
+<!-- A player's hero and stats; friends also see recent training. -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MDRNJfitness.Views"
@@ -66,8 +66,11 @@
                 </Border>
             </Grid>
 
-            <!-- ── Recent training ─────────────────────────────────── -->
-            <VerticalStackLayout Spacing="12">
+            <!-- ── Recent training (friends only) ────────────────────── -->
+            <Border Style="{StaticResource PxPanel}" IsVisible="{Binding HidesWorkouts}">
+                <Label Style="{StaticResource PxMuted}" Text="Become friends to see their recent training." />
+            </Border>
+            <VerticalStackLayout Spacing="12" IsVisible="{Binding ShowsWorkouts}">
                 <Label Style="{StaticResource PxCaption}" Text="RECENT SESSIONS" />
                 <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding RecentWorkouts}">
                     <BindableLayout.EmptyView>
@@ -103,8 +106,29 @@
                 </VerticalStackLayout>
             </VerticalStackLayout>
 
+            <!-- ── Actions (follow the friendship) ───────────────────── -->
+            <Button Style="{StaticResource PxButton}"
+                    Text="+ ADD FRIEND"
+                    IsVisible="{Binding CanAddFriend}"
+                    Command="{Binding AddFriendCommand}"
+                    IsEnabled="{Binding IsNotBusy}" />
+            <Button Style="{StaticResource PxButtonSecondary}"
+                    Text="REQUEST SENT"
+                    IsVisible="{Binding IsRequestSent}"
+                    IsEnabled="False" />
+            <Button Style="{StaticResource PxButton}"
+                    Text="ACCEPT FRIEND REQUEST"
+                    IsVisible="{Binding IsRequestReceived}"
+                    Command="{Binding AcceptRequestCommand}"
+                    IsEnabled="{Binding IsNotBusy}" />
+            <Button Style="{StaticResource PxButton}"
+                    Text="MESSAGE"
+                    IsVisible="{Binding IsFriend}"
+                    Command="{Binding MessageCommand}"
+                    IsEnabled="{Binding IsNotBusy}" />
             <Button Style="{StaticResource PxButtonDanger}"
                     Text="REMOVE FRIEND"
+                    IsVisible="{Binding IsFriend}"
                     Command="{Binding RemoveFriendCommand}"
                     IsEnabled="{Binding IsNotBusy}" />
 

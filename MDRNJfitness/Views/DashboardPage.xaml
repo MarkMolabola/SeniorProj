@@ -26,20 +26,21 @@
                     </Label.FormattedText>
                 </Label>
                 <HorizontalStackLayout Grid.Column="1" Spacing="8">
-                <Border Style="{StaticResource PxChip}" BackgroundColor="{StaticResource PxPanel}" Padding="10,2">
+                <Border Style="{StaticResource PxChip}" Padding="10,2">
                     <HorizontalStackLayout Spacing="6">
                         <Image Source="icon_gold.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
                         <Label Style="{StaticResource PxBody}"
                                Text="{Binding GoldText}"
-                               TextColor="{StaticResource PxGold}"
+                               TextColor="{StaticResource PxGoldInk}"
                                VerticalOptions="Center" />
                     </HorizontalStackLayout>
                 </Border>
-                <Border Style="{StaticResource PxChip}" BackgroundColor="{StaticResource PxPanel}" Padding="10,2">
+                <Border Style="{StaticResource PxChip}" Padding="10,2">
                     <HorizontalStackLayout Spacing="6">
                         <Image Source="icon_flame.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
                         <Label Style="{StaticResource PxBody}"
                                Text="{Binding Stats.CurrentStreak}"
+                               TextColor="{StaticResource PxGoldInk}"
                                VerticalOptions="Center" />
                     </HorizontalStackLayout>
                 </Border>

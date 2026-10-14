@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Guild ▸ Chat: global room, groups/guilds and direct chats. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MDRNJfitness.Views.ChatPage"
+             Title="{Binding Title}"
+             Style="{StaticResource PxPage}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,24,20,32" Spacing="20">
+
+            <Label Style="{StaticResource PxTitle}" Text="TAVERN" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button Grid.Column="0"
+                        Style="{StaticResource PxButtonSecondary}"
+                        Text="+ GROUP"
+                        Command="{Binding NewGroupCommand}" />
+                <Button Grid.Column="1"
+                        Style="{StaticResource PxButtonSecondary}"
+                        Text="+ DIRECT"
+                        Command="{Binding NewDirectCommand}" />
+            </Grid>
+
+            <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding Channels}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource PxPanel}" Padding="14,12">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.OpenCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding HasUnread}" Value="True">
+                                    <Setter Property="Stroke" Value="{StaticResource PxTeal}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="2">
+                                <Label Grid.Row="0" Grid.Column="0"
+                                       Style="{StaticResource PxCaption}"
+                                       Text="{Binding KindLabel}"
+                                       TextColor="{StaticResource PxTextDim}" />
+                                <Label Grid.Row="0" Grid.Column="1"
+                                       Style="{StaticResource PxMuted}"
+                                       Text="{Binding TimeText}"
+                                       HorizontalOptions="End" />
+
+                                <Label Grid.Row="1" Grid.Column="0"
+                                       Style="{StaticResource PxBody}"
+                                       Text="{Binding Name}"
+                                       TextColor="{StaticResource PxGold}"
+                                       LineBreakMode="TailTruncation" />
+                                <Border Grid.Row="1" Grid.Column="1" Grid.RowSpan="2"
+                                        BackgroundColor="{StaticResource PxTeal}"
+                                        Stroke="{StaticResource PxInk}"
+                                        StrokeThickness="2"
+                                        StrokeShape="Rectangle"
+                                        Padding="8,0"
+                                        HorizontalOptions="End"
+                                        VerticalOptions="Center"
+                                        IsVisible="{Binding HasUnread}">
+                                    <Label Style="{StaticResource PxBody}"
+                                           Text="{Binding UnreadText}"
+                                           TextColor="{StaticResource PxInk}" />
+                                </Border>
+
+                                <Label Grid.Row="2" Grid.Column="0"
+                                       Style="{StaticResource PxMuted}"
+                                       Text="{Binding Preview}"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="1" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+
+            <Label Style="{StaticResource PxMuted}"
+                   Text="Groups and direct chats are with friends. Tap a name in Global to view their profile."
+                   HorizontalTextAlignment="Center" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

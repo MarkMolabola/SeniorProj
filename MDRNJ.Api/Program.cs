@@ -128,6 +128,7 @@ builder.Services.AddScoped<IAchievementService, AchievementService>();
 builder.Services.AddScoped<IQuestService, QuestService>();
 builder.Services.AddScoped<IGoalProgressService, GoalProgressService>();
 builder.Services.AddScoped<IGearService, GearService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddSingleton<CharacterClassifierService>();
 
 // ── CORS (allows MAUI app to call the API) ─────────
@@ -165,5 +166,6 @@ app.UseAuthorization();
 // ── Route Mapping ────────────────────────────────────
 app.MapControllers();
 app.MapHub<LeaderboardHub>("/hubs/leaderboard");
+app.MapHub<ChatHub>("/hubs/chat");
 
 app.Run();

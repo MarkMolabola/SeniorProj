@@ -9,6 +9,7 @@ namespace MDRNJfitness
             InitializeComponent();
             Routing.RegisterRoute(nameof(FriendProfilePage), typeof(FriendProfilePage));
             Routing.RegisterRoute(nameof(AdminQuestPage), typeof(AdminQuestPage));
+            Routing.RegisterRoute(nameof(ChatRoomPage), typeof(ChatRoomPage));
         }
     }
 }

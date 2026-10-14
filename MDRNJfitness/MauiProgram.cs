@@ -81,6 +81,10 @@ namespace MDRNJfitness
                 c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
                 .AddHttpMessageHandler<AuthHeaderHandler>();
 
+            builder.Services.AddHttpClient<IChatService, ChatService>(
+                c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
+                .AddHttpMessageHandler<AuthHeaderHandler>();
+
             // Reward / evolution popup after workouts
             builder.Services.AddSingleton<ICharacterProgressPresenter, CharacterProgressPresenter>();
 
@@ -89,6 +93,7 @@ namespace MDRNJfitness
 
             // SignalR hub client
             builder.Services.AddSingleton<LeaderboardHubClient>();
+            builder.Services.AddSingleton<ChatHubClient>();
 
             // ViewModels
             builder.Services.AddTransient<LoginViewModel>();
@@ -105,6 +110,8 @@ namespace MDRNJfitness
             builder.Services.AddTransient<AdminQuestViewModel>();
             builder.Services.AddTransient<ShopViewModel>();
             builder.Services.AddTransient<CollectionViewModel>();
+            builder.Services.AddTransient<ChatListViewModel>();
+            builder.Services.AddTransient<ChatRoomViewModel>();
 
             // Pages
             builder.Services.AddTransient<LoginPage>();
@@ -121,6 +128,8 @@ namespace MDRNJfitness
             builder.Services.AddTransient<AdminQuestPage>();
             builder.Services.AddTransient<ShopPage>();
             builder.Services.AddTransient<CollectionPage>();
+            builder.Services.AddTransient<ChatPage>();
+            builder.Services.AddTransient<ChatRoomPage>();
 
             return builder.Build();
         }

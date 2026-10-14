@@ -242,6 +242,108 @@ namespace MDRNJ.Api.Migrations
                     b.ToTable("CharacterStates");
                 });
 
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChatChannelEntity", b =>
+                {
+                    b.Property<Guid>("ChannelId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DirectKey")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("LastMessageAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastMessagePreview")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("LastSenderName")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<Guid?>("OwnerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ChannelId");
+
+                    b.HasIndex("DirectKey")
+                        .IsUnique()
+                        .HasFilter("[DirectKey] IS NOT NULL");
+
+                    b.ToTable("ChatChannels");
+
+                    b.HasData(
+                        new
+                        {
+                            ChannelId = new Guid("6b1f7c0e-8f2a-4c1e-9d3b-1a2b3c4d5e6f"),
+                            CreatedAt = new DateTime(2026, 10, 14, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Kind = 0,
+                            Name = "Global"
+                        });
+                });
+
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChatMemberEntity", b =>
+                {
+                    b.Property<Guid>("ChannelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("JoinedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastReadAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ChannelId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ChatMembers");
+                });
+
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChatMessageEntity", b =>
+                {
+                    b.Property<Guid>("MessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("ChannelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("MessageId");
+
+                    b.HasIndex("ChannelId", "SentAt");
+
+                    b.HasIndex("SenderId", "SentAt");
+
+                    b.ToTable("ChatMessages");
+                });
+
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.ExerciseEntity", b =>
                 {
                     b.Property<Guid>("ExerciseId")
@@ -708,6 +810,44 @@ namespace MDRNJ.Api.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChatMemberEntity", b =>
+                {
+                    b.HasOne("MDRNJ.Api.Data.Entities.ChatChannelEntity", "Channel")
+                        .WithMany("Members")
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Channel");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChatMessageEntity", b =>
+                {
+                    b.HasOne("MDRNJ.Api.Data.Entities.ChatChannelEntity", "Channel")
+                        .WithMany("Messages")
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Channel");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.ExerciseEntity", b =>
                 {
                     b.HasOne("MDRNJ.Api.Data.Entities.WorkoutSessionEntity", "Session")
@@ -850,6 +990,13 @@ namespace MDRNJ.Api.Migrations
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChallengeEntity", b =>
                 {
                     b.Navigation("Attempts");
+                });
+
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChatChannelEntity", b =>
+                {
+                    b.Navigation("Members");
+
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.QuestEntity", b =>

@@ -10,6 +10,12 @@ namespace MDRNJ.Shared.DTOs.Friend
         public string Username { get; set; } = null!;
         public string? AvatarUrl { get; set; }
 
+        /// <summary>How the viewer relates to this user: Self, Friends, RequestSent, RequestReceived or None.</summary>
+        public string Relationship { get; set; } = FriendRelationship.None;
+
+        /// <summary>The pending request to accept when Relationship is RequestReceived.</summary>
+        public Guid? PendingFriendshipId { get; set; }
+
         // Game stats
         public int CurrentLevel { get; set; }
         public int TotalXP { get; set; }

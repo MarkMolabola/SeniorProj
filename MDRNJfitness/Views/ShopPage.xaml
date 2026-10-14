@@ -19,10 +19,10 @@
             <VerticalStackLayout Padding="6,24,6,16" Spacing="14">
                 <Grid ColumnDefinitions="*,Auto">
                     <Label Grid.Column="0" Style="{StaticResource PxTitle}" Text="SHOP" VerticalOptions="Center" />
-                    <Border Grid.Column="1" Style="{StaticResource PxChip}" BackgroundColor="{StaticResource PxPanel}" Padding="10,2">
+                    <Border Grid.Column="1" Style="{StaticResource PxChip}" Padding="10,2">
                         <HorizontalStackLayout Spacing="6">
                             <Image Source="icon_gold.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                            <Label Style="{StaticResource PxBody}" Text="{Binding GoldText}" TextColor="{StaticResource PxGold}" VerticalOptions="Center" />
+                            <Label Style="{StaticResource PxBody}" Text="{Binding GoldText}" TextColor="{StaticResource PxGoldInk}" VerticalOptions="Center" />
                         </HorizontalStackLayout>
                     </Border>
                 </Grid>
