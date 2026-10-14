@@ -35,7 +35,7 @@
 
         <CollectionView.ItemTemplate>
             <DataTemplate>
-                <Border Style="{StaticResource PxPanel}" Padding="8,10">
+                <Border Style="{StaticResource PxPanel}" Padding="8,10" Stroke="{Binding RarityBrush}" StrokeThickness="3">
                     <Border.Triggers>
                         <DataTrigger TargetType="Border" Binding="{Binding Owned}" Value="True">
                             <Setter Property="Opacity" Value="0.6" />
@@ -52,7 +52,8 @@
                         </Border>
                         <Label Style="{StaticResource PxBody}" FontSize="18" Text="{Binding Item.Name}"
                                HorizontalTextAlignment="Center" LineBreakMode="TailTruncation" MaxLines="2" />
-                        <Label Style="{StaticResource PxCaption}" Text="{Binding SlotName}" HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxCaption}" Text="{Binding RarityName}" TextColor="{Binding RarityColor}" HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxBody}" FontSize="17" Text="{Binding Item.BonusText}" TextColor="{StaticResource PxTeal}" HorizontalOptions="Center" />
 
                         <!-- Price / owned -->
                         <HorizontalStackLayout Spacing="4" HorizontalOptions="Center">

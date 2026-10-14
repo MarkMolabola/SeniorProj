@@ -11,7 +11,14 @@ namespace MDRNJ.Shared.Game
     }
 
     /// <summary>A shop item. Art lives in the app (HeroSprites.TryGetGear).</summary>
-    public sealed record GearItem(string Id, string Name, GearSlot Slot, int Price);
+    public sealed record GearItem(string Id, string Name, GearSlot Slot, int Price, GearRarity Rarity, StatKind Stat)
+    {
+        /// <summary>Stat points added to <see cref="Stat"/> while worn.</summary>
+        public int Bonus => GearStats.BonusPoints(Rarity);
+
+        /// <summary>e.g. "+5 STR".</summary>
+        public string BonusText => $"+{Bonus} {GearStats.ShortName(Stat)}";
+    }
 
     /// <summary>
     /// Everything the shop sells. The list itself (GearCatalog.g.cs) is

@@ -14,6 +14,9 @@ namespace MDRNJ.Api.Data.Entities
         public int Gold { get; set; } = MDRNJ.Shared.Game.GoldRules.StartingGold;
         public DateTime? LastWorkoutDate { get; set; }
 
+        /// <summary>When dungeon gold was last collected; gold builds up from here (DungeonRules).</summary>
+        public DateTime DungeonCollectedAt { get; set; } = DateTime.UtcNow;
+
         // Navigation
         public UserEntity User { get; set; } = null!;
     }

@@ -15,10 +15,35 @@ namespace MDRNJfitness.ViewModels
     {
         private readonly ICharacterService _character;
         private readonly IGearService _gear;
+        private readonly IGameService _game;
         private List<string> _owned = new();
 
         [ObservableProperty] private CharacterStateDto? _characterState;
         [ObservableProperty] private ActivityScoreDto? _activityScore;
+        [ObservableProperty] private GameStatsDto? _stats;
+
+        // ── Account XP (moved here from Home) ──
+        public double XPProgress
+        {
+            get
+            {
+                if (Stats is null) return 0;
+                var start = Stats.CurrentLevel <= 1 ? 0 : AccountProgression.XPForNextLevel(Stats.CurrentLevel - 1);
+                var end = AccountProgression.XPForNextLevel(Stats.CurrentLevel);
+                return end <= start ? 0 : Math.Clamp((double)(Stats.TotalXP - start) / (end - start), 0, 1);
+            }
+        }
+
+        partial void OnStatsChanged(GameStatsDto? value) => OnPropertyChanged(nameof(XPProgress));
+
+        // ── Stats as they count in play: trained points + worn gear boosts ──
+        [ObservableProperty] private float _strengthPoints;
+        [ObservableProperty] private float _endurancePoints;
+        [ObservableProperty] private float _flexibilityPoints;
+        [ObservableProperty] private string _gearBonusText = string.Empty;
+        public bool HasGearBonus => GearBonusText.Length > 0;
+        partial void OnGearBonusTextChanged(string value) => OnPropertyChanged(nameof(HasGearBonus));
+        partial void OnActivityScoreChanged(ActivityScoreDto? value) => UpdateStats();
         [ObservableProperty] private string _avatarId = HeroAvatars.Classic;
         [ObservableProperty] private IReadOnlyList<string> _heroGear = Array.Empty<string>();
 
@@ -45,10 +70,11 @@ namespace MDRNJfitness.ViewModels
         [ObservableProperty] private bool _hasSlotChoices;
         [ObservableProperty] private bool _pickerSlotHasItem;
 
-        public CharacterViewModel(ICharacterService character, IGearService gear)
+        public CharacterViewModel(ICharacterService character, IGearService gear, IGameService game)
         {
             _character = character;
             _gear = gear;
+            _game = game;
             Title = "Character";
         }
 
@@ -56,6 +82,7 @@ namespace MDRNJfitness.ViewModels
         public async Task LoadAsync() =>
             await RunSafeAsync(async () =>
             {
+                Stats = await _game.GetStatsAsync();
                 ActivityScore = await _character.GetActivityScoreAsync();
                 ShowInventory(await _gear.GetInventoryAsync());
             });
@@ -73,6 +100,7 @@ namespace MDRNJfitness.ViewModels
             AvatarId = state?.AvatarId ?? HeroAvatars.Classic;
             HeroGear = state?.InDrawOrder() ?? Array.Empty<string>();
             HasHiddenGear = HeroGear.Any(id => !HeroSprites.GearFits(id, AvatarId));
+            UpdateStats();
 
             foreach (var slot in GearSlots)
                 slot.ItemId = state?.Get(slot.Slot);
@@ -84,7 +112,21 @@ namespace MDRNJfitness.ViewModels
             }
         }
 
-        /// <summary>CUSTOMIZE: pop-up grid of hero looks.</summary>
+        private void UpdateStats()
+        {
+            var gear = GearStats.Bonus(CharacterState);
+            StrengthPoints = (ActivityScore?.StrengthPoints ?? 0) + gear.Strength;
+            EndurancePoints = (ActivityScore?.CardioPoints ?? 0) + gear.Endurance;
+            FlexibilityPoints = (ActivityScore?.FlexibilityPoints ?? 0) + gear.Flexibility;
+
+            var parts = new List<string>();
+            if (gear.Strength > 0) parts.Add($"+{gear.Strength:0} STR");
+            if (gear.Endurance > 0) parts.Add($"+{gear.Endurance:0} END");
+            if (gear.Flexibility > 0) parts.Add($"+{gear.Flexibility:0} FLX");
+            GearBonusText = parts.Count == 0 ? string.Empty : "Gear: " + string.Join(" · ", parts);
+        }
+
+                /// <summary>CUSTOMIZE: pop-up grid of hero looks.</summary>
         [RelayCommand]
         public Task OpenCustomizeAsync() =>
             Shell.Current.Navigation.PushModalAsync(new AvatarPickerPage(this));

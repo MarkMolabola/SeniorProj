@@ -67,8 +67,8 @@ namespace MDRNJ.Api.Services
             if (stats is null) return new List<AchievementDto>();
 
             var character = await _db.CharacterStates.FirstOrDefaultAsync(c => c.UserId == userId);
-            var strengthLevel = StatProgression.LevelFor(
-                (await _db.ActivityScores.FirstOrDefaultAsync(a => a.UserId == userId))?.StrengthPoints ?? 0);
+            // Gear boosts count toward stat-gated achievements
+            var strengthLevel = StatProgression.LevelFor((await EffectiveStats.LoadAsync(_db, userId)).Strength);
             var friendCount = await _db.Friendships.CountAsync(f =>
                 (f.RequesterId == userId || f.AddresseeId == userId) &&
                 f.Status == FriendshipStatus.Accepted);

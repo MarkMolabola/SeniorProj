@@ -36,11 +36,11 @@
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource PxSunken}" Padding="6,8">
+                            <Border Style="{StaticResource PxSunken}" Padding="6,8" Stroke="{Binding RarityBrush}" StrokeThickness="2">
+                                <!-- Outline = rarity; the worn item gets a thicker one -->
                                 <Border.Triggers>
                                     <DataTrigger TargetType="Border" Binding="{Binding Equipped}" Value="True">
-                                        <Setter Property="Stroke" Value="{StaticResource PxGold}" />
-                                        <Setter Property="StrokeThickness" Value="3" />
+                                        <Setter Property="StrokeThickness" Value="5" />
                                     </DataTrigger>
                                 </Border.Triggers>
                                 <Border.GestureRecognizers>
@@ -53,6 +53,8 @@
                                     <local:GearIconView ItemId="{Binding Item.Id}" HeightRequest="56" />
                                     <Label Style="{StaticResource PxBody}" FontSize="16" Text="{Binding Item.Name}"
                                            HorizontalTextAlignment="Center" LineBreakMode="TailTruncation" MaxLines="2" />
+                                    <Label Style="{StaticResource PxBody}" FontSize="15" Text="{Binding Item.BonusText}"
+                                           TextColor="{StaticResource PxTeal}" HorizontalOptions="Center" />
                                     <Label Style="{StaticResource PxCaption}" FontSize="7" Text="WEARING"
                                            TextColor="{StaticResource PxGold}" HorizontalOptions="Center"
                                            IsVisible="{Binding Equipped}" />

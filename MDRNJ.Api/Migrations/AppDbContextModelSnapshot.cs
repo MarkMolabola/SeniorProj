@@ -425,6 +425,11 @@ namespace MDRNJ.Api.Migrations
                     b.Property<int>("CurrentStreak")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("DungeonCollectedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
                     b.Property<int>("Gold")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")

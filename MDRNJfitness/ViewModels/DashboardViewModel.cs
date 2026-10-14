@@ -2,8 +2,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MDRNJ.Shared.DTOs.Game;
 using MDRNJ.Shared.DTOs.Workout;
+using MDRNJ.Shared.Game;
 using MDRNJfitness.Services.Interfaces;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 
 namespace MDRNJfitness.ViewModels
@@ -12,32 +14,52 @@ namespace MDRNJfitness.ViewModels
     {
         private readonly IGameService _game;
         private readonly IWorkoutService _workout;
-        private readonly IAuthService _auth;
         private readonly ICharacterService _character;
 
+        /// <summary>Time since the dungeon snapshot was fetched, so the gold counter keeps ticking.</summary>
+        private readonly Stopwatch _sinceDungeonFetch = new();
+
         [ObservableProperty] private GameStatsDto? _stats;
-        [ObservableProperty] private string _userName = string.Empty;
         [ObservableProperty] private string _heroOutfit = "default";
         [ObservableProperty] private string _heroAvatarId = "classic";
         [ObservableProperty] private MDRNJ.Shared.DTOs.Character.CharacterStateDto? _hero;
 
-        public double XPProgress
+        // ── Dungeon ─────────────────────────────────────────────
+        [ObservableProperty] private DungeonDto? _dungeon;
+        [ObservableProperty] private int _pendingGold;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasCollectMessage))]
+        private string _collectMessage = string.Empty;
+        public bool HasCollectMessage => CollectMessage.Length > 0;
+
+        public string MonsterId => Dungeon?.MonsterId ?? "slime";
+        public string DungeonTitle => $"DUNGEON · {(Dungeon?.MonsterName ?? "Slime").ToUpperInvariant()}S";
+        public string PowerText => $"POWER {Dungeon?.Power ?? 3:0.#}";
+        public string RateText => Dungeon is null ? string.Empty
+            : IsDungeonFull ? "Full! Collect to keep earning."
+            : $"+{Dungeon.GoldPerHour:0.#} gold/hr · holds {Dungeon.CapHours}h";
+        public string PendingText => $"{PendingGold} / {Dungeon?.CapGold ?? 0}";
+        public double PendingProgress => Dungeon is { CapGold: > 0 } d ? Math.Clamp((double)PendingGold / d.CapGold, 0, 1) : 0;
+        public bool IsDungeonFull => Dungeon is { CapGold: > 0 } d && PendingGold >= d.CapGold;
+        public bool CanCollect => PendingGold > 0;
+
+        partial void OnStatsChanged(GameStatsDto? value) => OnPropertyChanged(nameof(GoldText));
+
+        partial void OnDungeonChanged(DungeonDto? value)
         {
-            get
-            {
-                if (Stats == null) return 0;
-                int level = Stats.CurrentLevel;
-                int xpStart = (level - 1) * (level - 1) * 100;
-                int xpEnd = level * level * 100;
-                int range = xpEnd - xpStart;
-                return range <= 0 ? 0 : Math.Clamp((double)(Stats.TotalXP - xpStart) / range, 0, 1);
-            }
+            OnPropertyChanged(nameof(MonsterId));
+            OnPropertyChanged(nameof(DungeonTitle));
+            OnPropertyChanged(nameof(PowerText));
+            UpdatePendingGold();
         }
 
-        partial void OnStatsChanged(GameStatsDto? value)
+        partial void OnPendingGoldChanged(int value)
         {
-            OnPropertyChanged(nameof(XPProgress));
-            OnPropertyChanged(nameof(GoldText));
+            OnPropertyChanged(nameof(PendingText));
+            OnPropertyChanged(nameof(PendingProgress));
+            OnPropertyChanged(nameof(IsDungeonFull));
+            OnPropertyChanged(nameof(RateText));
+            OnPropertyChanged(nameof(CanCollect));
         }
 
         /// <summary>Gold balance, or ∞ for admins (who shop for free).</summary>
@@ -47,11 +69,10 @@ namespace MDRNJfitness.ViewModels
 
         [ObservableProperty] private bool _hasNoAchievements = true;
 
-        public DashboardViewModel(IGameService game, IWorkoutService workout, IAuthService auth, ICharacterService character)
+        public DashboardViewModel(IGameService game, IWorkoutService workout, ICharacterService character)
         {
             _game = game;
             _workout = workout;
-            _auth = auth;
             _character = character;
             Title = "Dashboard";
         }
@@ -60,9 +81,6 @@ namespace MDRNJfitness.ViewModels
         public async Task LoadAsync() =>
             await RunSafeAsync(async () =>
             {
-                var user = await _auth.GetCurrentUserAsync();
-                UserName = user?.Username ?? string.Empty;
-
                 Stats = await _game.GetStatsAsync();
 
                 var hero = await _character.GetCharacterAsync();
@@ -77,9 +95,52 @@ namespace MDRNJfitness.ViewModels
                     Achievements.Add(a);
                 HasNoAchievements = Achievements.Count == 0;
 
+                // After achievements: their payouts and gear changes can raise power
+                ShowDungeon(await _game.GetDungeonAsync());
+
                 var history = await _workout.GetHistoryAsync(1, 5);
                 RecentWorkouts.Clear();
                 foreach (var w in history) RecentWorkouts.Add(w);
             });
+
+        [RelayCommand]
+        public async Task CollectAsync()
+        {
+            var collected = 0;
+            await RunSafeAsync(async () =>
+            {
+                var result = await _game.CollectDungeonAsync();
+                collected = result.Collected;
+                ShowDungeon(result.Dungeon);
+                if (Stats is not null)
+                {
+                    Stats.Gold = result.Gold;
+                    OnPropertyChanged(nameof(GoldText));
+                }
+            });
+            if (collected == 0) return;
+
+            CollectMessage = $"+{collected} gold!";
+            await Task.Delay(2500);
+            CollectMessage = string.Empty;
+        }
+
+        /// <summary>Called every second while Home is open.</summary>
+        public void UpdatePendingGold()
+        {
+            if (Dungeon is null)
+            {
+                PendingGold = 0;
+                return;
+            }
+            var elapsed = TimeSpan.FromSeconds(Dungeon.SecondsAccrued) + _sinceDungeonFetch.Elapsed;
+            PendingGold = DungeonRules.PendingGold(Dungeon.Power, elapsed);
+        }
+
+        private void ShowDungeon(DungeonDto dungeon)
+        {
+            _sinceDungeonFetch.Restart();
+            Dungeon = dungeon;
+        }
     }
 }

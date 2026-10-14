@@ -47,49 +47,49 @@
                 </HorizontalStackLayout>
             </Grid>
 
-            <!-- Hero card -->
+            <!-- Dungeon: the hero slays monsters for gold while you're away -->
             <Border Style="{StaticResource PxPanel}" Padding="0">
                 <VerticalStackLayout>
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16" Padding="16,16,16,0">
-                        <!-- Stage -->
-                        <Border Grid.Column="0" Style="{StaticResource PxSunken}" WidthRequest="120" HeightRequest="150">
-                            <Grid RowDefinitions="*,22">
-                                <BoxView Grid.Row="1" Color="{StaticResource PxPanelRaised}" />
-                                <local:PixelAvatarView Grid.RowSpan="2"
-                                                       AvatarType="{Binding HeroOutfit}"
-                                                       AvatarId="{Binding HeroAvatarId}"
-                                                       Gear="{Binding Hero, Converter={StaticResource GearList}}"
-                                                       WidthRequest="96"
-                                                       HeightRequest="96"
-                                                       VerticalOptions="End"
-                                                       Margin="0,0,0,10" />
-                            </Grid>
-                        </Border>
+                    <local:DungeonView HeightRequest="190"
+                                       AvatarType="{Binding HeroOutfit}"
+                                       AvatarId="{Binding HeroAvatarId}"
+                                       Gear="{Binding Hero, Converter={StaticResource GearList}}"
+                                       MonsterId="{Binding MonsterId}" />
 
-                        <VerticalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
-                            <Label Style="{StaticResource PxMuted}" Text="Welcome back," />
-                            <Label Style="{StaticResource PxTitle}"
-                                   Text="{Binding UserName}"
-                                   TextTransform="Uppercase"
-                                   LineBreakMode="TailTruncation" />
-                            <Border Style="{StaticResource PxChip}" Margin="0,8,0,0">
-                                <Label Style="{StaticResource PxHeading}"
-                                       TextColor="{StaticResource PxGoldInk}"
-                                       Text="{Binding Stats.CurrentLevel, StringFormat='LV {0}'}" />
-                            </Border>
-                        </VerticalStackLayout>
-                    </Grid>
-
-                    <VerticalStackLayout Padding="16,18,16,18" Spacing="8">
+                    <VerticalStackLayout Padding="16,14,16,16" Spacing="10">
                         <Grid ColumnDefinitions="*,Auto">
                             <Label Grid.Column="0" Style="{StaticResource PxHeading}" FontSize="10"
-                                   TextColor="{StaticResource PxGold}" Text="XP" VerticalOptions="Center" />
-                            <Label Grid.Column="1" Style="{StaticResource PxMuted}"
-                                   Text="{Binding Stats.TotalXP, StringFormat='{0:N0} total'}" />
+                                   TextColor="{StaticResource PxGold}" Text="{Binding DungeonTitle}"
+                                   VerticalOptions="Center" LineBreakMode="TailTruncation" />
+                            <Label Grid.Column="1" Style="{StaticResource PxBody}"
+                                   TextColor="{StaticResource PxTeal}" Text="{Binding PowerText}" />
                         </Grid>
-                        <controls:XPBarControl Progress="{Binding XPProgress}" HeightRequest="20" />
-                        <Label Style="{StaticResource PxMuted}"
-                               Text="{Binding Stats.XPToNextLevel, StringFormat='{0:N0} XP to next level'}" />
+
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                            <Image Grid.Column="0" Source="icon_gold.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                            <controls:XPBarControl Grid.Column="1" Progress="{Binding PendingProgress}" HeightRequest="16" VerticalOptions="Center" />
+                            <Label Grid.Column="2" Style="{StaticResource PxBody}" TextColor="{StaticResource PxGold}"
+                                   Text="{Binding PendingText}" VerticalOptions="Center" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                            <Label Grid.Column="0" Style="{StaticResource PxMuted}" Text="{Binding RateText}" VerticalOptions="Center">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsDungeonFull}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource PxOrange}" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                            <Button Grid.Column="1"
+                                    Style="{StaticResource PxButton}"
+                                    Text="COLLECT"
+                                    Command="{Binding CollectCommand}"
+                                    IsEnabled="{Binding CanCollect}" />
+                        </Grid>
+
+                        <Label Style="{StaticResource PxBody}" TextColor="{StaticResource PxGold}"
+                               Text="{Binding CollectMessage}" HorizontalOptions="Center"
+                               IsVisible="{Binding HasCollectMessage}" />
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </Border>

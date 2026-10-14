@@ -7,5 +7,7 @@ namespace MDRNJfitness.Services.Interfaces
         Task<GameStatsDto> GetStatsAsync();
         Task CheckAchievementsAsync();
         Task<List<AchievementDto>> GetAchievementsAsync();
+        Task<DungeonDto> GetDungeonAsync();
+        Task<DungeonCollectDto> CollectDungeonAsync();
     }
 }

@@ -27,10 +27,11 @@
 
         <CollectionView.ItemTemplate>
             <DataTemplate>
-                <Border Style="{StaticResource PxPanel}" Padding="8,10">
+                <Border Style="{StaticResource PxPanel}" Padding="8,10" Stroke="{Binding RarityBrush}" StrokeThickness="3">
+                    <!-- Outline = rarity; equipped items get a thicker one (gold is Legendary) -->
                     <Border.Triggers>
                         <DataTrigger TargetType="Border" Binding="{Binding Equipped}" Value="True">
-                            <Setter Property="Stroke" Value="{StaticResource PxGold}" />
+                            <Setter Property="StrokeThickness" Value="6" />
                         </DataTrigger>
                     </Border.Triggers>
                     <Border.GestureRecognizers>
@@ -44,6 +45,7 @@
                         </Border>
                         <Label Style="{StaticResource PxBody}" FontSize="18" Text="{Binding Item.Name}"
                                HorizontalTextAlignment="Center" LineBreakMode="TailTruncation" MaxLines="2" />
+                        <Label Style="{StaticResource PxBody}" FontSize="17" Text="{Binding Item.BonusText}" TextColor="{StaticResource PxTeal}" HorizontalOptions="Center" />
                         <Label Style="{StaticResource PxCaption}" Text="{Binding SlotName}" HorizontalOptions="Center">
                             <Label.Triggers>
                                 <DataTrigger TargetType="Label" Binding="{Binding Equipped}" Value="True">

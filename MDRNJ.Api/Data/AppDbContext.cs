@@ -67,6 +67,8 @@ namespace MDRNJ.Api.Data
                  .OnDelete(DeleteBehavior.Cascade);
                 // Existing accounts get the starting gold when the column is added
                 e.Property(g => g.Gold).HasDefaultValue(MDRNJ.Shared.Game.GoldRules.StartingGold);
+                // Existing heroes start their first dungeon run when the column is added
+                e.Property(g => g.DungeonCollectedAt).HasDefaultValueSql("GETUTCDATE()");
             });
 
             // WorkoutSessionEntity

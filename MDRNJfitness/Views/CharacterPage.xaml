@@ -45,6 +45,24 @@
                        HorizontalOptions="Center" />
             </VerticalStackLayout>
 
+            <!-- Level & XP (moved here from Home) -->
+            <Border Style="{StaticResource PxPanel}">
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border Grid.Column="0" Style="{StaticResource PxChip}">
+                            <Label Style="{StaticResource PxHeading}"
+                                   TextColor="{StaticResource PxGoldInk}"
+                                   Text="{Binding Stats.CurrentLevel, StringFormat='LV {0}'}" />
+                        </Border>
+                        <Label Grid.Column="2" Style="{StaticResource PxMuted}" VerticalOptions="Center"
+                               Text="{Binding Stats.TotalXP, StringFormat='{0:N0} XP total'}" />
+                    </Grid>
+                    <controls:XPBarControl Progress="{Binding XPProgress}" HeightRequest="20" />
+                    <Label Style="{StaticResource PxMuted}"
+                           Text="{Binding Stats.XPToNextLevel, StringFormat='{0:N0} XP to next level'}" />
+                </VerticalStackLayout>
+            </Border>
+
             <!-- Stats -->
             <Border Style="{StaticResource PxPanel}">
                 <VerticalStackLayout Spacing="14">
@@ -54,28 +72,30 @@
                                TextColor="{StaticResource PxStr}" Text="STR" VerticalOptions="Center" />
                         <controls:XPBarControl Grid.Row="0" Grid.Column="1" HeightRequest="16" VerticalOptions="Center"
                                                FillColor="{StaticResource PxStr}"
-                                               Progress="{Binding ActivityScore.StrengthPoints, Converter={StaticResource StatLevelProgress}}" />
+                                               Progress="{Binding StrengthPoints, Converter={StaticResource StatLevelProgress}}" />
                         <Label Grid.Row="0" Grid.Column="2" Style="{StaticResource PxBody}" HorizontalTextAlignment="End"
-                               Text="{Binding ActivityScore.StrengthPoints, Converter={StaticResource StatLevel}, StringFormat='Lv {0}'}" />
+                               Text="{Binding StrengthPoints, Converter={StaticResource StatLevel}, StringFormat='Lv {0}'}" />
 
                         <Label Grid.Row="1" Grid.Column="0" Style="{StaticResource PxHeading}" FontSize="10"
                                TextColor="{StaticResource PxTeal}" Text="END" VerticalOptions="Center" />
                         <controls:XPBarControl Grid.Row="1" Grid.Column="1" HeightRequest="16" VerticalOptions="Center"
                                                FillColor="{StaticResource PxTeal}"
-                                               Progress="{Binding ActivityScore.CardioPoints, Converter={StaticResource StatLevelProgress}}" />
+                                               Progress="{Binding EndurancePoints, Converter={StaticResource StatLevelProgress}}" />
                         <Label Grid.Row="1" Grid.Column="2" Style="{StaticResource PxBody}" HorizontalTextAlignment="End"
-                               Text="{Binding ActivityScore.CardioPoints, Converter={StaticResource StatLevel}, StringFormat='Lv {0}'}" />
+                               Text="{Binding EndurancePoints, Converter={StaticResource StatLevel}, StringFormat='Lv {0}'}" />
 
                         <Label Grid.Row="2" Grid.Column="0" Style="{StaticResource PxHeading}" FontSize="10"
                                TextColor="{StaticResource PxFlx}" Text="FLX" VerticalOptions="Center" />
                         <controls:XPBarControl Grid.Row="2" Grid.Column="1" HeightRequest="16" VerticalOptions="Center"
                                                FillColor="{StaticResource PxFlx}"
-                                               Progress="{Binding ActivityScore.FlexibilityPoints, Converter={StaticResource StatLevelProgress}}" />
+                                               Progress="{Binding FlexibilityPoints, Converter={StaticResource StatLevelProgress}}" />
                         <Label Grid.Row="2" Grid.Column="2" Style="{StaticResource PxBody}" HorizontalTextAlignment="End"
-                               Text="{Binding ActivityScore.FlexibilityPoints, Converter={StaticResource StatLevel}, StringFormat='Lv {0}'}" />
+                               Text="{Binding FlexibilityPoints, Converter={StaticResource StatLevel}, StringFormat='Lv {0}'}" />
                     </Grid>
+                    <Label Style="{StaticResource PxBody}" FontSize="18" TextColor="{StaticResource PxGold}"
+                           Text="{Binding GearBonusText}" IsVisible="{Binding HasGearBonus}" />
                     <Label Style="{StaticResource PxMuted}" FontSize="17"
-                           Text="STR = Strength · END = Cardio · FLX = Flexibility. Stats grow from workouts, quests and challenges." />
+                           Text="STR = Strength · END = Cardio · FLX = Flexibility. Stats grow from workouts, quests and challenges; gear adds a boost." />
                 </VerticalStackLayout>
             </Border>
 
@@ -95,12 +115,9 @@
                                                               CommandParameter="{Binding .}" />
                                     </VerticalStackLayout.GestureRecognizers>
 
-                                    <Border Style="{StaticResource PxSunken}" HeightRequest="58" Padding="6">
-                                        <Border.Triggers>
-                                            <DataTrigger TargetType="Border" Binding="{Binding IsEmpty}" Value="False">
-                                                <Setter Property="Stroke" Value="{StaticResource PxGold}" />
-                                            </DataTrigger>
-                                        </Border.Triggers>
+                                    <!-- Outline = the worn item's rarity -->
+                                    <Border Style="{StaticResource PxSunken}" HeightRequest="58" Padding="6"
+                                            Stroke="{Binding RarityBrush}" StrokeThickness="3">
                                         <Grid>
                                             <local:GearIconView ItemId="{Binding ItemId}" />
                                             <Label Text="+" FontFamily="PixelBody" FontSize="28"
