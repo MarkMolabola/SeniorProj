@@ -28,6 +28,8 @@ namespace MDRNJ.Api.Services
 
             if (requesterId == addressee.UserId)
                 throw new InvalidOperationException("Cannot send friend request to yourself.");
+            if (await _db.IsBlockedEitherWayAsync(requesterId, addressee.UserId))
+                throw new InvalidOperationException("You can't add this player.");
 
             var friendship = await _db.Friendships.FirstOrDefaultAsync(f =>
                 (f.RequesterId == requesterId && f.AddresseeId == addressee.UserId) ||
@@ -159,6 +161,7 @@ namespace MDRNJ.Api.Services
                 AvatarUrl = user.AvatarUrl,
                 Relationship = relationship,
                 PendingFriendshipId = relationship == FriendRelationship.RequestReceived ? friendship!.FriendshipId : null,
+                IsBlocked = await _db.UserBlocks.AnyAsync(b => b.BlockerId == requestingUserId && b.BlockedId == friendUserId),
                 CurrentLevel = stats?.CurrentLevel ?? 1,
                 TotalXP = stats?.TotalXP ?? 0,
                 TotalWorkouts = stats?.TotalWorkouts ?? 0,

@@ -27,6 +27,8 @@ namespace MDRNJ.Api.Data
         public DbSet<ChatChannelEntity> ChatChannels => Set<ChatChannelEntity>();
         public DbSet<ChatMemberEntity> ChatMembers => Set<ChatMemberEntity>();
         public DbSet<ChatMessageEntity> ChatMessages => Set<ChatMessageEntity>();
+        public DbSet<ChatReportEntity> ChatReports => Set<ChatReportEntity>();
+        public DbSet<UserBlockEntity> UserBlocks => Set<UserBlockEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -286,6 +288,38 @@ namespace MDRNJ.Api.Data
                  .OnDelete(DeleteBehavior.Cascade);
                 e.HasIndex(m => new { m.ChannelId, m.SentAt });
                 e.HasIndex(m => new { m.SenderId, m.SentAt });
+            });
+
+            // ChatReportEntity — the reporter link is Restrict (a second cascade path
+            // from Users via ChatMessages isn't allowed); account deletion removes reports first
+            modelBuilder.Entity<ChatReportEntity>(e =>
+            {
+                e.HasKey(r => r.ReportId);
+                e.Property(r => r.Reason).HasMaxLength(40).IsRequired();
+                e.HasOne(r => r.Message)
+                 .WithMany()
+                 .HasForeignKey(r => r.MessageId)
+                 .OnDelete(DeleteBehavior.Cascade);
+                e.HasOne(r => r.Reporter)
+                 .WithMany()
+                 .HasForeignKey(r => r.ReporterId)
+                 .OnDelete(DeleteBehavior.Restrict);
+                e.HasIndex(r => new { r.MessageId, r.ReporterId }).IsUnique();
+            });
+
+            // UserBlockEntity — two links to Users, so both Restrict (like friendships)
+            modelBuilder.Entity<UserBlockEntity>(e =>
+            {
+                e.HasKey(b => new { b.BlockerId, b.BlockedId });
+                e.HasOne(b => b.Blocker)
+                 .WithMany()
+                 .HasForeignKey(b => b.BlockerId)
+                 .OnDelete(DeleteBehavior.Restrict);
+                e.HasOne(b => b.Blocked)
+                 .WithMany()
+                 .HasForeignKey(b => b.BlockedId)
+                 .OnDelete(DeleteBehavior.Restrict);
+                e.HasIndex(b => b.BlockedId);
             });
         }
     }

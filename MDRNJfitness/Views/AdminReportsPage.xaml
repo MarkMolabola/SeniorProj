@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Admins: review reported chat messages. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MDRNJfitness.Views.AdminReportsPage"
+             Title="{Binding Title}"
+             Style="{StaticResource PxPage}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,16,20,32" Spacing="16">
+
+            <Button Style="{StaticResource PxButtonSecondary}"
+                    Text="◀ BACK"
+                    HorizontalOptions="Start"
+                    Clicked="OnBackClicked" />
+
+            <Label Style="{StaticResource PxTitle}" Text="REPORTS" />
+            <Label Style="{StaticResource PxMuted}"
+                   Text="Messages players reported, most reports first. Messages with 3+ reports are already hidden. DELETE removes it for everyone; KEEP clears the reports and shows it again." />
+
+            <Border Style="{StaticResource PxPanel}" IsVisible="{Binding HasNoReports}">
+                <Label Style="{StaticResource PxMuted}" Text="Nothing to review. The tavern is peaceful." />
+            </Border>
+
+            <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding Reports}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource PxPanel}" Padding="14,12">
+                            <VerticalStackLayout Spacing="8">
+                                <Label Style="{StaticResource PxCaption}" Text="{Binding Header}" TextColor="{StaticResource PxTeal}">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.OpenSenderCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Border Style="{StaticResource PxSunken}" Padding="10,8">
+                                    <Label Style="{StaticResource PxBody}" Text="{Binding Body}" LineBreakMode="WordWrap" />
+                                </Border>
+                                <Label Style="{StaticResource PxMuted}" TextColor="{StaticResource PxOrange}" Text="{Binding ReportText}" />
+                                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                                    <Button Grid.Column="0"
+                                            Style="{StaticResource PxButtonSecondary}"
+                                            Text="KEEP"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.KeepCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    <Button Grid.Column="1"
+                                            Style="{StaticResource PxButtonDanger}"
+                                            Text="DELETE"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteCommand}"
+                                            CommandParameter="{Binding .}" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

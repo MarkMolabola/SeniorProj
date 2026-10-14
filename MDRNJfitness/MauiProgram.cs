@@ -112,6 +112,7 @@ namespace MDRNJfitness
             builder.Services.AddTransient<CollectionViewModel>();
             builder.Services.AddTransient<ChatListViewModel>();
             builder.Services.AddTransient<ChatRoomViewModel>();
+            builder.Services.AddTransient<AdminReportsViewModel>();
 
             // Pages
             builder.Services.AddTransient<LoginPage>();
@@ -130,6 +131,7 @@ namespace MDRNJfitness
             builder.Services.AddTransient<CollectionPage>();
             builder.Services.AddTransient<ChatPage>();
             builder.Services.AddTransient<ChatRoomPage>();
+            builder.Services.AddTransient<AdminReportsPage>();
 
             return builder.Build();
         }

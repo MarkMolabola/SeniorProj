@@ -37,6 +37,7 @@
         <CollectionView x:Name="MessageList"
                         Grid.Row="1"
                         ItemsSource="{Binding Messages}"
+                        ItemsUpdatingScrollMode="KeepLastItemInView"
                         SelectionMode="None">
             <CollectionView.Header>
                 <Button Style="{StaticResource PxLinkButton}"
@@ -65,6 +66,12 @@
                             </Label.GestureRecognizers>
                         </Label>
                         <Border Style="{StaticResource PxPanel}" Padding="12,8" HorizontalOptions="{Binding Alignment}">
+                            <!-- Tap a message to delete, report or block -->
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.MessageActionsCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
                             <Border.Triggers>
                                 <DataTrigger TargetType="Border" Binding="{Binding IsMine}" Value="True">
                                     <Setter Property="BackgroundColor" Value="{StaticResource PxTrack}" />

@@ -20,6 +20,9 @@ namespace MDRNJfitness.SignalR
         /// <summary>Something changed in one of the user's group/direct chats (refresh the list).</summary>
         public event Action<Guid>? ChannelActivity;
 
+        /// <summary>A message was deleted or hidden after reports: (channelId, messageId).</summary>
+        public event Action<Guid, Guid>? MessageDeleted;
+
         public async Task ConnectAsync()
         {
             await _gate.WaitAsync();
@@ -38,6 +41,7 @@ namespace MDRNJfitness.SignalR
 
                 _connection.On<ChatMessageDto>("MessageReceived", m => MessageReceived?.Invoke(m));
                 _connection.On<Guid>("ChannelActivity", id => ChannelActivity?.Invoke(id));
+                _connection.On<Guid, Guid>("MessageDeleted", (channelId, messageId) => MessageDeleted?.Invoke(channelId, messageId));
 
                 // Hub groups don't survive a reconnect: rejoin the open chat
                 _connection.Reconnected += async _ =>

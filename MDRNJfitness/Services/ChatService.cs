@@ -45,5 +45,17 @@ namespace MDRNJfitness.Services
 
         public Task LeaveGroupAsync(Guid channelId) =>
             _http.PostAsync($"api/chat/groups/{channelId}/leave", new { });
+
+        public Task ReportMessageAsync(Guid messageId, string reason) =>
+            _http.PostAsync($"api/chat/messages/{messageId}/report", new ReportChatMessageDto { Reason = reason });
+
+        public Task DeleteMessageAsync(Guid messageId) =>
+            _http.DeleteAsync($"api/chat/messages/{messageId}");
+
+        public Task<List<ReportedMessageDto>> GetReportsAsync() =>
+            _http.GetAsync<List<ReportedMessageDto>>("api/chat/reports")!;
+
+        public Task DismissReportsAsync(Guid messageId) =>
+            _http.PostAsync($"api/chat/reports/{messageId}/dismiss", new { });
     }
 }

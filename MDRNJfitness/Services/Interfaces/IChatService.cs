@@ -13,5 +13,11 @@ namespace MDRNJfitness.Services.Interfaces
         Task<ChatChannelDto> CreateGroupAsync(string name, List<Guid> memberIds);
         Task<List<ChatMemberDto>> AddMembersAsync(Guid channelId, List<Guid> userIds);
         Task LeaveGroupAsync(Guid channelId);
+
+        // Moderation
+        Task ReportMessageAsync(Guid messageId, string reason);
+        Task DeleteMessageAsync(Guid messageId);
+        Task<List<ReportedMessageDto>> GetReportsAsync();
+        Task DismissReportsAsync(Guid messageId);
     }
 }

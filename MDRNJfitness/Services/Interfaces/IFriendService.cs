@@ -11,5 +11,9 @@ namespace MDRNJfitness.Services.Interfaces
         Task DeclineRequestAsync(Guid friendshipId);
         Task RemoveFriendAsync(Guid userId);
         Task<FriendPublicProfileDto> GetFriendProfileAsync(Guid userId);
+
+        Task BlockAsync(Guid userId);
+        Task UnblockAsync(Guid userId);
+        Task<List<BlockedUserDto>> GetBlockedAsync();
     }
 }

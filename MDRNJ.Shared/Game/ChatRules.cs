@@ -16,5 +16,22 @@ namespace MDRNJ.Shared.Game
         /// <summary>Spam limit: at most this many messages per user within RateLimitWindow.</summary>
         public const int RateLimitCount = 5;
         public static readonly TimeSpan RateLimitWindow = TimeSpan.FromSeconds(5);
+
+        /// <summary>A message is hidden for everyone once this many players report it (until an admin reviews it).</summary>
+        public const int ReportsToHide = 3;
+
+        /// <summary>Reasons offered when reporting a message.</summary>
+        public static readonly IReadOnlyList<string> ReportReasons = new[]
+        {
+            "Spam", "Harassment or hate", "Sexual or violent content", "Other"
+        };
+
+        /// <summary>Bump to show the rules again after they change.</summary>
+        public const int RulesVersion = 1;
+
+        public const string RulesText =
+            "Be respectful. No harassment, hate speech, threats, sexual content or spam. " +
+            "Tap any message to report it or block its sender. Reported messages are reviewed " +
+            "by admins and removed, and players who break the rules can be banned.";
     }
 }

@@ -23,8 +23,10 @@ namespace MDRNJfitness.ViewModels
         public ObservableCollection<WorkoutDto> RecentWorkouts { get; } = new();
 
         private string Relationship => Profile?.Relationship ?? FriendRelationship.None;
+        public bool IsBlocked => Profile?.IsBlocked ?? false;
+        public bool CanBlock => Profile is not null && !IsBlocked && Relationship != FriendRelationship.Self;
         public bool IsFriend => Relationship == FriendRelationship.Friends;
-        public bool CanAddFriend => Relationship == FriendRelationship.None;
+        public bool CanAddFriend => Relationship == FriendRelationship.None && !IsBlocked;
         public bool IsRequestSent => Relationship == FriendRelationship.RequestSent;
         public bool IsRequestReceived => Relationship == FriendRelationship.RequestReceived;
         public bool ShowsWorkouts => IsFriend || Relationship == FriendRelationship.Self;
@@ -51,6 +53,8 @@ namespace MDRNJfitness.ViewModels
             OnPropertyChanged(nameof(IsRequestReceived));
             OnPropertyChanged(nameof(ShowsWorkouts));
             OnPropertyChanged(nameof(HidesWorkouts));
+            OnPropertyChanged(nameof(IsBlocked));
+            OnPropertyChanged(nameof(CanBlock));
         }
 
         [RelayCommand]
@@ -94,6 +98,28 @@ namespace MDRNJfitness.ViewModels
                 if (Profile is null) return;
                 var channel = await _chat.OpenDirectAsync(Profile.UserId);
                 await Shell.Current.GoToAsync("ChatRoomPage", new ShellNavigationQueryParameters { ["channel"] = channel });
+            });
+
+        [RelayCommand]
+        public async Task BlockAsync() =>
+            await RunSafeAsync(async () =>
+            {
+                if (Profile is null) return;
+                if (!await Shell.Current.DisplayAlertAsync($"Block {Profile.Username}?",
+                        "You won't see their chat messages, any friendship ends, and they can't friend or message you. Unblock any time.",
+                        "Block", "Cancel"))
+                    return;
+                await _friends.BlockAsync(Profile.UserId);
+                await ReloadAsync();
+            });
+
+        [RelayCommand]
+        public async Task UnblockAsync() =>
+            await RunSafeAsync(async () =>
+            {
+                if (Profile is null) return;
+                await _friends.UnblockAsync(Profile.UserId);
+                await ReloadAsync();
             });
 
         [RelayCommand]

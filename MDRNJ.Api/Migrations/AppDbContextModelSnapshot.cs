@@ -329,6 +329,9 @@ namespace MDRNJ.Api.Migrations
                     b.Property<Guid>("ChannelId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("SenderId")
                         .HasColumnType("uniqueidentifier");
 
@@ -342,6 +345,36 @@ namespace MDRNJ.Api.Migrations
                     b.HasIndex("SenderId", "SentAt");
 
                     b.ToTable("ChatMessages");
+                });
+
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChatReportEntity", b =>
+                {
+                    b.Property<Guid>("ReportId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<Guid>("ReporterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ReportId");
+
+                    b.HasIndex("ReporterId");
+
+                    b.HasIndex("MessageId", "ReporterId")
+                        .IsUnique();
+
+                    b.ToTable("ChatReports");
                 });
 
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.ExerciseEntity", b =>
@@ -551,6 +584,24 @@ namespace MDRNJ.Api.Migrations
                     b.HasIndex("AchievementId");
 
                     b.ToTable("UserAchievements");
+                });
+
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.UserBlockEntity", b =>
+                {
+                    b.Property<Guid>("BlockerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BlockedId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("BlockerId", "BlockedId");
+
+                    b.HasIndex("BlockedId");
+
+                    b.ToTable("UserBlocks");
                 });
 
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.UserEntity", b =>
@@ -853,6 +904,25 @@ namespace MDRNJ.Api.Migrations
                     b.Navigation("Sender");
                 });
 
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.ChatReportEntity", b =>
+                {
+                    b.HasOne("MDRNJ.Api.Data.Entities.ChatMessageEntity", "Message")
+                        .WithMany()
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "Reporter")
+                        .WithMany()
+                        .HasForeignKey("ReporterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Message");
+
+                    b.Navigation("Reporter");
+                });
+
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.ExerciseEntity", b =>
                 {
                     b.HasOne("MDRNJ.Api.Data.Entities.WorkoutSessionEntity", "Session")
@@ -922,6 +992,25 @@ namespace MDRNJ.Api.Migrations
                     b.Navigation("Achievement");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.UserBlockEntity", b =>
+                {
+                    b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "Blocked")
+                        .WithMany()
+                        .HasForeignKey("BlockedId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "Blocker")
+                        .WithMany()
+                        .HasForeignKey("BlockerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Blocked");
+
+                    b.Navigation("Blocker");
                 });
 
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.UserGearEntity", b =>

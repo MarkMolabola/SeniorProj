@@ -49,7 +49,9 @@ namespace MDRNJ.Api.Services
                 })
                 .ToListAsync();
 
+            var blocked = await _db.BlockedByAsync(userId);
             var rows = mine
+                .Where(x => !(x.Channel.Kind == ChatChannelKind.Direct && x.Other is not null && blocked.Contains(x.Other.UserId)))
                 .Select(x => ToDto(x.Channel, userId, x.MemberCount, x.Other?.UserId, x.Other?.Username, x.Unread))
                 .OrderByDescending(c => c.LastMessageAt ?? DateTime.MinValue)
                 .ToList();
@@ -67,7 +69,8 @@ namespace MDRNJ.Api.Services
             await EnsureAccessAsync(userId, channelId);
             take = Math.Clamp(take, 1, 100);
 
-            var query = _db.ChatMessages.Where(m => m.ChannelId == channelId);
+            var blocked = await _db.BlockedByAsync(userId);
+            var query = _db.ChatMessages.Where(m => m.ChannelId == channelId && !m.IsHidden && !blocked.Contains(m.SenderId));
             if (before is not null)
                 query = query.Where(m => m.SentAt < before);
 
@@ -100,9 +103,20 @@ namespace MDRNJ.Api.Services
                 throw new ArgumentException("Type a message first.");
             if (body.Length > ChatRules.MaxMessageLength)
                 throw new ArgumentException($"Messages can be up to {ChatRules.MaxMessageLength} characters.");
+            body = ContentFilter.Clean(body);
 
             await EnsureAccessAsync(userId, channelId);
             var channel = await _db.ChatChannels.FirstAsync(c => c.ChannelId == channelId);
+
+            if (channel.Kind == ChatChannelKind.Direct)
+            {
+                var otherId = await _db.ChatMembers
+                    .Where(m => m.ChannelId == channelId && m.UserId != userId)
+                    .Select(m => (Guid?)m.UserId)
+                    .FirstOrDefaultAsync();
+                if (otherId is Guid other && await _db.IsBlockedEitherWayAsync(userId, other))
+                    throw new InvalidOperationException("You can't message this player.");
+            }
 
             var now = DateTime.UtcNow;
             var cutoff = now - ChatRules.RateLimitWindow;
@@ -115,7 +129,7 @@ namespace MDRNJ.Api.Services
             _db.ChatMessages.Add(message);
 
             channel.LastMessageAt = now;
-            channel.LastMessagePreview = body.Length <= 120 ? body : body[..117] + "...";
+            channel.LastMessagePreview = Preview(body);
             channel.LastSenderName = senderName;
 
             var membership = await _db.ChatMembers.FirstOrDefaultAsync(m => m.ChannelId == channelId && m.UserId == userId);
@@ -175,6 +189,8 @@ namespace MDRNJ.Api.Services
             var other = await _db.Users.Where(u => u.UserId == otherUserId).Select(u => new { u.UserId, u.Username }).FirstOrDefaultAsync()
                 ?? throw new KeyNotFoundException("User not found.");
 
+            if (await _db.IsBlockedEitherWayAsync(userId, otherUserId))
+                throw new InvalidOperationException("You can't message this player.");
             if (!await AreFriendsAsync(userId, otherUserId))
                 throw new InvalidOperationException("You can only message friends. Send a friend request first.");
 
@@ -194,7 +210,7 @@ namespace MDRNJ.Api.Services
 
         public async Task<ChatChannelDto> CreateGroupAsync(Guid userId, CreateChatGroupDto dto)
         {
-            var name = (dto.Name ?? string.Empty).Trim();
+            var name = ContentFilter.Clean((dto.Name ?? string.Empty).Trim());
             if (name.Length == 0)
                 throw new ArgumentException("Give your group a name.");
             if (name.Length > ChatRules.MaxGroupNameLength)
@@ -256,6 +272,23 @@ namespace MDRNJ.Api.Services
                 await NotifyMembersAsync(channelId);
         }
 
+        public async Task RefreshPreviewAsync(Guid channelId)
+        {
+            var channel = await _db.ChatChannels.FirstOrDefaultAsync(c => c.ChannelId == channelId);
+            if (channel is null) return;
+
+            var last = await _db.ChatMessages
+                .Where(m => m.ChannelId == channelId && !m.IsHidden)
+                .OrderByDescending(m => m.SentAt)
+                .Select(m => new { m.Body, m.SentAt, m.Sender.Username })
+                .FirstOrDefaultAsync();
+
+            channel.LastMessageAt = last?.SentAt;
+            channel.LastMessagePreview = last is null ? null : Preview(last.Body);
+            channel.LastSenderName = last?.Username;
+            await _db.SaveChangesAsync();
+        }
+
         // ── Helpers ─────────────────────────────────────────────
 
         private async Task EnsureAccessAsync(Guid userId, Guid channelId)
@@ -301,6 +334,9 @@ namespace MDRNJ.Api.Services
                 .ToListAsync();
             await _hub.Clients.Users(memberIds).SendAsync("ChannelActivity", channelId);
         }
+
+        /// <summary>Chat list preview of a message (first 120 characters).</summary>
+        public static string Preview(string body) => body.Length <= 120 ? body : body[..117] + "...";
 
         private static string DirectKey(Guid a, Guid b)
         {

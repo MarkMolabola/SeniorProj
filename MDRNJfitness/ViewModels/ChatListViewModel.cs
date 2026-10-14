@@ -1,6 +1,8 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MDRNJ.Shared.DTOs.Chat;
 using MDRNJ.Shared.Game;
+using MDRNJfitness.Helpers;
 using MDRNJfitness.Models.Social;
 using MDRNJfitness.Services.Interfaces;
 using MDRNJfitness.SignalR;
@@ -14,15 +16,20 @@ namespace MDRNJfitness.ViewModels
         private readonly IChatService _chat;
         private readonly IFriendService _friends;
         private readonly ChatHubClient _hub;
+        private readonly IAuthService _auth;
         private bool _visible;
+
+        /// <summary>Admins get a REPORTS button for the moderation queue.</summary>
+        [ObservableProperty] private bool _isAdmin;
 
         public ObservableCollection<ChatChannelCard> Channels { get; } = new();
 
-        public ChatListViewModel(IChatService chat, IFriendService friends, ChatHubClient hub)
+        public ChatListViewModel(IChatService chat, IFriendService friends, ChatHubClient hub, IAuthService auth)
         {
             _chat = chat;
             _friends = friends;
             _hub = hub;
+            _auth = auth;
             _hub.ChannelActivity += OnChannelActivity;
             Title = "Chat";
         }
@@ -30,6 +37,7 @@ namespace MDRNJfitness.ViewModels
         public async Task AppearingAsync()
         {
             _visible = true;
+            IsAdmin = (await _auth.GetCurrentUserAsync())?.IsAdmin ?? false;
             await LoadAsync();
             try { await _hub.ConnectAsync(); }
             catch (Exception ex)
@@ -64,6 +72,7 @@ namespace MDRNJfitness.ViewModels
         public async Task NewGroupAsync() =>
             await RunSafeAsync(async () =>
             {
+                if (!await ChatRulesGate.EnsureAcceptedAsync()) return;
                 var name = await Shell.Current.DisplayPromptAsync(
                     "NEW GROUP", "Name your group or guild. You can add friends once it's made.",
                     "CREATE", "Cancel", "e.g. Iron Guild", ChatRules.MaxGroupNameLength);
@@ -77,6 +86,7 @@ namespace MDRNJfitness.ViewModels
         public async Task NewDirectAsync() =>
             await RunSafeAsync(async () =>
             {
+                if (!await ChatRulesGate.EnsureAcceptedAsync()) return;
                 var friends = await _friends.GetFriendsAsync();
                 if (friends.Count == 0)
                 {
@@ -92,6 +102,9 @@ namespace MDRNJfitness.ViewModels
 
                 await OpenChannelAsync(await _chat.OpenDirectAsync(friend.UserId));
             });
+
+        [RelayCommand]
+        public Task OpenReportsAsync() => Shell.Current.GoToAsync("AdminReportsPage");
 
         private static Task OpenChannelAsync(ChatChannelDto channel) =>
             Shell.Current.GoToAsync("ChatRoomPage", new ShellNavigationQueryParameters { ["channel"] = channel });

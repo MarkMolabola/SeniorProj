@@ -17,5 +17,8 @@ namespace MDRNJ.Api.Services.Interfaces
         Task<ChatChannelDto> CreateGroupAsync(Guid userId, CreateChatGroupDto dto);
         Task<List<ChatMemberDto>> AddMembersAsync(Guid userId, Guid channelId, AddChatMembersDto dto);
         Task LeaveGroupAsync(Guid userId, Guid channelId);
+
+        /// <summary>Re-points a chat's list preview at its newest visible message (after deletes/hides).</summary>
+        Task RefreshPreviewAsync(Guid channelId);
     }
 }

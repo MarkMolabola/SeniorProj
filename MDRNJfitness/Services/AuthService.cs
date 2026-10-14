@@ -91,6 +91,13 @@ namespace MDRNJfitness.Services
             await _userRepo.ClearAsync();
         }
 
+        public async Task DeleteAccountAsync()
+        {
+            await _http.DeleteAsync("api/users/me");
+            TokenStore.Clear();
+            await _userRepo.ClearAsync();
+        }
+
         public async Task<bool> TryResumeSessionAsync()
         {
             if (string.IsNullOrEmpty(await TokenStore.GetRefreshTokenAsync()))

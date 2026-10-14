@@ -130,6 +130,7 @@ builder.Services.AddScoped<IGoalProgressService, GoalProgressService>();
 builder.Services.AddScoped<IGearService, GearService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IDungeonService, DungeonService>();
+builder.Services.AddScoped<IModerationService, ModerationService>();
 builder.Services.AddSingleton<CharacterClassifierService>();
 
 // ── CORS (allows MAUI app to call the API) ─────────

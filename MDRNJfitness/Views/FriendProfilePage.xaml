@@ -132,6 +132,22 @@
                     Command="{Binding RemoveFriendCommand}"
                     IsEnabled="{Binding IsNotBusy}" />
 
+            <!-- Safety -->
+            <Border Style="{StaticResource PxPanel}" IsVisible="{Binding IsBlocked}">
+                <Label Style="{StaticResource PxMuted}" Text="You blocked this player. You won't see their messages." />
+            </Border>
+            <Button Style="{StaticResource PxButtonSecondary}"
+                    Text="UNBLOCK"
+                    IsVisible="{Binding IsBlocked}"
+                    Command="{Binding UnblockCommand}"
+                    IsEnabled="{Binding IsNotBusy}" />
+            <Button Style="{StaticResource PxLinkButton}"
+                    Text="Block player"
+                    TextColor="{StaticResource PxStr}"
+                    HorizontalOptions="Center"
+                    IsVisible="{Binding CanBlock}"
+                    Command="{Binding BlockCommand}" />
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

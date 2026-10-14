@@ -30,5 +30,14 @@ namespace MDRNJfitness.Services
 
         public Task<FriendPublicProfileDto> GetFriendProfileAsync(Guid userId) =>
             _http.GetAsync<FriendPublicProfileDto>($"api/friends/{userId}/profile")!;
+
+        public Task BlockAsync(Guid userId) =>
+            _http.PostAsync($"api/blocks/{userId}", new { });
+
+        public Task UnblockAsync(Guid userId) =>
+            _http.DeleteAsync($"api/blocks/{userId}");
+
+        public Task<List<BlockedUserDto>> GetBlockedAsync() =>
+            _http.GetAsync<List<BlockedUserDto>>("api/blocks")!;
     }
 }

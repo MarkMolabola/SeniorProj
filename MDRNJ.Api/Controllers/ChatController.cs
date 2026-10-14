@@ -15,8 +15,13 @@ namespace MDRNJ.Api.Controllers
     public class ChatController : ControllerBase
     {
         private readonly IChatService _chat;
+        private readonly IModerationService _moderation;
 
-        public ChatController(IChatService chat) => _chat = chat;
+        public ChatController(IChatService chat, IModerationService moderation)
+        {
+            _chat = chat;
+            _moderation = moderation;
+        }
 
         private Guid UserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
@@ -33,6 +38,36 @@ namespace MDRNJ.Api.Controllers
         [HttpPost("channels/{channelId:guid}/messages")]
         public async Task<IActionResult> SendMessage(Guid channelId, [FromBody] SendChatMessageDto dto) =>
             Ok(await _chat.SendMessageAsync(UserId, channelId, dto));
+
+        [HttpPost("messages/{messageId:guid}/report")]
+        public async Task<IActionResult> Report(Guid messageId, [FromBody] ReportChatMessageDto dto)
+        {
+            await _moderation.ReportMessageAsync(UserId, messageId, dto);
+            return NoContent();
+        }
+
+        /// <summary>Your own message, or anyone's for admins.</summary>
+        [HttpDelete("messages/{messageId:guid}")]
+        public async Task<IActionResult> DeleteMessage(Guid messageId)
+        {
+            await _moderation.DeleteMessageAsync(UserId, messageId);
+            return NoContent();
+        }
+
+        /// <summary>Admins: reported messages to review.</summary>
+        [HttpGet("reports")]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<IActionResult> GetReports() =>
+            Ok(await _moderation.GetReportsAsync());
+
+        /// <summary>Admins: the message is fine; clear its reports and show it again.</summary>
+        [HttpPost("reports/{messageId:guid}/dismiss")]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<IActionResult> DismissReports(Guid messageId)
+        {
+            await _moderation.DismissReportsAsync(messageId);
+            return NoContent();
+        }
 
         [HttpPost("channels/{channelId:guid}/read")]
         public async Task<IActionResult> MarkRead(Guid channelId)

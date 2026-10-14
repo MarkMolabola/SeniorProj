@@ -16,6 +16,9 @@ namespace MDRNJ.Shared.DTOs.Friend
         /// <summary>The pending request to accept when Relationship is RequestReceived.</summary>
         public Guid? PendingFriendshipId { get; set; }
 
+        /// <summary>The viewer has blocked this player.</summary>
+        public bool IsBlocked { get; set; }
+
         // Game stats
         public int CurrentLevel { get; set; }
         public int TotalXP { get; set; }

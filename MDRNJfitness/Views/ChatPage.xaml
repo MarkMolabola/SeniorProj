@@ -9,7 +9,14 @@
     <ScrollView>
         <VerticalStackLayout Padding="20,24,20,32" Spacing="20">
 
-            <Label Style="{StaticResource PxTitle}" Text="TAVERN" />
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Grid.Column="0" Style="{StaticResource PxTitle}" Text="TAVERN" VerticalOptions="Center" />
+                <Button Grid.Column="1"
+                        Style="{StaticResource PxButtonSecondary}"
+                        Text="REPORTS"
+                        IsVisible="{Binding IsAdmin}"
+                        Command="{Binding OpenReportsCommand}" />
+            </Grid>
 
             <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                 <Button Grid.Column="0"

@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MDRNJ.Shared.DTOs.Chat;
 using MDRNJ.Shared.Game;
+using MDRNJfitness.Helpers;
 using MDRNJfitness.Models.Social;
 using MDRNJfitness.Services.Interfaces;
 using MDRNJfitness.SignalR;
@@ -17,11 +18,18 @@ namespace MDRNJfitness.ViewModels
         private readonly IAuthService _auth;
         private readonly ChatHubClient _hub;
         private Guid _myId;
+        private bool _isAdmin;
+
+        /// <summary>Players I've blocked: their messages are dropped, including live ones.</summary>
+        private HashSet<Guid> _blocked = new();
 
         [ObservableProperty] private ChatChannelDto? _channel;
         [ObservableProperty] private string _draft = string.Empty;
         [ObservableProperty] private bool _hasOlder;
         [ObservableProperty] private bool _isSending;
+
+        /// <summary>True while older messages are inserted at the top (the page stops pinning the newest).</summary>
+        [ObservableProperty] private bool _isLoadingOlder;
 
         public ObservableCollection<ChatMessageItem> Messages { get; } = new();
 
@@ -63,11 +71,15 @@ namespace MDRNJfitness.ViewModels
         public async Task AppearingAsync()
         {
             if (Channel is null) return;
-            _myId = (await _auth.GetCurrentUserAsync())?.UserId ?? Guid.Empty;
+            var me = await _auth.GetCurrentUserAsync();
+            _myId = me?.UserId ?? Guid.Empty;
+            _isAdmin = me?.IsAdmin ?? false;
             _hub.MessageReceived += OnMessageReceived;
+            _hub.MessageDeleted += OnMessageDeleted;
 
             await RunSafeAsync(async () =>
             {
+                _blocked = (await _friends.GetBlockedAsync()).Select(b => b.UserId).ToHashSet();
                 var page = await _chat.GetMessagesAsync(Channel.ChannelId);
                 Messages.Clear();
                 foreach (var m in page) Messages.Add(ToItem(m));
@@ -86,13 +98,14 @@ namespace MDRNJfitness.ViewModels
         public async Task DisappearingAsync()
         {
             _hub.MessageReceived -= OnMessageReceived;
+            _hub.MessageDeleted -= OnMessageDeleted;
             if (Channel is not null)
                 await _hub.LeaveChannelAsync(Channel.ChannelId);
         }
 
         private void OnMessageReceived(ChatMessageDto message)
         {
-            if (message.ChannelId != Channel?.ChannelId) return;
+            if (message.ChannelId != Channel?.ChannelId || _blocked.Contains(message.SenderId)) return;
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 if (!Add(message)) return;
@@ -102,11 +115,18 @@ namespace MDRNJfitness.ViewModels
             });
         }
 
+        private void OnMessageDeleted(Guid channelId, Guid messageId)
+        {
+            if (channelId != Channel?.ChannelId) return;
+            MainThread.BeginInvokeOnMainThread(() => Remove(messageId));
+        }
+
         [RelayCommand]
         public async Task SendAsync()
         {
             var text = Draft.Trim();
             if (Channel is null || text.Length == 0 || IsSending) return;
+            if (!await ChatRulesGate.EnsureAcceptedAsync()) return;
 
             IsSending = true;
             Draft = string.Empty;
@@ -133,10 +153,82 @@ namespace MDRNJfitness.ViewModels
             {
                 if (Channel is null || Messages.Count == 0) return;
                 var page = await _chat.GetMessagesAsync(Channel.ChannelId, Messages[0].Message.SentAt);
-                for (var i = page.Count - 1; i >= 0; i--)
-                    Messages.Insert(0, ToItem(page[i]));
+                IsLoadingOlder = true;
+                try
+                {
+                    for (var i = page.Count - 1; i >= 0; i--)
+                        if (!_blocked.Contains(page[i].SenderId))
+                            Messages.Insert(0, ToItem(page[i]));
+                }
+                finally
+                {
+                    IsLoadingOlder = false;
+                }
                 HasOlder = page.Count >= ChatRules.PageSize;
             });
+
+        /// <summary>Tap a message: delete (yours, or any for admins), report, or block its sender.</summary>
+        [RelayCommand]
+        public async Task MessageActionsAsync(ChatMessageItem item)
+        {
+            const string delete = "Delete message", report = "Report message";
+            var block = $"Block {item.SenderName}";
+            var actions = new List<string>();
+            if (!item.IsMine) actions.AddRange(new[] { report, block });
+            if (item.IsMine || _isAdmin) actions.Add(delete);
+
+            var choice = await Shell.Current.DisplayActionSheetAsync(Preview(item.Body), "Cancel", null, actions.ToArray());
+            if (choice == delete) await DeleteMessageAsync(item);
+            else if (choice == report) await ReportMessageAsync(item);
+            else if (choice == block) await BlockSenderAsync(item);
+        }
+
+        private async Task DeleteMessageAsync(ChatMessageItem item) =>
+            await RunSafeAsync(async () =>
+            {
+                if (!await Shell.Current.DisplayAlertAsync("Delete message", "Delete this message for everyone?", "Delete", "Cancel"))
+                    return;
+                await _chat.DeleteMessageAsync(item.Message.MessageId);
+                Remove(item.Message.MessageId);
+            });
+
+        private async Task ReportMessageAsync(ChatMessageItem item) =>
+            await RunSafeAsync(async () =>
+            {
+                var reason = await Shell.Current.DisplayActionSheetAsync("Why are you reporting this?", "Cancel", null,
+                    ChatRules.ReportReasons.ToArray());
+                if (reason is null || !ChatRules.ReportReasons.Contains(reason)) return;
+
+                await _chat.ReportMessageAsync(item.Message.MessageId, reason);
+                await Shell.Current.DisplayAlertAsync("Reported",
+                    $"Thanks. Admins will review it. You can also block {item.SenderName} so you don't see their messages.", "OK");
+            });
+
+        private async Task BlockSenderAsync(ChatMessageItem item) =>
+            await RunSafeAsync(async () =>
+            {
+                if (!await Shell.Current.DisplayAlertAsync($"Block {item.SenderName}?",
+                        "You won't see their messages, and they can't friend or message you. Unblock any time from your Profile.",
+                        "Block", "Cancel"))
+                    return;
+
+                await _friends.BlockAsync(item.Message.SenderId);
+                _blocked.Add(item.Message.SenderId);
+                foreach (var m in Messages.Where(m => m.Message.SenderId == item.Message.SenderId).ToList())
+                    Messages.Remove(m);
+
+                // A blocked direct chat is closed for both sides
+                if (IsDirect)
+                    await Shell.Current.GoToAsync("..");
+            });
+
+        private void Remove(Guid messageId)
+        {
+            var item = Messages.FirstOrDefault(m => m.Message.MessageId == messageId);
+            if (item is not null) Messages.Remove(item);
+        }
+
+        private static string Preview(string body) => body.Length <= 60 ? body : body[..57] + "...";
 
         /// <summary>Tap a name to see that player's profile (and add them as a friend).</summary>
         [RelayCommand]

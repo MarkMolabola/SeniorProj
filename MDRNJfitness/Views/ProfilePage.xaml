@@ -111,9 +111,21 @@
                 </VerticalStackLayout>
             </Border>
 
+            <Button Style="{StaticResource PxButtonSecondary}"
+                    Text="BLOCKED PLAYERS"
+                    Command="{Binding ManageBlockedCommand}"
+                    IsEnabled="{Binding IsNotBusy}" />
+
             <Button Style="{StaticResource PxButtonDanger}"
                     Text="LOG OUT"
                     Command="{Binding LogoutCommand}"
+                    IsEnabled="{Binding IsNotBusy}" />
+
+            <Button Style="{StaticResource PxLinkButton}"
+                    Text="Delete account"
+                    TextColor="{StaticResource PxStr}"
+                    HorizontalOptions="Center"
+                    Command="{Binding DeleteAccountCommand}"
                     IsEnabled="{Binding IsNotBusy}" />
 
         </VerticalStackLayout>

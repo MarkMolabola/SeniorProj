@@ -50,6 +50,18 @@ namespace MDRNJfitness.Models.Social
         public LayoutOptions Alignment => IsMine ? LayoutOptions.End : LayoutOptions.Start;
     }
 
+    /// <summary>A reported message in the admin queue.</summary>
+    public class ReportedMessageCard
+    {
+        public ReportedMessageCard(ReportedMessageDto report) => Report = report;
+
+        public ReportedMessageDto Report { get; }
+        public string Header => $"{Report.SenderName} · {Report.ChannelName} · {ChatTime.Short(Report.SentAt)}";
+        public string Body => Report.Body;
+        public string ReportText => $"{Report.ReportCount} report{(Report.ReportCount == 1 ? "" : "s")}: {string.Join(", ", Report.Reasons)}"
+            + (Report.IsHidden ? " · HIDDEN" : "");
+    }
+
     public static class ChatTime
     {
         /// <summary>"3:42 PM" today, "Mon" this week, else "Oct 3". API times are UTC.</summary>

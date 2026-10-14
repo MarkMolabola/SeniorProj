@@ -15,6 +15,9 @@ namespace MDRNJfitness.Services.Interfaces
 
         Task LogoutAsync();
 
+        /// <summary>Permanently deletes the account on the server, then clears the local session.</summary>
+        Task DeleteAccountAsync();
+
         /// <summary>Signs back in with the saved refresh token (app launch). False if there's no valid session.</summary>
         Task<bool> TryResumeSessionAsync();
         Task<UserDto?> GetCurrentUserAsync();
