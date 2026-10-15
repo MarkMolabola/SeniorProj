@@ -194,6 +194,7 @@ namespace MDRNJ.Api.Data
                  .HasForeignKey(c => c.OpponentId)
                  .OnDelete(DeleteBehavior.Restrict);
                 e.HasIndex(c => new { c.ChallengerId, c.Status });
+                e.Property(c => c.DisputeReason).HasMaxLength(200);
                 e.HasIndex(c => new { c.OpponentId, c.Status });
             });
 
@@ -206,6 +207,7 @@ namespace MDRNJ.Api.Data
                  .HasForeignKey(a => a.ChallengeId)
                  .OnDelete(DeleteBehavior.Cascade);
                 e.HasIndex(a => new { a.ChallengeId, a.UserId });
+                e.Property(a => a.ProofPath).HasMaxLength(300);
             });
 
             // QuestEntity

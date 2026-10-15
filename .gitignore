@@ -366,3 +366,6 @@ FodyWeavers.xsd
 *.db-shm
 *.db-wal
 *.db
+
+# Challenge proof uploads (local dev storage)
+MDRNJ.Api/App_Data/

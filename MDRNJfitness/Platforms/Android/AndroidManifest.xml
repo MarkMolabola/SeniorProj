@@ -3,10 +3,21 @@
 	<application android:allowBackup="true" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round" android:supportsRtl="true"></application>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.INTERNET" />
+	<!-- Challenge proof: record a video / take a photo (MediaPicker) -->
+	<uses-permission android:name="android.permission.CAMERA" />
+	<uses-permission android:name="android.permission.RECORD_AUDIO" />
+	<uses-feature android:name="android.hardware.camera" android:required="false" />
 	<!-- Lets WebAuthenticator open Google sign-in in a Chrome Custom Tab (Android 11+) -->
 	<queries>
 		<intent>
 			<action android:name="android.support.customtabs.action.CustomTabsService" />
+		</intent>
+		<!-- Lets MediaPicker open the camera app for challenge proof -->
+		<intent>
+			<action android:name="android.media.action.IMAGE_CAPTURE" />
+		</intent>
+		<intent>
+			<action android:name="android.media.action.VIDEO_CAPTURE" />
 		</intent>
 	</queries>
 </manifest>

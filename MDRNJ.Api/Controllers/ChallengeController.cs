@@ -41,7 +41,23 @@ namespace MDRNJ.Api.Controllers
 
         [HttpPost("{challengeId:guid}/attempts")]
         public async Task<IActionResult> SubmitAttempt(Guid challengeId, [FromBody] SubmitAttemptDto dto) =>
-            Ok(await _challenges.SubmitAttemptAsync(UserId, challengeId, dto.Value));
+            Ok(await _challenges.SubmitAttemptAsync(UserId, challengeId, dto.Value, dto.ProofPath));
+
+        [HttpPost("{challengeId:guid}/proof-upload")]
+        public async Task<IActionResult> CreateProofUpload(Guid challengeId, [FromBody] ProofUploadRequestDto dto) =>
+            Ok(await _challenges.CreateProofUploadAsync(UserId, challengeId, dto.ContentType));
+
+        [HttpGet("{challengeId:guid}/attempts/{attemptId:guid}/proof")]
+        public async Task<IActionResult> GetProofLink(Guid challengeId, Guid attemptId) =>
+            Ok(await _challenges.GetProofLinkAsync(UserId, challengeId, attemptId));
+
+        [HttpPost("{challengeId:guid}/approve")]
+        public async Task<IActionResult> Approve(Guid challengeId) =>
+            Ok(await _challenges.ApproveAsync(UserId, challengeId));
+
+        [HttpPost("{challengeId:guid}/dispute")]
+        public async Task<IActionResult> Dispute(Guid challengeId, [FromBody] DisputeChallengeDto dto) =>
+            Ok(await _challenges.DisputeAsync(UserId, challengeId, dto.Reason));
 
         [HttpPost("{challengeId:guid}/seen")]
         public async Task<IActionResult> MarkSeen(Guid challengeId)

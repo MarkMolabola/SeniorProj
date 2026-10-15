@@ -11,7 +11,7 @@ namespace MDRNJ.Shared.DTOs.Challenge
         public string Scoring { get; set; } = null!;
         public float? DistanceKm { get; set; }
 
-        /// <summary>Pending, Active, Completed, Declined, Expired or Cancelled.</summary>
+        /// <summary>Pending, Active, InReview, Completed, Disputed, Declined, Expired or Cancelled.</summary>
         public string Status { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public DateTime Deadline { get; set; }
@@ -33,6 +33,30 @@ namespace MDRNJ.Shared.DTOs.Challenge
         /// <summary>False until I've seen the result popup.</summary>
         public bool ResultSeen { get; set; }
 
+        /// <summary>Every result needs a video (reps, plank) or photo (run).</summary>
+        public bool RequireProof { get; set; }
+
+        /// <summary>Results go through a review window where either player can dispute.</summary>
+        public bool AllowDisputes { get; set; }
+
+        /// <summary>"Video" or "Photo".</summary>
+        public string ProofKind { get; set; } = string.Empty;
+
+        /// <summary>Proof attached to results so far (both players).</summary>
+        public List<ChallengeProofDto> Proofs { get; set; } = new();
+
+        /// <summary>When the review closes and the result counts, while InReview.</summary>
+        public DateTime? ReviewDeadline { get; set; }
+
+        /// <summary>I can approve or dispute (in review, haven't approved yet).</summary>
+        public bool CanReview { get; set; }
+        public bool IApproved { get; set; }
+        public bool TheyApproved { get; set; }
+
+        /// <summary>Set when Disputed.</summary>
+        public bool DisputedByMe { get; set; }
+        public string? DisputeReason { get; set; }
+
         public bool CanRespond { get; set; }
         public bool CanCancel { get; set; }
         public bool CanSubmit { get; set; }
@@ -42,5 +66,15 @@ namespace MDRNJ.Shared.DTOs.Challenge
 
         /// <summary>Set when this request resolved the challenge.</summary>
         public AccountProgressDto? AccountProgress { get; set; }
+    }
+
+    public class ChallengeProofDto
+    {
+        public Guid AttemptId { get; set; }
+        public bool IsMine { get; set; }
+
+        /// <summary>The result this proof backs (reps, seconds or km).</summary>
+        public float Value { get; set; }
+        public DateTime SubmittedAt { get; set; }
     }
 }

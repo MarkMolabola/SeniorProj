@@ -103,6 +103,16 @@ if (!string.IsNullOrWhiteSpace(builder.Configuration["Email:ConnectionString"]))
 else
     builder.Services.AddSingleton<IEmailService, DevEmailService>();
 
+// ── Challenge proof storage (Azure Blob Storage, or a local folder in dev) ──
+var storageConnection = builder.Configuration["Storage:ConnectionString"];
+if (!string.IsNullOrWhiteSpace(storageConnection))
+    builder.Services.AddSingleton<IProofStorage>(_ =>
+        new BlobProofStorage(storageConnection, builder.Configuration["Storage:ProofContainer"] ?? "proofs"));
+else
+    builder.Services.AddSingleton<IProofStorage>(sp => new LocalProofStorage(
+        Path.Combine(builder.Environment.ContentRootPath, "App_Data", "proofs"),
+        sp.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtectionProvider>()));
+
 // App Service terminates HTTPS at its proxy; trust X-Forwarded-Proto so the
 // Google redirect URI is built as https://.../signin-google.
 builder.Services.Configure<ForwardedHeadersOptions>(options =>

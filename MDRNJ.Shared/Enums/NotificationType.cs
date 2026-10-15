@@ -16,6 +16,8 @@ namespace MDRNJ.Shared.Enums
         FriendActivity = 7,  // friend completed a workout
         FriendAccepted = 8,  // your friend request was accepted
         ChallengeAccepted = 9,  // a friend accepted your challenge
-        ChallengeDeclined = 10  // a friend declined your challenge
+        ChallengeDeclined = 10, // a friend declined your challenge
+        ChallengeReview = 11,   // results are in: check your opponent's proof
+        ChallengeDisputed = 12  // your opponent disputed your proof
     }
 }

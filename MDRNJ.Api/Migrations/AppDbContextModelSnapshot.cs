@@ -102,6 +102,10 @@ namespace MDRNJ.Api.Migrations
                     b.Property<Guid>("ChallengeId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ProofPath")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
                     b.Property<DateTime>("SubmittedAt")
                         .HasColumnType("datetime2");
 
@@ -124,6 +128,12 @@ namespace MDRNJ.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("AllowDisputes")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ChallengerApproved")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("ChallengerId")
                         .HasColumnType("uniqueidentifier");
 
@@ -145,8 +155,18 @@ namespace MDRNJ.Api.Migrations
                     b.Property<DateTime>("Deadline")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DisputeReason")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid?>("DisputedById")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<float?>("DistanceKm")
                         .HasColumnType("real");
+
+                    b.Property<bool>("OpponentApproved")
+                        .HasColumnType("bit");
 
                     b.Property<Guid>("OpponentId")
                         .HasColumnType("uniqueidentifier");
@@ -160,7 +180,13 @@ namespace MDRNJ.Api.Migrations
                     b.Property<int>("OpponentXP")
                         .HasColumnType("int");
 
+                    b.Property<bool>("RequireProof")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ReviewDeadline")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Scoring")

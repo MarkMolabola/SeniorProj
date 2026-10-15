@@ -51,6 +51,21 @@ namespace MDRNJfitness.ViewModels
         [ObservableProperty] private bool _formNeedsDistance;
         [ObservableProperty] private string _formRulesText = string.Empty;
 
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(FormProofHint))]
+        private bool _formRequireProof;
+        [ObservableProperty] private bool _formAllowDisputes = true;
+
+        /// <summary>What each player will have to upload, under the proof toggle.</summary>
+        public string FormProofHint => FormRequireProof ? DuelRules.ProofHint(FormContest) : "Results are on the honor system.";
+
+        /// <summary>Shown while a proof uploads (videos can take a while).</summary>
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsUploading))]
+        private string _uploadStatus = string.Empty;
+
+        public bool IsUploading => !string.IsNullOrEmpty(UploadStatus);
+
         /// <summary>Friend to challenge once the page loads (set by navigation).</summary>
         private Guid? _pendingOpponent;
 
@@ -71,7 +86,11 @@ namespace MDRNJfitness.ViewModels
         private DuelContest FormContest => (DuelContest)Math.Max(0, FormContestIndex);
         private DuelScoring FormScoring => (DuelScoring)Math.Max(0, FormScoringIndex);
 
-        partial void OnFormContestIndexChanged(int value) => UpdateFormRules();
+        partial void OnFormContestIndexChanged(int value)
+        {
+            UpdateFormRules();
+            OnPropertyChanged(nameof(FormProofHint));
+        }
         partial void OnFormScoringIndexChanged(int value) => UpdateFormRules();
 
         private void UpdateFormRules()
@@ -105,9 +124,9 @@ namespace MDRNJfitness.ViewModels
         private void Show(List<ChallengeDto> all)
         {
             Fill(Incoming, all.Where(c => c.CanRespond));
-            Fill(Active, all.Where(c => c.Status == "Active"));
+            Fill(Active, all.Where(c => c.Status is "Active" or "InReview"));
             Fill(Outgoing, all.Where(c => c.Status == "Pending" && c.IsChallenger));
-            Fill(History, all.Where(c => c.Status is not ("Pending" or "Active")).Take(20));
+            Fill(History, all.Where(c => c.Status is not ("Pending" or "Active" or "InReview")).Take(20));
 
             HasIncoming = Incoming.Count > 0;
             HasActive = Active.Count > 0;
@@ -187,7 +206,9 @@ namespace MDRNJfitness.ViewModels
                     Contest = FormContest.ToString(),
                     Scoring = FormScoring.ToString(),
                     DistanceKm = distance,
-                    DurationHours = DuelRules.DurationHours[Math.Clamp(FormDurationIndex, 0, DuelRules.DurationHours.Length - 1)]
+                    DurationHours = DuelRules.DurationHours[Math.Clamp(FormDurationIndex, 0, DuelRules.DurationHours.Length - 1)],
+                    RequireProof = FormRequireProof,
+                    AllowDisputes = FormRequireProof && FormAllowDisputes
                 });
 
                 IsFormOpen = false;
@@ -224,7 +245,16 @@ namespace MDRNJfitness.ViewModels
         [RelayCommand]
         public async Task SubmitAsync(ChallengeCard card)
         {
-            var value = await AskForResultAsync(card);
+            // With proof: capture it first, then read the result off it (no in-app stopwatch:
+            // the phone is busy filming the plank, and a run's time is on its summary)
+            FileResult? proof = null;
+            if (card.Dto.RequireProof)
+            {
+                proof = await PickProofAsync(card);
+                if (proof is null) return;
+            }
+
+            var value = await AskForResultAsync(card, allowStopwatch: proof is null);
             if (value is not float result) return;
 
             if (card.Scoring == DuelScoring.BestAttempt)
@@ -237,11 +267,23 @@ namespace MDRNJfitness.ViewModels
 
             await RunSafeAsync(async () =>
             {
-                var updated = await _challenges.SubmitAttemptAsync(card.Dto.ChallengeId, result);
+                string? proofPath = null;
+                if (proof is not null)
+                {
+                    UploadStatus = card.ProofKind == ProofKind.Video ? "UPLOADING VIDEO… KEEP THE APP OPEN" : "UPLOADING PHOTO…";
+                    try { proofPath = await _challenges.UploadProofAsync(card.Dto.ChallengeId, proof); }
+                    finally { UploadStatus = string.Empty; }
+                }
+
+                var updated = await _challenges.SubmitAttemptAsync(card.Dto.ChallengeId, result, proofPath);
                 Show(await _challenges.GetMyChallengesAsync());
 
                 if (updated.AccountProgress is not null)
                     await _progress.PresentAsync(updated.CharacterProgress, updated.AccountProgress, Headline(updated.Outcome));
+                else if (updated.Status == "InReview")
+                    await Shell.Current.DisplayAlertAsync("Results are in!",
+                        $"Both results are locked in. Check {card.Dto.OpponentUsername}'s proof and approve or dispute it. "
+                        + $"The result counts in {DuelRules.ReviewHours}h if nobody disputes.", "OK");
                 else
                     await Shell.Current.DisplayAlertAsync("Result saved",
                         card.Scoring == DuelScoring.Total
@@ -251,9 +293,81 @@ namespace MDRNJfitness.ViewModels
             });
         }
 
-        /// <summary>Stopwatch for plank / timed races, a number prompt for reps and km.</summary>
-        private static async Task<float?> AskForResultAsync(ChallengeCard card)
+        /// <summary>Video challenges: record now or pick a clip. Run challenges: photo or screenshot of the summary.</summary>
+        private static async Task<FileResult?> PickProofAsync(ChallengeCard card)
         {
+            var video = card.ProofKind == ProofKind.Video;
+            var capture = video ? "Record a video" : "Take a photo";
+            var pick = video ? "Choose a video" : "Choose a photo / screenshot";
+            var options = MediaPicker.Default.IsCaptureSupported ? new[] { capture, pick } : new[] { pick };
+
+            var choice = await Shell.Current.DisplayActionSheetAsync(
+                $"PROOF: {DuelRules.ProofHint(card.Contest)}", "Cancel", null, options);
+            if (choice is null || choice == "Cancel") return null;
+
+            try
+            {
+                if (choice == capture)
+                {
+                    if (await Permissions.RequestAsync<Permissions.Camera>() != PermissionStatus.Granted)
+                    {
+                        await Shell.Current.DisplayAlertAsync("Camera", "Allow camera access to record your proof, or choose an existing file.", "OK");
+                        return null;
+                    }
+                    if (video && await Permissions.RequestAsync<Permissions.Microphone>() != PermissionStatus.Granted)
+                    {
+                        await Shell.Current.DisplayAlertAsync("Microphone", "Allow microphone access to record video, or choose an existing clip.", "OK");
+                        return null;
+                    }
+                    return video ? await MediaPicker.Default.CaptureVideoAsync() : await MediaPicker.Default.CapturePhotoAsync();
+                }
+                var single = new MediaPickerOptions { SelectionLimit = 1 };
+                var picked = video ? await MediaPicker.Default.PickVideosAsync(single) : await MediaPicker.Default.PickPhotosAsync(single);
+                return picked?.FirstOrDefault();
+            }
+            catch (Exception ex) when (ex is FeatureNotSupportedException or PermissionException)
+            {
+                await Shell.Current.DisplayAlertAsync("Proof", ex.Message, "OK");
+                return null;
+            }
+        }
+
+        [RelayCommand]
+        public async Task ViewProofAsync(ProofItem proof) =>
+            await RunSafeAsync(async () =>
+            {
+                var link = await _challenges.GetProofLinkAsync(proof.ChallengeId, proof.AttemptId);
+                await Browser.Default.OpenAsync(link, BrowserLaunchMode.SystemPreferred);
+            });
+
+        [RelayCommand]
+        public async Task ApproveAsync(ChallengeCard card)
+        {
+            var sure = await Shell.Current.DisplayAlertAsync("Approve result?",
+                $"You checked {card.Dto.OpponentUsername}'s proof and it's legit?", "Approve", "Back");
+            if (sure)
+                await ActAndReloadAsync(() => _challenges.ApproveAsync(card.Dto.ChallengeId));
+        }
+
+        [RelayCommand]
+        public async Task DisputeAsync(ChallengeCard card)
+        {
+            var reason = await Shell.Current.DisplayPromptAsync("Dispute proof",
+                $"This voids the duel: no winner, and nobody gets XP or gold. What's wrong with {card.Dto.OpponentUsername}'s proof? (optional)",
+                "Dispute", "Back", "e.g. reps not counted properly", 200);
+            if (reason is null) return; // Back
+            await ActAndReloadAsync(() => _challenges.DisputeAsync(card.Dto.ChallengeId, reason));
+        }
+
+        /// <summary>
+        /// Stopwatch for plank / timed races, a number prompt for reps and km. With proof,
+        /// times are typed in from the video / summary instead.
+        /// </summary>
+        private static async Task<float?> AskForResultAsync(ChallengeCard card, bool allowStopwatch = true)
+        {
+            if (DuelRules.UsesStopwatch(card.Contest, card.Scoring) && !allowStopwatch)
+                return await AskForTimeAsync(card);
+
             if (DuelRules.UsesStopwatch(card.Contest, card.Scoring))
             {
                 var hint = card.Contest == DuelContest.Plank
@@ -276,6 +390,34 @@ namespace MDRNJfitness.ViewModels
             await Shell.Current.DisplayAlertAsync("Invalid result",
                 unit == "km" ? "Enter a distance like 3.5." : "Enter a whole number of reps.", "OK");
             return null;
+        }
+
+        /// <summary>A time read off the proof: "1:35", "1:02:10" or plain seconds.</summary>
+        private static async Task<float?> AskForTimeAsync(ChallengeCard card)
+        {
+            var prompt = card.Contest == DuelContest.Plank
+                ? "How long did you hold the plank? (as in your video, e.g. 1:35)"
+                : $"What was your time for {card.Dto.DistanceKm:0.##} km? (as on the summary, e.g. 24:10)";
+            var text = await Shell.Current.DisplayPromptAsync(card.Title, prompt, "Submit", "Cancel", placeholder: "m:ss");
+            if (string.IsNullOrWhiteSpace(text)) return null;
+
+            if (TryParseTime(text.Trim(), out var seconds) && seconds > 0)
+                return seconds;
+            await Shell.Current.DisplayAlertAsync("Invalid time", "Enter a time like 1:35 or 1:02:10.", "OK");
+            return null;
+        }
+
+        internal static bool TryParseTime(string text, out float seconds)
+        {
+            seconds = 0;
+            var parts = text.Split(':');
+            if (parts.Length > 3) return false;
+            foreach (var part in parts)
+            {
+                if (!int.TryParse(part, out var n) || n < 0) return false;
+                seconds = seconds * 60 + n;
+            }
+            return true;
         }
 
         private static string Headline(string? outcome) => outcome switch

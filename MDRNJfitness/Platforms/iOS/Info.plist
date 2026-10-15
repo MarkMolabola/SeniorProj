@@ -39,6 +39,12 @@
 			<string>Editor</string>
 		</dict>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Record a video or photo as proof for a friend challenge.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Record sound with your challenge proof video.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Choose a video or screenshot as proof for a friend challenge.</string>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
 </dict>

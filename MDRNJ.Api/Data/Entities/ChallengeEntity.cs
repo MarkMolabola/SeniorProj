@@ -31,6 +31,21 @@ namespace MDRNJ.Api.Data.Entities
         public bool ChallengerSeenResult { get; set; }
         public bool OpponentSeenResult { get; set; }
 
+        /// <summary>Every result needs a proof video / photo.</summary>
+        public bool RequireProof { get; set; }
+
+        /// <summary>Results go to a review window (InReview) where either player can dispute.</summary>
+        public bool AllowDisputes { get; set; }
+
+        /// <summary>While InReview: when the result counts if nobody disputes.</summary>
+        public DateTime? ReviewDeadline { get; set; }
+        public bool ChallengerApproved { get; set; }
+        public bool OpponentApproved { get; set; }
+
+        /// <summary>Set when Disputed.</summary>
+        public Guid? DisputedById { get; set; }
+        public string? DisputeReason { get; set; }
+
         // Navigation
         public UserEntity Challenger { get; set; } = null!;
         public UserEntity Opponent { get; set; } = null!;

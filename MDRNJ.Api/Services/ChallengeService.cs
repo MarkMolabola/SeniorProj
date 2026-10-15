@@ -22,15 +22,17 @@ namespace MDRNJ.Api.Services
         private readonly IGoalProgressService _goals;
         private readonly IAchievementService _achievements;
         private readonly INotifier _notifier;
+        private readonly IProofStorage _proofs;
 
         public ChallengeService(AppDbContext db, ICharacterService character,
-            IGoalProgressService goals, IAchievementService achievements, INotifier notifier)
+            IGoalProgressService goals, IAchievementService achievements, INotifier notifier, IProofStorage proofs)
         {
             _db = db;
             _character = character;
             _goals = goals;
             _achievements = achievements;
             _notifier = notifier;
+            _proofs = proofs;
         }
 
         public async Task<ChallengeDto> CreateAsync(Guid userId, CreateChallengeDto dto)
@@ -62,7 +64,9 @@ namespace MDRNJ.Api.Services
                 Contest = contest,
                 Scoring = scoring,
                 DistanceKm = isTimedRace ? dto.DistanceKm : null,
-                Deadline = DateTime.UtcNow.AddHours(dto.DurationHours)
+                Deadline = DateTime.UtcNow.AddHours(dto.DurationHours),
+                RequireProof = dto.RequireProof,
+                AllowDisputes = dto.RequireProof && dto.AllowDisputes
             };
 
             _db.Challenges.Add(challenge);
@@ -128,7 +132,7 @@ namespace MDRNJ.Api.Services
             return ToDto(challenge, userId);
         }
 
-        public async Task<ChallengeDto> SubmitAttemptAsync(Guid userId, Guid challengeId, float value)
+        public async Task<ChallengeDto> SubmitAttemptAsync(Guid userId, Guid challengeId, float value, string? proofPath)
         {
             if (value <= 0)
                 throw new ArgumentException("Enter a result greater than zero.");
@@ -142,8 +146,19 @@ namespace MDRNJ.Api.Services
                 && challenge.Attempts.Any(a => a.UserId == userId))
                 throw new InvalidOperationException("You already locked in your attempt.");
 
+            if (challenge.RequireProof)
+                await CheckProofAsync(challenge, userId, proofPath);
+            else
+                proofPath = null;
+
             // Added via the DbSet: the attempt's preset key would otherwise make EF treat it as existing
-            _db.ChallengeAttempts.Add(new ChallengeAttemptEntity { ChallengeId = challengeId, UserId = userId, Value = value });
+            _db.ChallengeAttempts.Add(new ChallengeAttemptEntity
+            {
+                ChallengeId = challengeId,
+                UserId = userId,
+                Value = value,
+                ProofPath = proofPath
+            });
             if (isChallenger)
                 challenge.ChallengerScore = DuelRules.Combine(challenge.ChallengerScore, value, challenge.Contest, challenge.Scoring);
             else
@@ -154,6 +169,15 @@ namespace MDRNJ.Api.Services
             if (challenge.Scoring == DuelScoring.Total || !bothIn)
             {
                 await _db.SaveChangesAsync();
+                return ToDto(challenge, userId);
+            }
+
+            // Reviewed challenges wait for approval (or the review window) before anyone is paid
+            if (challenge.AllowDisputes)
+            {
+                StartReview(challenge, DateTime.UtcNow);
+                await _db.SaveChangesAsync();
+                await NotifyReviewAsync(challenge);
                 return ToDto(challenge, userId);
             }
 
@@ -203,20 +227,169 @@ namespace MDRNJ.Api.Services
 
         // ── Resolution ──────────────────────────────────────────────────────
 
-        /// <summary>Expires unanswered challenges and resolves running ones past their deadline.</summary>
+        /// <summary>
+        /// Expires unanswered challenges, settles running ones past their deadline (or sends
+        /// them to review), and settles reviews nobody disputed in time.
+        /// </summary>
         private async Task ResolveDueAsync(Guid userId)
         {
             var now = DateTime.UtcNow;
             var due = await Query()
                 .Where(c => (c.ChallengerId == userId || c.OpponentId == userId)
-                         && (c.Status == ChallengeStatus.Pending || c.Status == ChallengeStatus.Active)
-                         && c.Deadline <= now)
+                         && (((c.Status == ChallengeStatus.Pending || c.Status == ChallengeStatus.Active) && c.Deadline <= now)
+                             || (c.Status == ChallengeStatus.InReview && c.ReviewDeadline <= now)))
                 .ToListAsync();
-            if (due.Count == 0) return;
+            await SettleDueAsync(due);
+        }
 
-            await ResolveAndSaveAsync(due);
-            foreach (var challenge in due)
+        private async Task SettleDueAsync(List<ChallengeEntity> due)
+        {
+            if (due.Count == 0) return;
+            var now = DateTime.UtcNow;
+
+            // Running out the clock on a reviewed challenge opens the review, unless nobody played
+            var toReview = due.Where(c => c.Status == ChallengeStatus.Active && c.AllowDisputes
+                && (c.ChallengerScore is not null || c.OpponentScore is not null)).ToList();
+            foreach (var c in toReview)
+                StartReview(c, now);
+            if (toReview.Count > 0)
+                await _db.SaveChangesAsync();
+            foreach (var c in toReview)
+                await NotifyReviewAsync(c);
+
+            var toResolve = due.Except(toReview).ToList();
+            if (toResolve.Count == 0) return;
+            await ResolveAndSaveAsync(toResolve);
+            foreach (var challenge in toResolve)
                 await ApplyOpponentStatsAsync(challenge, exceptUserId: null);
+        }
+
+        private static void StartReview(ChallengeEntity c, DateTime now)
+        {
+            c.Status = ChallengeStatus.InReview;
+            c.ReviewDeadline = now.AddHours(DuelRules.ReviewHours);
+        }
+
+        private async Task NotifyReviewAsync(ChallengeEntity c)
+        {
+            var contest = DuelRules.ContestName(c.Contest);
+            await _notifier.NotifyAsync(c.ChallengerId, NotificationType.ChallengeReview,
+                $"Results are in for your {contest} duel vs {c.Opponent.Username}. Check their proof!", c.OpponentId, c.ChallengeId);
+            await _notifier.NotifyAsync(c.OpponentId, NotificationType.ChallengeReview,
+                $"Results are in for your {contest} duel vs {c.Challenger.Username}. Check their proof!", c.ChallengerId, c.ChallengeId);
+        }
+
+        // ── Proof and review ────────────────────────────────────────────────
+
+        public async Task<ProofUploadDto> CreateProofUploadAsync(Guid userId, Guid challengeId, string contentType)
+        {
+            var challenge = await LoadOpenAsync(userId, challengeId);
+            if (!challenge.RequireProof)
+                throw new InvalidOperationException("This challenge doesn't need proof.");
+            if (challenge.Status != ChallengeStatus.Active)
+                throw new InvalidOperationException("This challenge isn't running.");
+
+            var kind = DuelRules.ProofKindFor(challenge.Contest);
+            var extension = ExtensionFor(contentType, kind)
+                ?? throw new ArgumentException(kind == ProofKind.Video
+                    ? "Proof for this challenge has to be a video."
+                    : "Proof for this challenge has to be a photo.");
+
+            return _proofs.CreateUpload(ProofPaths.ForUpload(challengeId, userId, extension),
+                contentType.ToLowerInvariant(), DuelRules.MaxProofBytes(kind));
+        }
+
+        /// <summary>The proof must be this player's upload for this challenge, and within the size limit.</summary>
+        private async Task CheckProofAsync(ChallengeEntity challenge, Guid userId, string? proofPath)
+        {
+            if (string.IsNullOrWhiteSpace(proofPath))
+                throw new ArgumentException("This challenge needs proof: attach a video or photo of your result. (Update the app if you don't see the option.)");
+            if (!proofPath.StartsWith(ProofPaths.UserFolder(challenge.ChallengeId, userId), StringComparison.Ordinal)
+                || proofPath.Contains(".."))
+                throw new ArgumentException("That proof doesn't belong to this challenge.");
+            if (challenge.Attempts.Any(a => a.ProofPath == proofPath))
+                throw new InvalidOperationException("That proof was already used for another result.");
+
+            var size = await _proofs.GetSizeAsync(proofPath)
+                ?? throw new ArgumentException("The proof upload didn't finish. Try again.");
+            var max = DuelRules.MaxProofBytes(DuelRules.ProofKindFor(challenge.Contest));
+            if (size > max)
+            {
+                await _proofs.DeleteAsync(proofPath);
+                throw new ArgumentException($"That file is too big (limit {max / (1024 * 1024)} MB). Try a shorter clip.");
+            }
+        }
+
+        private static string? ExtensionFor(string contentType, ProofKind kind) =>
+            (kind, contentType.ToLowerInvariant()) switch
+            {
+                (ProofKind.Video, "video/mp4") => ".mp4",
+                (ProofKind.Video, "video/quicktime") => ".mov",
+                (ProofKind.Video, "video/3gpp") => ".3gp",
+                (ProofKind.Video, "video/webm") => ".webm",
+                (ProofKind.Photo, "image/jpeg") => ".jpg",
+                (ProofKind.Photo, "image/png") => ".png",
+                (ProofKind.Photo, "image/heic") => ".heic",
+                (ProofKind.Photo, "image/webp") => ".webp",
+                _ => null
+            };
+
+        public async Task<ProofLinkDto> GetProofLinkAsync(Guid userId, Guid challengeId, Guid attemptId)
+        {
+            var challenge = await LoadAsync(userId, challengeId);
+            var attempt = challenge.Attempts.FirstOrDefault(a => a.AttemptId == attemptId && a.ProofPath is not null)
+                ?? throw new KeyNotFoundException("Proof not found.");
+
+            return new ProofLinkDto
+            {
+                Url = _proofs.CreateReadUrl(attempt.ProofPath!),
+                Kind = DuelRules.ProofKindFor(challenge.Contest).ToString()
+            };
+        }
+
+        public async Task<ChallengeDto> ApproveAsync(Guid userId, Guid challengeId)
+        {
+            var challenge = await LoadOpenAsync(userId, challengeId);
+            if (challenge.Status != ChallengeStatus.InReview)
+                throw new InvalidOperationException("This challenge isn't in review.");
+
+            if (challenge.ChallengerId == userId) challenge.ChallengerApproved = true;
+            else challenge.OpponentApproved = true;
+
+            if (!(challenge.ChallengerApproved && challenge.OpponentApproved))
+            {
+                await _db.SaveChangesAsync();
+                return ToDto(challenge, userId);
+            }
+
+            // Both happy: settle now. Results show as popups on the next Challenges load.
+            await ResolveAndSaveAsync(new[] { challenge });
+            await ApplyOpponentStatsAsync(challenge, exceptUserId: null);
+            var otherId = challenge.ChallengerId == userId ? challenge.OpponentId : challenge.ChallengerId;
+            await _notifier.NotifyAsync(otherId, NotificationType.ChallengeCompleted,
+                $"Your {DuelRules.ContestName(challenge.Contest)} duel is settled. See the result!", userId, challengeId);
+            return ToDto(challenge, userId);
+        }
+
+        public async Task<ChallengeDto> DisputeAsync(Guid userId, Guid challengeId, string? reason)
+        {
+            var challenge = await LoadOpenAsync(userId, challengeId);
+            if (challenge.Status != ChallengeStatus.InReview || !challenge.AllowDisputes)
+                throw new InvalidOperationException("This challenge can't be disputed.");
+
+            challenge.Status = ChallengeStatus.Disputed;
+            challenge.DisputedById = userId;
+            challenge.DisputeReason = string.IsNullOrWhiteSpace(reason) ? null : reason.Trim();
+            challenge.ResolvedAt = DateTime.UtcNow;
+            challenge.ChallengerSeenResult = challenge.OpponentSeenResult = true; // no rewards to show
+            await _db.SaveChangesAsync();
+
+            var me = challenge.ChallengerId == userId ? challenge.Challenger : challenge.Opponent;
+            var otherId = challenge.ChallengerId == userId ? challenge.OpponentId : challenge.ChallengerId;
+            await _notifier.NotifyAsync(otherId, NotificationType.ChallengeDisputed,
+                $"{me.Username} disputed your proof. The {DuelRules.ContestName(challenge.Contest)} duel is void.",
+                userId, challengeId);
+            return ToDto(challenge, userId);
         }
 
         /// <summary>
@@ -295,17 +468,21 @@ namespace MDRNJ.Api.Services
                     && (c.ChallengerId == userId || c.OpponentId == userId))
                 ?? throw new KeyNotFoundException("Challenge not found.");
 
-        /// <summary>Loads a challenge, settling it first if its deadline has passed.</summary>
+        /// <summary>
+        /// Loads a challenge, settling it first if its deadline (or review window) has passed.
+        /// Throws if that ended it; a challenge that just went to review is returned.
+        /// </summary>
         private async Task<ChallengeEntity> LoadOpenAsync(Guid userId, Guid challengeId)
         {
             var challenge = await LoadAsync(userId, challengeId);
-            if (challenge.Deadline <= DateTime.UtcNow
-                && challenge.Status is ChallengeStatus.Pending or ChallengeStatus.Active)
-            {
-                await ResolveAndSaveAsync(new[] { challenge });
-                await ApplyOpponentStatsAsync(challenge, exceptUserId: null);
+            var now = DateTime.UtcNow;
+            var due = (challenge.Status is ChallengeStatus.Pending or ChallengeStatus.Active && challenge.Deadline <= now)
+                || (challenge.Status == ChallengeStatus.InReview && challenge.ReviewDeadline <= now);
+            if (!due) return challenge;
+
+            await SettleDueAsync(new List<ChallengeEntity> { challenge });
+            if (challenge.Status != ChallengeStatus.InReview)
                 throw new InvalidOperationException("This challenge has ended.");
-            }
             return challenge;
         }
 
@@ -315,6 +492,7 @@ namespace MDRNJ.Api.Services
             var them = me ? c.Opponent : c.Challenger;
             var myAttempts = c.Attempts.Count(a => a.UserId == userId);
             var open = c.Deadline > DateTime.UtcNow;
+            var iApproved = me ? c.ChallengerApproved : c.OpponentApproved;
 
             return new ChallengeDto
             {
@@ -341,7 +519,27 @@ namespace MDRNJ.Api.Services
                 CanRespond = !me && open && c.Status == ChallengeStatus.Pending,
                 CanCancel = me && open && c.Status == ChallengeStatus.Pending,
                 CanSubmit = open && c.Status == ChallengeStatus.Active
-                    && (c.Scoring == DuelScoring.Total || myAttempts == 0)
+                    && (c.Scoring == DuelScoring.Total || myAttempts == 0),
+                RequireProof = c.RequireProof,
+                AllowDisputes = c.AllowDisputes,
+                ProofKind = DuelRules.ProofKindFor(c.Contest).ToString(),
+                Proofs = c.Attempts
+                    .Where(a => a.ProofPath is not null)
+                    .OrderBy(a => a.SubmittedAt)
+                    .Select(a => new ChallengeProofDto
+                    {
+                        AttemptId = a.AttemptId,
+                        IsMine = a.UserId == userId,
+                        Value = a.Value,
+                        SubmittedAt = a.SubmittedAt
+                    })
+                    .ToList(),
+                ReviewDeadline = c.Status == ChallengeStatus.InReview ? c.ReviewDeadline : null,
+                CanReview = c.Status == ChallengeStatus.InReview && !iApproved,
+                IApproved = iApproved,
+                TheyApproved = me ? c.OpponentApproved : c.ChallengerApproved,
+                DisputedByMe = c.DisputedById == userId,
+                DisputeReason = c.Status == ChallengeStatus.Disputed ? c.DisputeReason : null
             };
         }
 

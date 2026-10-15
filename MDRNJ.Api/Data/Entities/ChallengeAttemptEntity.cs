@@ -11,6 +11,9 @@ namespace MDRNJ.Api.Data.Entities
         public float Value { get; set; }
         public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
 
+        /// <summary>Storage path of the proof video / photo (see IProofStorage), if one was required.</summary>
+        public string? ProofPath { get; set; }
+
         // Navigation
         public ChallengeEntity Challenge { get; set; } = null!;
     }

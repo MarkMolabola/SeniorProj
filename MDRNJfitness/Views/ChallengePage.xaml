@@ -32,6 +32,8 @@
 
                     <Label Style="{StaticResource PxBody}" Text="{Binding VersusText}" />
                     <Label Style="{StaticResource PxMuted}" Text="{Binding ModeText}" />
+                    <Label Style="{StaticResource PxCaption}" TextColor="{StaticResource PxOrange}"
+                           Text="{Binding ProofRuleText}" IsVisible="{Binding Dto.RequireProof}" />
 
                     <Border Style="{StaticResource PxSunken}" Padding="14,10" IsVisible="{Binding ShowScores}">
                         <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
@@ -43,6 +45,41 @@
                                    TextColor="{StaticResource PxStr}" Text="{Binding TheirScoreText}" />
                         </Grid>
                     </Border>
+
+                    <!-- Proof attached so far -->
+                    <VerticalStackLayout Spacing="6" IsVisible="{Binding HasProofs}"
+                                         BindableLayout.ItemsSource="{Binding Proofs}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                    <Label Style="{StaticResource PxBody}" Text="{Binding Label}" VerticalOptions="Center" />
+                                    <Button Grid.Column="1"
+                                            Style="{StaticResource PxButtonSecondary}"
+                                            Text="VIEW"
+                                            Padding="12,4"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChallengeViewModel}}, Path=ViewProofCommand}"
+                                            CommandParameter="{Binding .}" />
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                    <!-- Review window -->
+                    <Label Style="{StaticResource PxMuted}" Text="{Binding ReviewText}" IsVisible="{Binding IsInReview}" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12" IsVisible="{Binding Dto.CanReview}">
+                        <Button Grid.Column="0"
+                                Style="{StaticResource PxButtonDanger}"
+                                Text="DISPUTE"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChallengeViewModel}}, Path=DisputeCommand}"
+                                CommandParameter="{Binding .}" />
+                        <Button Grid.Column="1"
+                                Style="{StaticResource PxButton}"
+                                Text="APPROVE"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChallengeViewModel}}, Path=ApproveCommand}"
+                                CommandParameter="{Binding .}" />
+                    </Grid>
+                    <Label Style="{StaticResource PxMuted}" TextColor="{StaticResource PxStr}"
+                           Text="{Binding DisputeText}" IsVisible="{Binding IsDisputed}" />
 
                     <!-- Opponent answering an invite -->
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="12" IsVisible="{Binding Dto.CanRespond}">
@@ -87,6 +124,13 @@
                         Text="+ NEW"
                         Command="{Binding OpenFormCommand}" />
             </Grid>
+
+            <Border Style="{StaticResource PxPanelHighlight}" IsVisible="{Binding IsUploading}">
+                <HorizontalStackLayout Spacing="12">
+                    <ActivityIndicator IsRunning="True" Color="{StaticResource PxTeal}" WidthRequest="24" HeightRequest="24" />
+                    <Label Style="{StaticResource PxBody}" Text="{Binding UploadStatus}" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Border>
 
             <!-- ── New challenge form ─────────────────────────────────── -->
             <Border Style="{StaticResource PxPanelHighlight}" IsVisible="{Binding IsFormOpen}">
@@ -134,6 +178,24 @@
                     </Border>
 
                     <Label Style="{StaticResource PxMuted}" Text="{Binding FormRulesText}" />
+
+                    <Border Style="{StaticResource PxSunken}" Padding="12,8">
+                        <VerticalStackLayout Spacing="8">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Style="{StaticResource PxCaption}" Text="REQUIRE PROOF" VerticalOptions="Center" />
+                                <Switch Grid.Column="1" IsToggled="{Binding FormRequireProof}"
+                                        OnColor="{StaticResource PxTeal}" ThumbColor="{StaticResource PxText}" />
+                            </Grid>
+                            <Label Style="{StaticResource PxMuted}" Text="{Binding FormProofHint}" />
+                            <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding FormRequireProof}">
+                                <Label Style="{StaticResource PxCaption}" Text="OPPONENT CAN REVIEW + DISPUTE" VerticalOptions="Center" />
+                                <Switch Grid.Column="1" IsToggled="{Binding FormAllowDisputes}"
+                                        OnColor="{StaticResource PxTeal}" ThumbColor="{StaticResource PxText}" />
+                            </Grid>
+                            <Label Style="{StaticResource PxMuted}" IsVisible="{Binding FormRequireProof}"
+                                   Text="On: results wait for a 24h review, and a dispute voids the duel. Off: results count right away." />
+                        </VerticalStackLayout>
+                    </Border>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                         <Button Grid.Column="0"

@@ -15,12 +15,14 @@ namespace MDRNJ.Api.Services
         private readonly AppDbContext _db;
         private readonly IMapper _mapper;
         private readonly IChatService _chat;
+        private readonly IProofStorage _proofs;
 
-        public UserService(AppDbContext db, IMapper mapper, IChatService chat)
+        public UserService(AppDbContext db, IMapper mapper, IChatService chat, IProofStorage proofs)
         {
             _db = db;
             _mapper = mapper;
             _chat = chat;
+            _proofs = proofs;
         }
 
         public async Task<UserDto> GetByIdAsync(Guid userId)
@@ -72,6 +74,13 @@ namespace MDRNJ.Api.Services
             await _db.ChatReports.Where(r => r.ReporterId == userId).ExecuteDeleteAsync();
             await _db.UserBlocks.Where(b => b.BlockerId == userId || b.BlockedId == userId).ExecuteDeleteAsync();
             await _db.Friendships.Where(f => f.RequesterId == userId || f.AddresseeId == userId).ExecuteDeleteAsync();
+            // Challenge proof videos / photos go with the challenges (both players' files)
+            var challengeIds = await _db.Challenges
+                .Where(c => c.ChallengerId == userId || c.OpponentId == userId)
+                .Select(c => c.ChallengeId)
+                .ToListAsync();
+            foreach (var challengeId in challengeIds)
+                await _proofs.DeleteFolderAsync(ProofPaths.ChallengeFolder(challengeId));
             await _db.Challenges.Where(c => c.ChallengerId == userId || c.OpponentId == userId).ExecuteDeleteAsync();
 
             // Chats this user posted in need new list previews once their messages are gone

@@ -56,6 +56,27 @@ namespace MDRNJ.Shared.Game
             return aHigher == HigherIsBetter(contest, scoring) ? 1 : -1;
         }
 
+        /// <summary>How long players have to approve or dispute each other's proof.</summary>
+        public const int ReviewHours = 24;
+
+        public const long MaxVideoBytes = 300L * 1024 * 1024;
+        public const long MaxPhotoBytes = 15L * 1024 * 1024;
+
+        /// <summary>Runs are proven with a summary photo; reps and holds with a video.</summary>
+        public static ProofKind ProofKindFor(DuelContest contest) =>
+            contest == DuelContest.Run ? ProofKind.Photo : ProofKind.Video;
+
+        public static long MaxProofBytes(ProofKind kind) =>
+            kind == ProofKind.Video ? MaxVideoBytes : MaxPhotoBytes;
+
+        /// <summary>What each player has to upload, for the challenge form and cards.</summary>
+        public static string ProofHint(DuelContest contest) => contest switch
+        {
+            DuelContest.Run => "Both players upload a photo or screenshot of the run summary (treadmill screen or fitness app).",
+            DuelContest.Plank => "Both players record a video of the full plank.",
+            _ => $"Both players record a video of their {ContestName(contest).ToLowerInvariant()}."
+        };
+
         /// <summary>"42 reps", "1:35", "3.2 km".</summary>
         public static string Format(float value, DuelContest contest, DuelScoring scoring)
         {
