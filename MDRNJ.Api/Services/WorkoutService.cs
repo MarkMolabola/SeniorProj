@@ -50,7 +50,7 @@ namespace MDRNJ.Api.Services
             return _mapper.Map<WorkoutDto>(session);
         }
 
-        public async Task<WorkoutDto> EndWorkoutAsync(Guid userId, Guid sessionId)
+        public async Task<WorkoutDto> EndWorkoutAsync(Guid userId, Guid sessionId, float? distanceKm)
         {
             var session = await _db.WorkoutSessions
                 .Include(s => s.Exercises)
@@ -63,6 +63,7 @@ namespace MDRNJ.Api.Services
             session.EndTime = DateTime.UtcNow;
             session.DurationMins = (int)(session.EndTime.Value - session.StartTime).TotalMinutes;
             session.XPAwarded = Math.Max(10, session.DurationMins * 2);
+            AddDistance(session, distanceKm);
 
             return await RecordCompletedAsync(userId, session);
         }
@@ -87,7 +88,29 @@ namespace MDRNJ.Api.Services
             };
 
             _db.WorkoutSessions.Add(session);
+            AddDistance(session, dto.DistanceKm);
             return await RecordCompletedAsync(userId, session);
+        }
+
+        /// <summary>
+        /// Records the distance as an exercise on the session, which is what Distance
+        /// quests count. Ignored for workout types that don't cover distance.
+        /// </summary>
+        private void AddDistance(WorkoutSessionEntity session, float? distanceKm)
+        {
+            if (distanceKm is not > 0 || !WorkoutTypes.TracksDistance(session.WorkoutType)) return;
+
+            var exercise = new ExerciseEntity
+            {
+                SessionId = session.SessionId,
+                Name = "Distance",
+                Category = session.WorkoutType.ToString(),
+                DistanceKm = distanceKm
+            };
+            // Added via the DbSet: the preset key would otherwise make EF treat it as existing
+            _db.Exercises.Add(exercise);
+            if (!session.Exercises.Contains(exercise))
+                session.Exercises.Add(exercise);
         }
 
         /// <summary>
@@ -102,7 +125,8 @@ namespace MDRNJ.Api.Services
             var goldBefore = stats.Gold;
 
             _goals.GrantXP(stats, session.XPAwarded, XPReason.WorkoutCompleted);
-            _goals.GrantGold(stats, GoldRules.ForWorkout(session.DurationMins));
+            _goals.GrantGold(stats, GoldRules.ForWorkout(session.DurationMins), GoldReason.Workout,
+                $"{session.WorkoutType} · {session.DurationMins} min");
             stats.TotalWorkouts++;
 
             var today = DateTime.UtcNow.Date;

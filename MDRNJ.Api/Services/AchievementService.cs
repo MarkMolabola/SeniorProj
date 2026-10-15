@@ -104,7 +104,8 @@ namespace MDRNJ.Api.Services
                     unlockedThisPass = true;
 
                     _goals.GrantXP(stats, achievement.XPReward, XPReason.AchievementUnlocked);
-                    _goals.GrantGold(stats, GoldRules.ForAchievement(achievement.XPReward));
+                    _goals.GrantGold(stats, GoldRules.ForAchievement(achievement.XPReward),
+                        GoldReason.Achievement, achievement.Name);
 
                     newlyUnlocked.Add(new AchievementDto
                     {

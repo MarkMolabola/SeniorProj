@@ -122,6 +122,11 @@
                     Command="{Binding AcceptRequestCommand}"
                     IsEnabled="{Binding IsNotBusy}" />
             <Button Style="{StaticResource PxButton}"
+                    Text="CHALLENGE TO A DUEL"
+                    IsVisible="{Binding IsFriend}"
+                    Command="{Binding ChallengeCommand}"
+                    IsEnabled="{Binding IsNotBusy}" />
+            <Button Style="{StaticResource PxButton}"
                     Text="MESSAGE"
                     IsVisible="{Binding IsFriend}"
                     Command="{Binding MessageCommand}"

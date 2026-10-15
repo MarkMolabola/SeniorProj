@@ -22,9 +22,14 @@ namespace MDRNJfitness.ViewModels
         public bool HasSelectedDay => SelectedDay is not null;
 
         // Backlog form fields
-        [ObservableProperty] private string _backlogWorkoutType = "Running";
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(BacklogTracksDistance))]
+        private string _backlogWorkoutType = "Running";
         [ObservableProperty] private TimeSpan _backlogTime = TimeSpan.FromHours(8);
         [ObservableProperty] private int _backlogDuration = 30;
+        [ObservableProperty] private string _backlogDistanceKm = string.Empty;
+
+        public bool BacklogTracksDistance => MDRNJ.Shared.Game.WorkoutTypes.TracksDistance(BacklogWorkoutType);
 
         public IReadOnlyList<string> WorkoutTypes { get; } = MDRNJ.Shared.Game.WorkoutTypes.SelectableNames;
 
@@ -97,6 +102,11 @@ namespace MDRNJfitness.ViewModels
         public async Task LogBacklogAsync()
         {
             if (SelectedDay is null) return;
+            if (!WorkoutViewModel.TryReadDistance(BacklogTracksDistance, BacklogDistanceKm, out var distance))
+            {
+                await Shell.Current.DisplayAlertAsync("Distance", "Enter a distance in km, like 5 or 3.2, or leave it blank.", "OK");
+                return;
+            }
 
             await RunSafeAsync(async () =>
             {
@@ -107,8 +117,10 @@ namespace MDRNJfitness.ViewModels
                 {
                     WorkoutType = BacklogWorkoutType,
                     StartTime = startUtc,
-                    DurationMins = BacklogDuration
+                    DurationMins = BacklogDuration,
+                    DistanceKm = distance
                 });
+                BacklogDistanceKm = string.Empty;
 
                 _monthWorkouts.Add(added);
                 SelectedWorkouts.Add(added);

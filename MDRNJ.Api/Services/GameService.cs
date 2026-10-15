@@ -50,49 +50,6 @@ namespace MDRNJ.Api.Services
             return dto;
         }
 
-        public async Task<GameStatsDto> AwardXPAsync(Guid userId, int amount, string reason)
-        {
-            var stats = await _db.GameStats.FirstOrDefaultAsync(g => g.UserId == userId);
-            if (stats is null)
-            {
-                stats = new GameStatsEntity { UserId = userId };
-                _db.GameStats.Add(stats);
-            }
-
-            stats.TotalXP += amount;
-            stats.CurrentLevel = LevelFromXP(stats.TotalXP);
-            stats.TotalWorkouts++;
-
-            var today = DateTime.UtcNow.Date;
-            if (stats.LastWorkoutDate?.Date == today.AddDays(-1))
-            {
-                stats.CurrentStreak++;
-                if (stats.CurrentStreak > stats.LongestStreak)
-                    stats.LongestStreak = stats.CurrentStreak;
-            }
-            else if (stats.LastWorkoutDate?.Date != today)
-            {
-                stats.CurrentStreak = 1;
-            }
-            stats.LastWorkoutDate = DateTime.UtcNow;
-
-            if (Enum.TryParse<XPReason>(reason, out var xpReason))
-            {
-                _db.XPTransactions.Add(new XPTransactionEntity
-                {
-                    UserId = userId,
-                    Amount = amount,
-                    Reason = xpReason
-                });
-            }
-
-            await _db.SaveChangesAsync();
-
-            var dto = _mapper.Map<GameStatsDto>(stats);
-            dto.XPToNextLevel = XPForNextLevel(stats.CurrentLevel) - stats.TotalXP;
-            return dto;
-        }
-
         public async Task<List<XPTransactionDto>> GetXPHistoryAsync(Guid userId)
         {
             var transactions = await _db.XPTransactions
@@ -101,6 +58,17 @@ namespace MDRNJ.Api.Services
                 .ToListAsync();
 
             return _mapper.Map<List<XPTransactionDto>>(transactions);
+        }
+
+        public async Task<List<GoldTransactionDto>> GetGoldHistoryAsync(Guid userId, int count)
+        {
+            var transactions = await _db.GoldTransactions
+                .Where(g => g.UserId == userId)
+                .OrderByDescending(g => g.CreatedAt)
+                .Take(Math.Clamp(count, 1, 200))
+                .ToListAsync();
+
+            return _mapper.Map<List<GoldTransactionDto>>(transactions);
         }
 
         private static int LevelFromXP(int xp) => AccountProgression.LevelFor(xp);

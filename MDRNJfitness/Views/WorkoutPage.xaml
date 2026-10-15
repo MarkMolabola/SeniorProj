@@ -61,6 +61,16 @@
                                HorizontalOptions="Center" />
                     </Border>
 
+                    <VerticalStackLayout Spacing="6" IsVisible="{Binding TracksDistance}">
+                        <Label Style="{StaticResource PxCaption}" Text="DISTANCE (KM) · OPTIONAL" />
+                        <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                            <Entry Style="{StaticResource PxEntry}"
+                                   Text="{Binding DistanceKm}"
+                                   Keyboard="Numeric"
+                                   Placeholder="e.g. 5.0" />
+                        </Border>
+                    </VerticalStackLayout>
+
                     <Button Style="{StaticResource PxButton}"
                             Text="■ FINISH"
                             Command="{Binding CompleteWorkoutCommand}"
@@ -88,8 +98,14 @@
                                                TextColor="{StaticResource PxTeal}" />
                                         <Label Style="{StaticResource PxMuted}"
                                                Text="{Binding StartTime, Converter={StaticResource UtcToLocal}, StringFormat='{0:MMM d · h:mm tt}'}" />
-                                        <Label Style="{StaticResource PxMuted}"
-                                               Text="{Binding DurationMins, StringFormat='{0} min'}" />
+                                        <Label Style="{StaticResource PxMuted}">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding DurationMins, StringFormat='{0} min'}" />
+                                                    <Span Text="{Binding DistanceKm, StringFormat=' · {0:0.##} km', TargetNullValue=''}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
                                     </VerticalStackLayout>
                                     <Label Grid.Column="1"
                                            Style="{StaticResource PxXp}"

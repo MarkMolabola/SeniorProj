@@ -22,6 +22,9 @@ namespace MDRNJfitness.Services
         public async Task CheckAchievementsAsync() =>
             await _http.PostAsync<List<AchievementDto>>("api/achievements/check", null);
 
+        public Task<List<GoldTransactionDto>> GetGoldHistoryAsync(int count = 50) =>
+            _http.GetAsync<List<GoldTransactionDto>>($"api/game/gold/history?count={count}")!;
+
         public Task<List<AchievementDto>> GetAchievementsAsync() =>
             _http.GetAsync<List<AchievementDto>>("api/achievements")!;
     }

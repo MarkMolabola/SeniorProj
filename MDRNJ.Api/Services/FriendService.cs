@@ -16,9 +16,12 @@ namespace MDRNJ.Api.Services
     {
         private readonly AppDbContext _db;
 
-        public FriendService(AppDbContext db)
+        private readonly INotifier _notifier;
+
+        public FriendService(AppDbContext db, INotifier notifier)
         {
             _db = db;
+            _notifier = notifier;
         }
 
         public async Task<FriendDto> SendFriendRequestAsync(Guid requesterId, SendFriendRequestDto dto)
@@ -67,8 +70,19 @@ namespace MDRNJ.Api.Services
 
             await _db.SaveChangesAsync();
 
+            var requester = await UsernameAsync(requesterId);
+            if (friendship.Status == FriendshipStatus.Accepted)
+                await _notifier.NotifyAsync(addressee.UserId, NotificationType.FriendAccepted,
+                    $"You and {requester} are now friends!", requesterId, friendship.FriendshipId);
+            else
+                await _notifier.NotifyAsync(addressee.UserId, NotificationType.FriendRequest,
+                    $"{requester} wants to be your friend.", requesterId, friendship.FriendshipId);
+
             return await BuildFriendDtoAsync(friendship, requesterId);
         }
+
+        private Task<string> UsernameAsync(Guid userId) =>
+            _db.Users.Where(u => u.UserId == userId).Select(u => u.Username).FirstAsync();
 
         public async Task<FriendDto> AcceptFriendRequestAsync(Guid addresseeId, Guid friendshipId)
         {
@@ -78,6 +92,9 @@ namespace MDRNJ.Api.Services
 
             friendship.Status = FriendshipStatus.Accepted;
             await _db.SaveChangesAsync();
+
+            await _notifier.NotifyAsync(friendship.RequesterId, NotificationType.FriendAccepted,
+                $"{await UsernameAsync(addresseeId)} accepted your friend request!", addresseeId, friendship.FriendshipId);
 
             return await BuildFriendDtoAsync(friendship, addresseeId);
         }

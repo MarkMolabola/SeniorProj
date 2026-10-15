@@ -491,6 +491,35 @@ namespace MDRNJ.Api.Migrations
                     b.ToTable("GameStats");
                 });
 
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.GoldTransactionEntity", b =>
+                {
+                    b.Property<Guid>("TransactionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Reason")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("TransactionId");
+
+                    b.HasIndex("UserId", "CreatedAt");
+
+                    b.ToTable("GoldTransactions");
+                });
+
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.QuestEntity", b =>
                 {
                     b.Property<Guid>("QuestId")
@@ -958,6 +987,17 @@ namespace MDRNJ.Api.Migrations
                     b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "User")
                         .WithOne("GameStats")
                         .HasForeignKey("MDRNJ.Api.Data.Entities.GameStatsEntity", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.GoldTransactionEntity", b =>
+                {
+                    b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

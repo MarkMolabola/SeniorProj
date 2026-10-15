@@ -39,51 +39,63 @@ namespace MDRNJfitness
             // HTTP handler
             builder.Services.AddSingleton<TokenRefresher>();
             builder.Services.AddTransient<AuthHeaderHandler>();
+            builder.Services.AddTransient<TransientRetryHandler>();
 
-            // HTTP services (typed clients with auth handler)
+            // HTTP services (typed clients: auth handler, then retry while the server wakes up)
             builder.Services.AddHttpClient<IAuthService, AuthService>(
                 c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
-                .AddHttpMessageHandler<AuthHeaderHandler>();
+                .AddHttpMessageHandler<AuthHeaderHandler>()
+                .AddHttpMessageHandler<TransientRetryHandler>();
 
             builder.Services.AddHttpClient<IGameService, GameService>(
                 c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
-                .AddHttpMessageHandler<AuthHeaderHandler>();
+                .AddHttpMessageHandler<AuthHeaderHandler>()
+                .AddHttpMessageHandler<TransientRetryHandler>();
 
             builder.Services.AddHttpClient<IWorkoutService, WorkoutService>(
                 c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
-                .AddHttpMessageHandler<AuthHeaderHandler>();
+                .AddHttpMessageHandler<AuthHeaderHandler>()
+                .AddHttpMessageHandler<TransientRetryHandler>();
 
             builder.Services.AddHttpClient<ILeaderboardService, LeaderboardService>(
                 c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
-                .AddHttpMessageHandler<AuthHeaderHandler>();
+                .AddHttpMessageHandler<AuthHeaderHandler>()
+                .AddHttpMessageHandler<TransientRetryHandler>();
 
             builder.Services.AddHttpClient<IChallengeService, ChallengeService>(
                 c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
-                .AddHttpMessageHandler<AuthHeaderHandler>();
+                .AddHttpMessageHandler<AuthHeaderHandler>()
+                .AddHttpMessageHandler<TransientRetryHandler>();
 
             builder.Services.AddHttpClient<IGearService, GearService>(
                 c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
-                .AddHttpMessageHandler<AuthHeaderHandler>();
+                .AddHttpMessageHandler<AuthHeaderHandler>()
+                .AddHttpMessageHandler<TransientRetryHandler>();
 
             builder.Services.AddHttpClient<ICharacterService, CharacterService>(
                 c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
-                .AddHttpMessageHandler<AuthHeaderHandler>();
+                .AddHttpMessageHandler<AuthHeaderHandler>()
+                .AddHttpMessageHandler<TransientRetryHandler>();
 
             builder.Services.AddHttpClient<IFriendService, FriendService>(
                 c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
-                .AddHttpMessageHandler<AuthHeaderHandler>();
+                .AddHttpMessageHandler<AuthHeaderHandler>()
+                .AddHttpMessageHandler<TransientRetryHandler>();
 
             builder.Services.AddHttpClient<IUserService, UserService>(
                 c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
-                .AddHttpMessageHandler<AuthHeaderHandler>();
+                .AddHttpMessageHandler<AuthHeaderHandler>()
+                .AddHttpMessageHandler<TransientRetryHandler>();
 
             builder.Services.AddHttpClient<IQuestService, QuestService>(
                 c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
-                .AddHttpMessageHandler<AuthHeaderHandler>();
+                .AddHttpMessageHandler<AuthHeaderHandler>()
+                .AddHttpMessageHandler<TransientRetryHandler>();
 
             builder.Services.AddHttpClient<IChatService, ChatService>(
                 c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
-                .AddHttpMessageHandler<AuthHeaderHandler>();
+                .AddHttpMessageHandler<AuthHeaderHandler>()
+                .AddHttpMessageHandler<TransientRetryHandler>();
 
             // Reward / evolution popup after workouts
             builder.Services.AddSingleton<ICharacterProgressPresenter, CharacterProgressPresenter>();
@@ -94,6 +106,7 @@ namespace MDRNJfitness
             // SignalR hub client
             builder.Services.AddSingleton<LeaderboardHubClient>();
             builder.Services.AddSingleton<ChatHubClient>();
+            builder.Services.AddSingleton<NotificationHubClient>();
 
             // ViewModels
             builder.Services.AddTransient<LoginViewModel>();
@@ -113,6 +126,7 @@ namespace MDRNJfitness
             builder.Services.AddTransient<ChatListViewModel>();
             builder.Services.AddTransient<ChatRoomViewModel>();
             builder.Services.AddTransient<AdminReportsViewModel>();
+            builder.Services.AddTransient<GoldHistoryViewModel>();
 
             // Pages
             builder.Services.AddTransient<LoginPage>();
@@ -132,6 +146,7 @@ namespace MDRNJfitness
             builder.Services.AddTransient<ChatPage>();
             builder.Services.AddTransient<ChatRoomPage>();
             builder.Services.AddTransient<AdminReportsPage>();
+            builder.Services.AddTransient<GoldHistoryPage>();
 
             return builder.Build();
         }

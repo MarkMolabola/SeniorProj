@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Gold history: what the player earned and spent, newest first. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MDRNJfitness.Views.GoldHistoryPage"
+             Title="{Binding Title}"
+             Style="{StaticResource PxPage}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,16,20,32" Spacing="16">
+
+            <Button Style="{StaticResource PxButtonSecondary}"
+                    Text="◀ BACK"
+                    HorizontalOptions="Start"
+                    Clicked="OnBackClicked" />
+
+            <Label Style="{StaticResource PxTitle}" Text="GOLD HISTORY" />
+
+            <Border Style="{StaticResource PxPanel}">
+                <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                    <Image Source="icon_gold.png" WidthRequest="32" HeightRequest="32" VerticalOptions="Center" />
+                    <Label Style="{StaticResource PxStatValue}" FontSize="34"
+                           Text="{Binding GoldText}"
+                           TextColor="{StaticResource PxGold}"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Border>
+
+            <Label Style="{StaticResource PxMuted}"
+                   Text="Earn gold from workouts, quests, duels, achievements, level-ups and the dungeon. Spend it in the shop." />
+
+            <Border Style="{StaticResource PxPanel}" IsVisible="{Binding HasNoEntries}">
+                <Label Style="{StaticResource PxMuted}" Text="No gold moves yet. Finish a workout to earn some!" />
+            </Border>
+
+            <VerticalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding Entries}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource PxPanel}" Padding="14,10">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                    <Label Style="{StaticResource PxCaption}" Text="{Binding ReasonText}" TextColor="{StaticResource PxTeal}" />
+                                    <Label Style="{StaticResource PxBody}" Text="{Binding Detail}" LineBreakMode="TailTruncation" />
+                                    <Label Style="{StaticResource PxMuted}" Text="{Binding WhenText}" />
+                                </VerticalStackLayout>
+                                <Label Grid.Column="1"
+                                       Style="{StaticResource PxStatValue}"
+                                       FontSize="24"
+                                       Text="{Binding AmountText}"
+                                       TextColor="{StaticResource PxGold}"
+                                       VerticalOptions="Center">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsSpent}" Value="True">
+                                            <Setter Property="TextColor" Value="{StaticResource PxStr}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

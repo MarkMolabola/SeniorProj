@@ -22,7 +22,11 @@ namespace MDRNJ.Api.Services.Interfaces
         /// </summary>
         void GrantXP(GameStatsEntity stats, int amount, XPReason reason);
 
-        void GrantGold(GameStatsEntity stats, int amount);
+        /// <summary>Adds gold and records it in the gold history.</summary>
+        void GrantGold(GameStatsEntity stats, int amount, GoldReason reason, string? description = null);
+
+        /// <summary>Takes gold (caller checks the balance) and records it in the gold history.</summary>
+        void SpendGold(GameStatsEntity stats, int amount, GoldReason reason, string? description = null);
 
         /// <summary>
         /// Advances the user's active quests for a finished workout.

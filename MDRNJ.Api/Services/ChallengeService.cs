@@ -21,14 +21,16 @@ namespace MDRNJ.Api.Services
         private readonly ICharacterService _character;
         private readonly IGoalProgressService _goals;
         private readonly IAchievementService _achievements;
+        private readonly INotifier _notifier;
 
         public ChallengeService(AppDbContext db, ICharacterService character,
-            IGoalProgressService goals, IAchievementService achievements)
+            IGoalProgressService goals, IAchievementService achievements, INotifier notifier)
         {
             _db = db;
             _character = character;
             _goals = goals;
             _achievements = achievements;
+            _notifier = notifier;
         }
 
         public async Task<ChallengeDto> CreateAsync(Guid userId, CreateChallengeDto dto)
@@ -65,7 +67,11 @@ namespace MDRNJ.Api.Services
 
             _db.Challenges.Add(challenge);
             await _db.SaveChangesAsync();
-            return ToDto(await LoadAsync(userId, challenge.ChallengeId), userId);
+
+            var created = await LoadAsync(userId, challenge.ChallengeId);
+            await _notifier.NotifyAsync(created.OpponentId, NotificationType.ChallengeInvite,
+                $"{created.Challenger.Username} challenged you to {DuelRules.ContestName(contest)}!", userId, created.ChallengeId);
+            return ToDto(created, userId);
         }
 
         public async Task<List<ChallengeDto>> GetMyAsync(Guid userId)
@@ -89,6 +95,9 @@ namespace MDRNJ.Api.Services
 
             challenge.Status = ChallengeStatus.Active;
             await _db.SaveChangesAsync();
+            await _notifier.NotifyAsync(challenge.ChallengerId, NotificationType.ChallengeAccepted,
+                $"{challenge.Opponent.Username} accepted your {DuelRules.ContestName(challenge.Contest)} challenge. Game on!",
+                userId, challenge.ChallengeId);
             return ToDto(challenge, userId);
         }
 
@@ -101,6 +110,9 @@ namespace MDRNJ.Api.Services
             challenge.Status = ChallengeStatus.Declined;
             challenge.ResolvedAt = DateTime.UtcNow;
             await _db.SaveChangesAsync();
+            await _notifier.NotifyAsync(challenge.ChallengerId, NotificationType.ChallengeDeclined,
+                $"{challenge.Opponent.Username} declined your {DuelRules.ContestName(challenge.Contest)} challenge.",
+                userId, challenge.ChallengeId);
             return ToDto(challenge, userId);
         }
 
@@ -168,6 +180,13 @@ namespace MDRNJ.Api.Services
                 CompletedGoals = { ToGoal(challenge, dto) }
             };
             await ApplyOpponentStatsAsync(challenge, exceptUserId: userId);
+
+            // The other side learns the result live; their popup shows when they open Challenges
+            var otherId = isChallenger ? challenge.OpponentId : challenge.ChallengerId;
+            var submitter = isChallenger ? challenge.Challenger : challenge.Opponent;
+            await _notifier.NotifyAsync(otherId, NotificationType.ChallengeCompleted,
+                $"Results are in for your {DuelRules.ContestName(challenge.Contest)} duel vs {submitter.Username}!",
+                userId, challenge.ChallengeId);
             return dto;
         }
 
@@ -226,8 +245,11 @@ namespace MDRNJ.Api.Services
                 c.ChallengerXP = XPFor(result, c.ChallengerScore);
                 c.OpponentXP = XPFor(-result, c.OpponentScore);
 
-                await GrantAsync(c.ChallengerId, c.ChallengerXP, result, c.ChallengerScore is not null);
-                await GrantAsync(c.OpponentId, c.OpponentXP, -result, c.OpponentScore is not null);
+                var contest = DuelRules.ContestName(c.Contest);
+                await GrantAsync(c.ChallengerId, c.ChallengerXP, result, c.ChallengerScore is not null,
+                    $"{contest} vs {c.Opponent?.Username}");
+                await GrantAsync(c.OpponentId, c.OpponentXP, -result, c.OpponentScore is not null,
+                    $"{contest} vs {c.Challenger?.Username}");
                 touchedUsers.Add(c.ChallengerId);
                 touchedUsers.Add(c.OpponentId);
             }
@@ -242,12 +264,13 @@ namespace MDRNJ.Api.Services
             score is null ? 0 : result > 0 ? DuelRules.WinXP : result == 0 ? DuelRules.TieXP : DuelRules.LossXP;
 
         /// <summary>XP and gold for one side; <paramref name="result"/> is +1 win, 0 tie, -1 loss.</summary>
-        private async Task GrantAsync(Guid userId, int xp, int result, bool competed)
+        private async Task GrantAsync(Guid userId, int xp, int result, bool competed, string description)
         {
             if (!competed) return;
+            var outcome = result > 0 ? "Won" : result == 0 ? "Tie" : "Lost";
             var stats = await _goals.GetOrCreateStatsAsync(userId);
             _goals.GrantXP(stats, xp, result > 0 ? XPReason.FriendChallengeWon : XPReason.DuelPlayed);
-            _goals.GrantGold(stats, GoldRules.ForDuel(result > 0 ? "Won" : result == 0 ? "Tie" : "Lost", competed));
+            _goals.GrantGold(stats, GoldRules.ForDuel(outcome, competed), GoldReason.Duel, $"{description} — {outcome}");
         }
 
         /// <summary>Stat points for participants not already handled by the caller.</summary>

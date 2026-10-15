@@ -4,6 +4,7 @@ using MDRNJfitness.Data;
 using MDRNJfitness.Helpers;
 using MDRNJfitness.Helpers.Extensions;
 using MDRNJfitness.Services.Interfaces;
+using MDRNJfitness.SignalR;
 
 namespace MDRNJfitness.Services
 {
@@ -12,12 +13,14 @@ namespace MDRNJfitness.Services
         private readonly HttpClient _http;
         private readonly UserRepo _userRepo;
         private readonly TokenRefresher _refresher;
+        private readonly NotificationHubClient _notifications;
 
-        public AuthService(HttpClient http, UserRepo userRepo, TokenRefresher refresher)
+        public AuthService(HttpClient http, UserRepo userRepo, TokenRefresher refresher, NotificationHubClient notifications)
         {
             _http = http;
             _userRepo = userRepo;
             _refresher = refresher;
+            _notifications = notifications;
         }
 
         public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
@@ -87,6 +90,7 @@ namespace MDRNJfitness.Services
                 catch (HttpRequestException) { }
             }
 
+            await _notifications.StopAsync();
             TokenStore.Clear();
             await _userRepo.ClearAsync();
         }
@@ -94,6 +98,7 @@ namespace MDRNJfitness.Services
         public async Task DeleteAccountAsync()
         {
             await _http.DeleteAsync("api/users/me");
+            await _notifications.StopAsync();
             TokenStore.Clear();
             await _userRepo.ClearAsync();
         }

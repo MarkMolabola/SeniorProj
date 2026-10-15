@@ -196,6 +196,16 @@
                         </Border>
                     </Grid>
 
+                    <VerticalStackLayout Spacing="6" IsVisible="{Binding BacklogTracksDistance}">
+                        <Label Style="{StaticResource PxCaption}" Text="DISTANCE (KM) · OPTIONAL" />
+                        <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                            <Entry Style="{StaticResource PxEntry}"
+                                   Text="{Binding BacklogDistanceKm}"
+                                   Keyboard="Numeric"
+                                   Placeholder="e.g. 5.0" />
+                        </Border>
+                    </VerticalStackLayout>
+
                     <Button Style="{StaticResource PxButton}"
                             Text="LOG SESSION"
                             Command="{Binding LogBacklogCommand}"

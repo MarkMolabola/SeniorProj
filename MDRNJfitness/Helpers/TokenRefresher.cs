@@ -12,7 +12,10 @@ namespace MDRNJfitness.Helpers
     public class TokenRefresher
     {
         // Not routed through AuthHeaderHandler: a 401 here must not trigger another refresh
-        private readonly HttpClient _http = new() { BaseAddress = new Uri(ApiConstants.BaseUrl) };
+        private readonly HttpClient _http = new(new TransientRetryHandler { InnerHandler = new HttpClientHandler() })
+        {
+            BaseAddress = new Uri(ApiConstants.BaseUrl)
+        };
         private readonly SemaphoreSlim _gate = new(1, 1);
         private readonly UserRepo _userRepo;
 
@@ -39,6 +42,9 @@ namespace MDRNJfitness.Helpers
                     JsonConvert.SerializeObject(new RefreshTokenDto { RefreshToken = refreshToken }),
                     Encoding.UTF8, "application/json");
                 using var response = await _http.PostAsync("api/auth/refresh", body);
+                if ((int)response.StatusCode >= 500)
+                    return false; // server trouble, not a bad token: keep the session for next time
+
                 if (!response.IsSuccessStatusCode)
                 {
                     // Refresh token expired or revoked: this session is over

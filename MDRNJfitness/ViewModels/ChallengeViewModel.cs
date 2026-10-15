@@ -12,7 +12,11 @@ using System.Collections.ObjectModel;
 
 namespace MDRNJfitness.ViewModels
 {
-    /// <summary>1v1 friend challenges: issue, answer, compete, see results.</summary>
+    /// <summary>
+    /// 1v1 friend challenges: issue, answer, compete, see results.
+    /// "?challenge={userId}" (from a friend's profile) opens the form with that friend picked.
+    /// </summary>
+    [QueryProperty(nameof(ChallengeUserId), "challenge")]
     public partial class ChallengeViewModel : BaseViewModel
     {
         private const string DuelKind = "Duel";
@@ -46,6 +50,14 @@ namespace MDRNJfitness.ViewModels
         [ObservableProperty] private string _formDistanceKm = "1.6";
         [ObservableProperty] private bool _formNeedsDistance;
         [ObservableProperty] private string _formRulesText = string.Empty;
+
+        /// <summary>Friend to challenge once the page loads (set by navigation).</summary>
+        private Guid? _pendingOpponent;
+
+        public string ChallengeUserId
+        {
+            set => _pendingOpponent = Guid.TryParse(value, out var id) ? id : null;
+        }
 
         public ChallengeViewModel(IChallengeService challenges, IFriendService friends, ICharacterProgressPresenter progress)
         {
@@ -82,6 +94,12 @@ namespace MDRNJfitness.ViewModels
                 var all = await _challenges.GetMyChallengesAsync();
                 Show(all);
                 await ShowUnseenResultsAsync(all);
+
+                if (_pendingOpponent is Guid opponent)
+                {
+                    _pendingOpponent = null;
+                    await OpenFormForAsync(opponent);
+                }
             });
 
         private void Show(List<ChallengeDto> all)
@@ -124,21 +142,24 @@ namespace MDRNJfitness.ViewModels
 
         [RelayCommand]
         public async Task OpenFormAsync() =>
-            await RunSafeAsync(async () =>
-            {
-                var friends = await _friends.GetFriendsAsync();
-                if (friends.Count == 0)
-                {
-                    await Shell.Current.DisplayAlertAsync("No friends yet",
-                        "Add a friend on the Friends tab, then challenge them here.", "OK");
-                    return;
-                }
+            await RunSafeAsync(() => OpenFormForAsync(null));
 
-                Friends.Clear();
-                foreach (var f in friends) Friends.Add(f);
-                FormFriend = Friends[0];
-                IsFormOpen = true;
-            });
+        /// <summary>Opens the new-challenge form, with <paramref name="friendId"/> picked if given.</summary>
+        private async Task OpenFormForAsync(Guid? friendId)
+        {
+            var friends = await _friends.GetFriendsAsync();
+            if (friends.Count == 0)
+            {
+                await Shell.Current.DisplayAlertAsync("No friends yet",
+                    "Add a friend on the Friends tab, then challenge them here.", "OK");
+                return;
+            }
+
+            Friends.Clear();
+            foreach (var f in friends) Friends.Add(f);
+            FormFriend = Friends.FirstOrDefault(f => f.UserId == friendId) ?? Friends[0];
+            IsFormOpen = true;
+        }
 
         [RelayCommand]
         public void CloseForm() => IsFormOpen = false;

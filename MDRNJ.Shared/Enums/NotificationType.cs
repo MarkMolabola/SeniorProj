@@ -13,6 +13,9 @@ namespace MDRNJ.Shared.Enums
         FriendRequest = 4,  // someone added you
         CharacterEvolved = 5,  // character changed appearance
         LevelUp = 6,  // user reached a new level
-        FriendActivity = 7   // friend completed a workout
+        FriendActivity = 7,  // friend completed a workout
+        FriendAccepted = 8,  // your friend request was accepted
+        ChallengeAccepted = 9,  // a friend accepted your challenge
+        ChallengeDeclined = 10  // a friend declined your challenge
     }
 }

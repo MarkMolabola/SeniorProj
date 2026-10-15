@@ -24,8 +24,8 @@ namespace MDRNJ.Api.Controllers
             Ok(await _workouts.StartWorkoutAsync(UserId, dto));
 
         [HttpPut("{sessionId:guid}/end")]
-        public async Task<IActionResult> End(Guid sessionId) =>
-            Ok(await _workouts.EndWorkoutAsync(UserId, sessionId));
+        public async Task<IActionResult> End(Guid sessionId, [FromBody] EndWorkoutDto? dto) =>
+            Ok(await _workouts.EndWorkoutAsync(UserId, sessionId, dto?.DistanceKm));
 
         [HttpPost("{sessionId:guid}/exercises")]
         public async Task<IActionResult> AddExercise(Guid sessionId, [FromBody] AddExerciseDto dto) =>

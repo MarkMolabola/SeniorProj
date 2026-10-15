@@ -4,6 +4,7 @@ using MDRNJ.Api.Data.Entities;
 using MDRNJ.Api.Services.Interfaces;
 using MDRNJ.Shared.DTOs.Character;
 using MDRNJ.Shared.DTOs.Game;
+using MDRNJ.Shared.Enums;
 using MDRNJ.Shared.Game;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -47,7 +48,7 @@ namespace MDRNJ.Api.Services
             if (stats.Gold < price)
                 throw new InvalidOperationException($"Not enough gold: the {item.Name} costs {item.Price}, you have {stats.Gold}.");
 
-            stats.Gold -= price;
+            _goals.SpendGold(stats, price, GoldReason.Purchase, item.Name);
             _db.UserGear.Add(new UserGearEntity { UserId = userId, ItemId = item.Id, PricePaid = price });
             await _db.SaveChangesAsync();
             return await BuildAsync(userId, stats);

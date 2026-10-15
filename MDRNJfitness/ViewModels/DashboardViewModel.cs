@@ -4,6 +4,7 @@ using MDRNJ.Shared.DTOs.Game;
 using MDRNJ.Shared.DTOs.Workout;
 using MDRNJ.Shared.Game;
 using MDRNJfitness.Services.Interfaces;
+using MDRNJfitness.SignalR;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -69,11 +70,15 @@ namespace MDRNJfitness.ViewModels
 
         [ObservableProperty] private bool _hasNoAchievements = true;
 
-        public DashboardViewModel(IGameService game, IWorkoutService workout, ICharacterService character)
+        private readonly NotificationHubClient _notifications;
+
+        public DashboardViewModel(IGameService game, IWorkoutService workout, ICharacterService character,
+            NotificationHubClient notifications)
         {
             _game = game;
             _workout = workout;
             _character = character;
+            _notifications = notifications;
             Title = "Dashboard";
         }
 
@@ -101,7 +106,13 @@ namespace MDRNJfitness.ViewModels
                 var history = await _workout.GetHistoryAsync(1, 5);
                 RecentWorkouts.Clear();
                 foreach (var w in history) RecentWorkouts.Add(w);
+
+                // Signed in and the token is fresh: start live notifications (no-op if already on)
+                _ = _notifications.ConnectAsync();
             });
+
+        [RelayCommand]
+        public Task OpenGoldHistoryAsync() => Shell.Current.GoToAsync("GoldHistoryPage");
 
         [RelayCommand]
         public async Task CollectAsync()

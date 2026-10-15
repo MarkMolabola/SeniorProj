@@ -101,6 +101,13 @@ namespace MDRNJfitness.ViewModels
             });
 
         [RelayCommand]
+        public async Task ChallengeAsync()
+        {
+            if (Profile is null) return;
+            await Shell.Current.GoToAsync($"//guild/ChallengePage?challenge={Profile.UserId}");
+        }
+
+        [RelayCommand]
         public async Task BlockAsync() =>
             await RunSafeAsync(async () =>
             {

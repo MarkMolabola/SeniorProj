@@ -9,5 +9,6 @@ namespace MDRNJfitness.Services.Interfaces
         Task<List<AchievementDto>> GetAchievementsAsync();
         Task<DungeonDto> GetDungeonAsync();
         Task<DungeonCollectDto> CollectDungeonAsync();
+        Task<List<GoldTransactionDto>> GetGoldHistoryAsync(int count = 50);
     }
 }

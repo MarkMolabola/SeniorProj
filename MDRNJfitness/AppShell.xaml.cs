@@ -11,6 +11,7 @@ namespace MDRNJfitness
             Routing.RegisterRoute(nameof(AdminQuestPage), typeof(AdminQuestPage));
             Routing.RegisterRoute(nameof(ChatRoomPage), typeof(ChatRoomPage));
             Routing.RegisterRoute(nameof(AdminReportsPage), typeof(AdminReportsPage));
+            Routing.RegisterRoute(nameof(GoldHistoryPage), typeof(GoldHistoryPage));
         }
     }
 }

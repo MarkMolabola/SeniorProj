@@ -2,6 +2,7 @@ using MDRNJ.Api.Data;
 using MDRNJ.Api.Data.Entities;
 using MDRNJ.Api.Services.Interfaces;
 using MDRNJ.Shared.DTOs.Game;
+using MDRNJ.Shared.Enums;
 using MDRNJ.Shared.Game;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -16,8 +17,13 @@ namespace MDRNJ.Api.Services
     public class DungeonService : IDungeonService
     {
         private readonly AppDbContext _db;
+        private readonly IGoalProgressService _goals;
 
-        public DungeonService(AppDbContext db) => _db = db;
+        public DungeonService(AppDbContext db, IGoalProgressService goals)
+        {
+            _db = db;
+            _goals = goals;
+        }
 
         public async Task<DungeonDto> GetAsync(Guid userId)
         {
@@ -32,7 +38,7 @@ namespace MDRNJ.Api.Services
             var power = await PowerAsync(userId);
 
             var collected = DungeonRules.PendingGold(power, now - stats.DungeonCollectedAt);
-            stats.Gold += collected;
+            _goals.GrantGold(stats, collected, GoldReason.Dungeon, $"Dungeon run vs {DungeonRules.MonsterFor(power).Name}");
             stats.DungeonCollectedAt = now;
             await _db.SaveChangesAsync();
 

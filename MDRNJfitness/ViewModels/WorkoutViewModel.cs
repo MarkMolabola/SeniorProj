@@ -11,10 +11,16 @@ namespace MDRNJfitness.ViewModels
         private readonly IWorkoutService _workout;
         private readonly ICharacterProgressPresenter _progress;
 
-        [ObservableProperty] private WorkoutDto? _activeWorkout;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(TracksDistance))]
+        private WorkoutDto? _activeWorkout;
         [ObservableProperty] private string _workoutType = "Running";
         [ObservableProperty] private bool _hasActiveWorkout;
         [ObservableProperty] private string _elapsedTime = "0:00:00";
+        [ObservableProperty] private string _distanceKm = string.Empty;
+
+        /// <summary>Running, cycling, ...: ask for the distance when finishing.</summary>
+        public bool TracksDistance => MDRNJ.Shared.Game.WorkoutTypes.TracksDistance(ActiveWorkout?.WorkoutType);
 
         public ObservableCollection<WorkoutDto> History { get; } = new();
 
@@ -57,17 +63,33 @@ namespace MDRNJfitness.ViewModels
             await RunSafeAsync(async () =>
             {
                 if (ActiveWorkout is null) return;
+                if (!TryReadDistance(TracksDistance, DistanceKm, out var distance))
+                {
+                    await Shell.Current.DisplayAlertAsync("Distance", "Enter a distance in km, like 5 or 3.2, or leave it blank.", "OK");
+                    return;
+                }
                 StopStopwatch();
 
-                var completed = await _workout.CompleteAsync(ActiveWorkout.SessionId);
+                var completed = await _workout.CompleteAsync(ActiveWorkout.SessionId, distance);
                 if (completed is not null)
                     History.Insert(0, completed);
                 ActiveWorkout = null;
                 HasActiveWorkout = false;
                 ElapsedTime = "0:00:00";
+                DistanceKm = string.Empty;
 
                 await _progress.PresentAsync(completed?.CharacterProgress, completed?.AccountProgress, "WORKOUT COMPLETE");
             });
+
+        /// <summary>Blank means no distance; anything else must be 0-1000 km.</summary>
+        internal static bool TryReadDistance(bool tracksDistance, string text, out float? distanceKm)
+        {
+            distanceKm = null;
+            if (!tracksDistance || string.IsNullOrWhiteSpace(text)) return true;
+            if (!float.TryParse(text, out var km) || km < 0 || km > 1000) return false;
+            distanceKm = km > 0 ? km : null;
+            return true;
+        }
 
         private void StartStopwatch()
         {

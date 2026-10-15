@@ -26,7 +26,9 @@ builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program).Assembly));
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        sql => sql.EnableRetryOnFailure()));
+        // Azure SQL serverless auto-pauses when idle and takes up to a minute to resume:
+        // keep retrying long enough to ride that out
+        sql => sql.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(10), errorNumbersToAdd: null)));
 
 // ── SignalR ────────────────────────────────────────
 builder.Services.AddSignalR();
@@ -131,6 +133,7 @@ builder.Services.AddScoped<IGearService, GearService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IDungeonService, DungeonService>();
 builder.Services.AddScoped<IModerationService, ModerationService>();
+builder.Services.AddSingleton<INotifier, Notifier>();
 builder.Services.AddSingleton<CharacterClassifierService>();
 
 // ── CORS (allows MAUI app to call the API) ─────────
@@ -169,5 +172,6 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHub<LeaderboardHub>("/hubs/leaderboard");
 app.MapHub<ChatHub>("/hubs/chat");
+app.MapHub<NotificationHub>("/hubs/notifications");
 
 app.Run();

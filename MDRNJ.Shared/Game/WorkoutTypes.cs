@@ -21,6 +21,17 @@ namespace MDRNJ.Shared.Game
 
         public static IReadOnlyList<string> SelectableNames { get; } = Selectable.Select(t => t.ToString()).ToList();
 
+        private static readonly HashSet<WorkoutType> DistanceTypes = new()
+        {
+            WorkoutType.Running, WorkoutType.Cycling, WorkoutType.Swimming, WorkoutType.Hiking, WorkoutType.Rowing
+        };
+
+        /// <summary>Workouts that cover a distance; logging one advances Distance quests.</summary>
+        public static bool TracksDistance(WorkoutType type) => DistanceTypes.Contains(type);
+
+        public static bool TracksDistance(string? type) =>
+            Enum.TryParse<WorkoutType>(type, true, out var parsed) && TracksDistance(parsed);
+
         /// <summary>
         /// Parses a quest's workout filter: null / "" / "Any" means any workout.
         /// Returns false for an unknown name.

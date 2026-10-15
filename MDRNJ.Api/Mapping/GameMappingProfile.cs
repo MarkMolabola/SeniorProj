@@ -12,6 +12,8 @@ namespace MDRNJ.Api.Mapping
                 .ForMember(d => d.XPToNextLevel, o => o.Ignore());
             CreateMap<XPTransactionEntity, XPTransactionDto>()
                 .ForMember(d => d.Reason, o => o.MapFrom(s => s.Reason.ToString()));
+            CreateMap<GoldTransactionEntity, GoldTransactionDto>()
+                .ForMember(d => d.Reason, o => o.MapFrom(s => s.Reason.ToString()));
             CreateMap<AchievementEntity, AchievementDto>()
                 .ForMember(d => d.Rarity, o => o.MapFrom(s => s.Rarity.ToString()))
                 .ForMember(d => d.UnlockedAt, o => o.Ignore());

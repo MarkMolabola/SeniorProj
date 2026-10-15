@@ -22,8 +22,8 @@ namespace MDRNJfitness.Services
         public Task<WorkoutDto> AddExerciseAsync(Guid sessionId, AddExerciseDto dto) =>
             _http.PostAsync<WorkoutDto>($"api/workouts/{sessionId}/exercises", dto)!;
 
-        public Task<WorkoutDto> CompleteAsync(Guid sessionId) =>
-            _http.PutAsync<WorkoutDto>($"api/workouts/{sessionId}/end", new { })!;
+        public Task<WorkoutDto> CompleteAsync(Guid sessionId, float? distanceKm = null) =>
+            _http.PutAsync<WorkoutDto>($"api/workouts/{sessionId}/end", new EndWorkoutDto { DistanceKm = distanceKm })!;
 
         public Task<WorkoutDto> BacklogAsync(BacklogWorkoutDto dto) =>
             _http.PostAsync<WorkoutDto>("api/workouts/backlog", dto)!;

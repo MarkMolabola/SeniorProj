@@ -8,7 +8,9 @@ namespace MDRNJ.Api.Services.Interfaces
     public interface IGameService
     {
         Task<GameStatsDto> GetStatsAsync(Guid userId);
-        Task<GameStatsDto> AwardXPAsync(Guid userId, int amount, string reason);
         Task<List<XPTransactionDto>> GetXPHistoryAsync(Guid userId);
+
+        /// <summary>The latest gold earned and spent, newest first.</summary>
+        Task<List<GoldTransactionDto>> GetGoldHistoryAsync(Guid userId, int count);
     }
 }

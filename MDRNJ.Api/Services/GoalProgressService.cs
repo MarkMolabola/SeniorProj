@@ -39,7 +39,9 @@ namespace MDRNJ.Api.Services
             var levelBefore = stats.CurrentLevel;
             stats.TotalXP += amount;
             stats.CurrentLevel = AccountProgression.LevelFor(stats.TotalXP);
-            GrantGold(stats, (stats.CurrentLevel - levelBefore) * GoldRules.PerLevelUp);
+            if (stats.CurrentLevel > levelBefore)
+                GrantGold(stats, (stats.CurrentLevel - levelBefore) * GoldRules.PerLevelUp,
+                    GoldReason.LevelUp, $"Reached level {stats.CurrentLevel}");
             _db.XPTransactions.Add(new XPTransactionEntity
             {
                 UserId = stats.UserId,
@@ -48,10 +50,28 @@ namespace MDRNJ.Api.Services
             });
         }
 
-        public void GrantGold(GameStatsEntity stats, int amount)
+        public void GrantGold(GameStatsEntity stats, int amount, GoldReason reason, string? description = null)
         {
-            if (amount > 0) stats.Gold += amount;
+            if (amount <= 0) return;
+            stats.Gold += amount;
+            Record(stats.UserId, amount, reason, description);
         }
+
+        public void SpendGold(GameStatsEntity stats, int amount, GoldReason reason, string? description = null)
+        {
+            if (amount <= 0) return;
+            stats.Gold -= amount;
+            Record(stats.UserId, -amount, reason, description);
+        }
+
+        private void Record(Guid userId, int amount, GoldReason reason, string? description) =>
+            _db.GoldTransactions.Add(new GoldTransactionEntity
+            {
+                UserId = userId,
+                Amount = amount,
+                Reason = reason,
+                Description = description is { Length: > 200 } ? description[..200] : description
+            });
 
         public async Task<List<GoalCompletion>> AdvanceForWorkoutAsync(GameStatsEntity stats, WorkoutSessionEntity session)
         {
@@ -84,7 +104,7 @@ namespace MDRNJ.Api.Services
         public GoalCompletion CompleteQuest(GameStatsEntity stats, QuestEntity quest)
         {
             GrantXP(stats, quest.XPReward, XPReason.QuestCompleted);
-            GrantGold(stats, GoldRules.ForQuest(quest.XPReward));
+            GrantGold(stats, GoldRules.ForQuest(quest.XPReward), GoldReason.Quest, quest.Title);
             return new GoalCompletion(
                 new CompletedGoalDto { Kind = QuestKind, Id = quest.QuestId, Title = quest.Title, XPReward = quest.XPReward },
                 quest.QuestType);

@@ -13,6 +13,7 @@ namespace MDRNJ.Api.Data
         public DbSet<WorkoutSessionEntity> WorkoutSessions => Set<WorkoutSessionEntity>();
         public DbSet<ExerciseEntity> Exercises => Set<ExerciseEntity>();
         public DbSet<XPTransactionEntity> XPTransactions => Set<XPTransactionEntity>();
+        public DbSet<GoldTransactionEntity> GoldTransactions => Set<GoldTransactionEntity>();
         public DbSet<AchievementEntity> Achievements => Set<AchievementEntity>();
         public DbSet<UserAchievementEntity> UserAchievements => Set<UserAchievementEntity>();
         public DbSet<CharacterStateEntity> CharacterStates => Set<CharacterStateEntity>();
@@ -101,6 +102,18 @@ namespace MDRNJ.Api.Data
                 e.HasKey(x => x.TransactionId);
                 e.HasOne(x => x.User)
                  .WithMany(u => u.XPTransactions)
+                 .HasForeignKey(x => x.UserId)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // GoldTransactionEntity
+            modelBuilder.Entity<GoldTransactionEntity>(e =>
+            {
+                e.HasKey(x => x.TransactionId);
+                e.Property(x => x.Description).HasMaxLength(200);
+                e.HasIndex(x => new { x.UserId, x.CreatedAt });
+                e.HasOne(x => x.User)
+                 .WithMany()
                  .HasForeignKey(x => x.UserId)
                  .OnDelete(DeleteBehavior.Cascade);
             });

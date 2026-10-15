@@ -23,5 +23,9 @@ namespace MDRNJ.Api.Controllers
 
         [HttpGet("xp/history")]
         public async Task<IActionResult> GetXPHistory() => Ok(await _game.GetXPHistoryAsync(UserId));
+
+        [HttpGet("gold/history")]
+        public async Task<IActionResult> GetGoldHistory([FromQuery] int count = 50) =>
+            Ok(await _game.GetGoldHistoryAsync(UserId, count));
     }
 }

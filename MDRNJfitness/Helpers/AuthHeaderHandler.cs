@@ -34,7 +34,7 @@ namespace MDRNJfitness.Helpers
             }
 
             response.Dispose();
-            using var retry = Clone(request, body);
+            using var retry = TransientRetryHandler.Clone(request, body);
             Authorize(retry, await TokenStore.GetAccessTokenAsync());
             return await base.SendAsync(retry, cancellationToken);
         }
@@ -49,20 +49,6 @@ namespace MDRNJfitness.Helpers
         /// <summary>Login / register / refresh answer 401 for bad credentials; refreshing won't help.</summary>
         private static bool IsAuthEndpoint(HttpRequestMessage request) =>
             request.RequestUri?.AbsolutePath.Contains("/api/auth/", StringComparison.OrdinalIgnoreCase) == true;
-
-        private static HttpRequestMessage Clone(HttpRequestMessage original, byte[]? body)
-        {
-            var clone = new HttpRequestMessage(original.Method, original.RequestUri) { Version = original.Version };
-            foreach (var header in original.Headers)
-                clone.Headers.TryAddWithoutValidation(header.Key, header.Value);
-            if (body is not null)
-            {
-                clone.Content = new ByteArrayContent(body);
-                foreach (var header in original.Content!.Headers)
-                    clone.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
-            }
-            return clone;
-        }
 
         private static void SendToLogin() =>
             MainThread.BeginInvokeOnMainThread(async () =>
