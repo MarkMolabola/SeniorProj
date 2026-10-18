@@ -45,6 +45,7 @@
                                    TextColor="{StaticResource PxStr}" Text="{Binding TheirScoreText}" />
                         </Grid>
                     </Border>
+                    <Label Style="{StaticResource PxMuted}" Text="{Binding HiddenScoreText}" IsVisible="{Binding IsActive}" />
 
                     <!-- Proof attached so far -->
                     <VerticalStackLayout Spacing="6" IsVisible="{Binding HasProofs}"

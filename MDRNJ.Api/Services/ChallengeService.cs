@@ -240,6 +240,17 @@ namespace MDRNJ.Api.Services
                              || (c.Status == ChallengeStatus.InReview && c.ReviewDeadline <= now)))
                 .ToListAsync();
             await SettleDueAsync(due);
+
+            // Ended challenges whose proofs have outlived their viewing window
+            var cutoff = now.AddHours(-ProofKeepHours);
+            var stale = await _db.Challenges
+                .Include(c => c.Attempts)
+                .Where(c => (c.ChallengerId == userId || c.OpponentId == userId)
+                         && c.ResolvedAt != null
+                         && (c.AllowDisputes || c.ResolvedAt <= cutoff)
+                         && c.Attempts.Any(a => a.ProofPath != null))
+                .ToListAsync();
+            await DeleteExpiredProofsAsync(stale);
         }
 
         private async Task SettleDueAsync(List<ChallengeEntity> due)
@@ -337,7 +348,10 @@ namespace MDRNJ.Api.Services
         public async Task<ProofLinkDto> GetProofLinkAsync(Guid userId, Guid challengeId, Guid attemptId)
         {
             var challenge = await LoadAsync(userId, challengeId);
-            var attempt = challenge.Attempts.FirstOrDefault(a => a.AttemptId == attemptId && a.ProofPath is not null)
+            if (ProofsExpired(challenge, DateTime.UtcNow))
+                throw new KeyNotFoundException("That proof has been deleted.");
+            var attempt = challenge.Attempts.FirstOrDefault(a => a.AttemptId == attemptId && a.ProofPath is not null
+                    && (a.UserId == userId || !TheirResultHidden(challenge)))
                 ?? throw new KeyNotFoundException("Proof not found.");
 
             return new ProofLinkDto
@@ -383,6 +397,7 @@ namespace MDRNJ.Api.Services
             challenge.ResolvedAt = DateTime.UtcNow;
             challenge.ChallengerSeenResult = challenge.OpponentSeenResult = true; // no rewards to show
             await _db.SaveChangesAsync();
+            await DeleteExpiredProofsAsync(new[] { challenge });
 
             var me = challenge.ChallengerId == userId ? challenge.Challenger : challenge.Opponent;
             var otherId = challenge.ChallengerId == userId ? challenge.OpponentId : challenge.ChallengerId;
@@ -430,6 +445,48 @@ namespace MDRNJ.Api.Services
             await _db.SaveChangesAsync();
             foreach (var user in touchedUsers)
                 await _achievements.CheckAndUnlockAsync(user);
+            await DeleteExpiredProofsAsync(challenges);
+        }
+
+        // ── Proof cleanup ───────────────────────────────────────────────────
+
+        /// <summary>How long an unreviewed challenge's proofs stay viewable after it ends.</summary>
+        private const int ProofKeepHours = 24;
+
+        /// <summary>
+        /// Proofs are only kept while they're useful: a reviewed challenge's go as soon as it
+        /// settles (the review window was the time to look), others a day after it ends.
+        /// </summary>
+        private static bool ProofsExpired(ChallengeEntity c, DateTime now) =>
+            c.ResolvedAt is { } resolved
+            && (c.AllowDisputes || resolved.AddHours(ProofKeepHours) <= now);
+
+        /// <summary>
+        /// Deletes the stored files of challenges whose proofs have expired. A failed delete
+        /// leaves the paths in place so the next load retries (the container's lifecycle
+        /// rule is the backstop).
+        /// </summary>
+        private async Task DeleteExpiredProofsAsync(IEnumerable<ChallengeEntity> challenges)
+        {
+            var now = DateTime.UtcNow;
+            var cleared = false;
+            foreach (var c in challenges)
+            {
+                if (!ProofsExpired(c, now) || !c.Attempts.Any(a => a.ProofPath is not null)) continue;
+                try
+                {
+                    await _proofs.DeleteFolderAsync(ProofPaths.ChallengeFolder(c.ChallengeId));
+                }
+                catch
+                {
+                    continue;
+                }
+                foreach (var a in c.Attempts)
+                    a.ProofPath = null;
+                cleared = true;
+            }
+            if (cleared)
+                await _db.SaveChangesAsync();
         }
 
         /// <summary>No-shows (no score) get nothing; everyone who competed gets something.</summary>
@@ -493,6 +550,8 @@ namespace MDRNJ.Api.Services
             var myAttempts = c.Attempts.Count(a => a.UserId == userId);
             var open = c.Deadline > DateTime.UtcNow;
             var iApproved = me ? c.ChallengerApproved : c.OpponentApproved;
+            var proofsGone = ProofsExpired(c, DateTime.UtcNow);
+            var hideTheirs = TheirResultHidden(c);
 
             return new ChallengeDto
             {
@@ -507,7 +566,7 @@ namespace MDRNJ.Api.Services
                 OpponentUserId = them.UserId,
                 OpponentUsername = them.Username,
                 MyScore = me ? c.ChallengerScore : c.OpponentScore,
-                TheirScore = me ? c.OpponentScore : c.ChallengerScore,
+                TheirScore = hideTheirs ? null : me ? c.OpponentScore : c.ChallengerScore,
                 MyAttempts = myAttempts,
                 TheirAttempts = c.Attempts.Count - myAttempts,
                 Outcome = c.Status != ChallengeStatus.Completed ? null
@@ -524,7 +583,7 @@ namespace MDRNJ.Api.Services
                 AllowDisputes = c.AllowDisputes,
                 ProofKind = DuelRules.ProofKindFor(c.Contest).ToString(),
                 Proofs = c.Attempts
-                    .Where(a => a.ProofPath is not null)
+                    .Where(a => a.ProofPath is not null && !proofsGone && (a.UserId == userId || !hideTheirs))
                     .OrderBy(a => a.SubmittedAt)
                     .Select(a => new ChallengeProofDto
                     {
@@ -542,6 +601,12 @@ namespace MDRNJ.Api.Services
                 DisputeReason = c.Status == ChallengeStatus.Disputed ? c.DisputeReason : null
             };
         }
+
+        /// <summary>
+        /// While a challenge runs, neither side sees the other's score or proof: in a best-attempt
+        /// duel you can't aim for their number, and a running total stays a surprise until the deadline.
+        /// </summary>
+        private static bool TheirResultHidden(ChallengeEntity c) => c.Status == ChallengeStatus.Active;
 
         private static CompletedGoalDto ToGoal(ChallengeEntity c, ChallengeDto dto) => new()
         {

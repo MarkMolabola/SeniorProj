@@ -13,6 +13,8 @@ namespace MDRNJ.Api.Services.Interfaces
 
         Task<List<ReportedMessageDto>> GetReportsAsync();
         Task DismissReportsAsync(Guid messageId);
+        Task MuteAsync(Guid adminId, Guid userId, int hours);
+        Task SetBannedAsync(Guid adminId, Guid userId, bool banned);
 
         Task BlockAsync(Guid userId, Guid blockedUserId);
         Task UnblockAsync(Guid userId, Guid blockedUserId);

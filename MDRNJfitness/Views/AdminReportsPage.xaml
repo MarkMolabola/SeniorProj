@@ -16,7 +16,7 @@
 
             <Label Style="{StaticResource PxTitle}" Text="REPORTS" />
             <Label Style="{StaticResource PxMuted}"
-                   Text="Messages players reported, most reports first. Messages with 3+ reports are already hidden. DELETE removes it for everyone; KEEP clears the reports and shows it again." />
+                   Text="Messages players reported, most reports first. Messages with 3+ reports are already hidden. DELETE removes it for everyone; KEEP clears the reports and shows it again; SENDER mutes or bans whoever wrote it." />
 
             <Border Style="{StaticResource PxPanel}" IsVisible="{Binding HasNoReports}">
                 <Label Style="{StaticResource PxMuted}" Text="Nothing to review. The tavern is peaceful." />
@@ -38,13 +38,20 @@
                                     <Label Style="{StaticResource PxBody}" Text="{Binding Body}" LineBreakMode="WordWrap" />
                                 </Border>
                                 <Label Style="{StaticResource PxMuted}" TextColor="{StaticResource PxOrange}" Text="{Binding ReportText}" />
-                                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                                <Label Style="{StaticResource PxMuted}" TextColor="{StaticResource PxStr}"
+                                       Text="{Binding SenderStatusText}" IsVisible="{Binding HasSenderStatus}" />
+                                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
                                     <Button Grid.Column="0"
                                             Style="{StaticResource PxButtonSecondary}"
                                             Text="KEEP"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.KeepCommand}"
                                             CommandParameter="{Binding .}" />
                                     <Button Grid.Column="1"
+                                            Style="{StaticResource PxButtonSecondary}"
+                                            Text="SENDER"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ModerateSenderCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    <Button Grid.Column="2"
                                             Style="{StaticResource PxButtonDanger}"
                                             Text="DELETE"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteCommand}"

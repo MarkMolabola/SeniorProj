@@ -32,6 +32,7 @@ namespace MDRNJfitness.Models.Social
             : Dto.AllowDisputes ? $"PROOF REQUIRED ({(ProofKind == ProofKind.Video ? "VIDEO" : "PHOTO")}) · REVIEWED"
             : $"PROOF REQUIRED ({(ProofKind == ProofKind.Video ? "VIDEO" : "PHOTO")})";
 
+        public bool IsActive => Dto.Status == "Active";
         public bool IsInReview => Dto.Status == "InReview";
 
         /// <summary>Review panel text while InReview.</summary>
@@ -59,7 +60,15 @@ namespace MDRNJfitness.Models.Social
             : $"{Dto.OpponentUsername} challenged you";
 
         public string MyScoreText => Score(Dto.MyScore);
-        public string TheirScoreText => Score(Dto.TheirScore);
+        public string TheirScoreText => IsTheirScoreHidden ? "???" : Score(Dto.TheirScore);
+
+        /// <summary>The API keeps their result secret until the duel closes; we only know they've played.</summary>
+        public bool IsTheirScoreHidden => Dto.Status == "Active" && Dto.TheirScore is null && Dto.TheirAttempts > 0;
+
+        public string HiddenScoreText => Dto.Status != "Active" ? string.Empty
+            : Dto.TheirAttempts > 0
+                ? $"{Dto.OpponentUsername} has logged a result. Scores are revealed when the duel ends."
+                : "Scores stay hidden until the duel ends.";
 
         public string StatusText => Dto.Status switch
         {

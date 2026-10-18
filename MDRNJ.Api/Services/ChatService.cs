@@ -106,6 +106,14 @@ namespace MDRNJ.Api.Services
             body = ContentFilter.Clean(body);
 
             await EnsureAccessAsync(userId, channelId);
+            var sender = await _db.Users
+                .Where(u => u.UserId == userId)
+                .Select(u => new { u.IsBanned, u.ChatMutedUntil })
+                .FirstAsync();
+            if (sender.IsBanned)
+                throw new UnauthorizedAccessException(ChatRules.SuspendedMessage);
+            if (sender.ChatMutedUntil is DateTime until && until > DateTime.UtcNow)
+                throw new InvalidOperationException($"A moderator muted you. You can chat again in {Remaining(until - DateTime.UtcNow)}.");
             var channel = await _db.ChatChannels.FirstAsync(c => c.ChannelId == channelId);
 
             if (channel.Kind == ChatChannelKind.Direct)
@@ -336,6 +344,11 @@ namespace MDRNJ.Api.Services
         }
 
         /// <summary>Chat list preview of a message (first 120 characters).</summary>
+        private static string Remaining(TimeSpan left) =>
+            left.TotalHours >= 24 ? $"{(int)left.TotalDays}d {left.Hours}h"
+            : left.TotalMinutes >= 60 ? $"{(int)left.TotalHours}h {left.Minutes}m"
+            : $"{Math.Max(1, (int)Math.Ceiling(left.TotalMinutes))}m";
+
         public static string Preview(string body) => body.Length <= 120 ? body : body[..117] + "...";
 
         private static string DirectKey(Guid a, Guid b)

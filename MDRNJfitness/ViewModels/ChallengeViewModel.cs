@@ -24,6 +24,7 @@ namespace MDRNJfitness.ViewModels
         private readonly IChallengeService _challenges;
         private readonly IFriendService _friends;
         private readonly ICharacterProgressPresenter _progress;
+        private readonly ICharacterService _character;
 
         public ObservableCollection<ChallengeCard> Incoming { get; } = new();
         public ObservableCollection<ChallengeCard> Active { get; } = new();
@@ -74,11 +75,13 @@ namespace MDRNJfitness.ViewModels
             set => _pendingOpponent = Guid.TryParse(value, out var id) ? id : null;
         }
 
-        public ChallengeViewModel(IChallengeService challenges, IFriendService friends, ICharacterProgressPresenter progress)
+        public ChallengeViewModel(IChallengeService challenges, IFriendService friends, ICharacterProgressPresenter progress,
+            ICharacterService character)
         {
             _challenges = challenges;
             _friends = friends;
             _progress = progress;
+            _character = character;
             Title = "Challenges";
             UpdateFormRules();
         }
@@ -147,6 +150,7 @@ namespace MDRNJfitness.ViewModels
             foreach (var c in all.Where(c => !c.ResultSeen))
             {
                 var card = new ChallengeCard(c);
+                await PlayDuelAsync(card);
                 await _progress.PresentAsync(null, new AccountProgressDto
                 {
                     XPGained = c.XPEarned,
@@ -279,7 +283,10 @@ namespace MDRNJfitness.ViewModels
                 Show(await _challenges.GetMyChallengesAsync());
 
                 if (updated.AccountProgress is not null)
+                {
+                    await PlayDuelAsync(new ChallengeCard(updated));
                     await _progress.PresentAsync(updated.CharacterProgress, updated.AccountProgress, Headline(updated.Outcome));
+                }
                 else if (updated.Status == "InReview")
                     await Shell.Current.DisplayAlertAsync("Results are in!",
                         $"Both results are locked in. Check {card.Dto.OpponentUsername}'s proof and approve or dispute it. "
@@ -418,6 +425,31 @@ namespace MDRNJfitness.ViewModels
                 seconds = seconds * 60 + n;
             }
             return true;
+        }
+
+        /// <summary>The fight animation for a settled duel: our hero vs theirs, in their real gear.</summary>
+        private async Task PlayDuelAsync(ChallengeCard card)
+        {
+            if (card.Dto.Outcome is not string outcome) return;
+
+            var me = DuelResultPage.Fighter.Plain("YOU");
+            try
+            {
+                var mine = await _character.GetCharacterAsync();
+                me = new DuelResultPage.Fighter("YOU", mine.OutfitSlot ?? "default", mine.AvatarId, mine.InDrawOrder());
+            }
+            catch { /* draw the default hero */ }
+
+            var name = card.Dto.OpponentUsername.ToUpperInvariant();
+            var them = DuelResultPage.Fighter.Plain(name);
+            try
+            {
+                var theirs = await _friends.GetFriendProfileAsync(card.Dto.OpponentUserId);
+                them = new DuelResultPage.Fighter(name, theirs.SpriteState, theirs.AvatarId, theirs.InDrawOrder());
+            }
+            catch { /* unfriended or blocked since: still show the fight */ }
+
+            await DuelResultPage.ShowAsync(me, them, outcome, card.Title, card.MyScoreText, card.TheirScoreText);
         }
 
         private static string Headline(string? outcome) => outcome switch

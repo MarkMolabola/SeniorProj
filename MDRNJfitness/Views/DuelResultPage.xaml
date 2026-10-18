@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Shown when a duel settles, before the rewards popup: the two heroes square
+    off and the winner knocks the loser out (or they clash to a draw).
+-->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             xmlns:local="clr-namespace:MDRNJfitness.Views"
+             x:Class="MDRNJfitness.Views.DuelResultPage"
+             ios:Page.ModalPresentationStyle="OverFullScreen"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#E60B0918">
+
+    <Grid Padding="24">
+        <Border Style="{StaticResource PxPanel}"
+                Padding="18,24,18,22"
+                VerticalOptions="Center">
+            <VerticalStackLayout Spacing="14">
+
+                <Label x:Name="TitleLabel"
+                       Style="{StaticResource PxCaption}"
+                       HorizontalOptions="Center" />
+
+                <!-- Arena: you on the left, them on the right -->
+                <Grid x:Name="Arena" HeightRequest="150">
+                    <local:PixelAvatarView x:Name="MyHero"
+                                           WidthRequest="96" HeightRequest="96"
+                                           HorizontalOptions="Start"
+                                           VerticalOptions="End" />
+                    <local:PixelAvatarView x:Name="TheirHero"
+                                           WidthRequest="96" HeightRequest="96"
+                                           HorizontalOptions="End"
+                                           VerticalOptions="End" />
+
+                    <Label x:Name="VsLabel"
+                           Style="{StaticResource PxTitle}"
+                           Text="VS"
+                           TextColor="{StaticResource PxGold}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Opacity="0" />
+                    <Label x:Name="ImpactLabel"
+                           Style="{StaticResource PxTitle}"
+                           FontSize="18"
+                           TextColor="{StaticResource PxOrange}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Opacity="0" />
+                    <Label x:Name="KoLabel"
+                           Style="{StaticResource PxTitle}"
+                           FontSize="28"
+                           TextColor="{StaticResource PxGold}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Start"
+                           Opacity="0" />
+                </Grid>
+
+                <Grid ColumnDefinitions="*,*">
+                    <Label x:Name="MyNameLabel"
+                           Style="{StaticResource PxCaption}"
+                           TextColor="{StaticResource PxTeal}" />
+                    <Label x:Name="TheirNameLabel"
+                           Grid.Column="1"
+                           Style="{StaticResource PxCaption}"
+                           TextColor="{StaticResource PxStr}"
+                           HorizontalTextAlignment="End" />
+                </Grid>
+
+                <VerticalStackLayout x:Name="ResultPanel" Spacing="12" Opacity="0">
+                    <Label x:Name="ResultLabel"
+                           Style="{StaticResource PxTitle}"
+                           FontSize="22"
+                           HorizontalOptions="Center" />
+                    <Label x:Name="ScoreLabel"
+                           Style="{StaticResource PxBody}"
+                           HorizontalTextAlignment="Center"
+                           HorizontalOptions="Center" />
+                    <Button x:Name="ContinueButton"
+                            Style="{StaticResource PxButton}"
+                            Text="CONTINUE"
+                            IsEnabled="False"
+                            Clicked="OnContinueClicked" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>

@@ -57,5 +57,11 @@ namespace MDRNJfitness.Services
 
         public Task DismissReportsAsync(Guid messageId) =>
             _http.PostAsync($"api/chat/reports/{messageId}/dismiss", new { });
+
+        public Task MuteUserAsync(Guid userId, int hours) =>
+            _http.PostAsync($"api/chat/users/{userId}/mute", new MuteUserDto { Hours = hours });
+
+        public Task SetBannedAsync(Guid userId, bool banned) =>
+            _http.PostAsync($"api/chat/users/{userId}/ban", new BanUserDto { Banned = banned });
     }
 }

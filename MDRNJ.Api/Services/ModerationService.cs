@@ -17,7 +17,8 @@ namespace MDRNJ.Api.Services
 {
     /// <summary>
     /// Chat safety: reporting (auto-hide after ChatRules.ReportsToHide reports), deleting
-    /// messages (own, or any for admins), the admin report queue, and blocking players.
+    /// messages (own, or any for admins), the admin report queue, admin mutes and bans,
+    /// and blocking players.
     /// </summary>
     public class ModerationService : IModerationService
     {
@@ -90,7 +91,8 @@ namespace MDRNJ.Api.Services
                 .Select(m => new
                 {
                     m.MessageId, m.ChannelId, m.SenderId, SenderName = m.Sender.Username,
-                    m.Body, m.SentAt, m.IsHidden, m.Channel.Kind, m.Channel.Name
+                    m.Body, m.SentAt, m.IsHidden, m.Channel.Kind, m.Channel.Name,
+                    m.Sender.ChatMutedUntil, m.Sender.IsBanned
                 })
                 .ToDictionaryAsync(m => m.MessageId);
 
@@ -110,6 +112,8 @@ namespace MDRNJ.Api.Services
                         Body = m.Body,
                         SentAt = m.SentAt,
                         IsHidden = m.IsHidden,
+                        SenderMutedUntil = m.ChatMutedUntil > DateTime.UtcNow ? m.ChatMutedUntil : null,
+                        SenderBanned = m.IsBanned,
                         ReportCount = r.Count,
                         Reasons = r.Reasons
                     };
@@ -129,6 +133,32 @@ namespace MDRNJ.Api.Services
                 message.IsHidden = false;
                 await _db.SaveChangesAsync(); // before the preview query reads it
                 await _chat.RefreshPreviewAsync(message.ChannelId);
+            }
+        }
+
+        public async Task MuteAsync(Guid adminId, Guid userId, int hours)
+        {
+            if (hours is < 0 or > 24 * 30)
+                throw new ArgumentException("Mutes last up to 30 days.");
+
+            var user = await FindModeratableAsync(adminId, userId);
+            user.ChatMutedUntil = hours == 0 ? null : DateTime.UtcNow.AddHours(hours);
+            await _db.SaveChangesAsync();
+        }
+
+        /// <summary>A banned player can't sign in or refresh, and every session they have is ended.</summary>
+        public async Task SetBannedAsync(Guid adminId, Guid userId, bool banned)
+        {
+            var user = await FindModeratableAsync(adminId, userId);
+            user.IsBanned = banned;
+            await _db.SaveChangesAsync();
+
+            if (banned)
+            {
+                var now = DateTime.UtcNow;
+                await _db.RefreshTokens
+                    .Where(t => t.UserId == userId && t.RevokedAt == null)
+                    .ExecuteUpdateAsync(u => u.SetProperty(t => t.RevokedAt, now));
             }
         }
 
@@ -163,6 +193,17 @@ namespace MDRNJ.Api.Services
                 .ToListAsync();
 
         // ── Helpers ─────────────────────────────────────────────
+
+        private async Task<UserEntity> FindModeratableAsync(Guid adminId, Guid userId)
+        {
+            if (adminId == userId)
+                throw new ArgumentException("You can't moderate yourself.");
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.UserId == userId)
+                ?? throw new KeyNotFoundException("User not found.");
+            if (user.IsAdmin)
+                throw new InvalidOperationException("Admins can't be muted or banned.");
+            return user;
+        }
 
         private async Task<ChatMessageEntity> FindVisibleMessageAsync(Guid userId, Guid messageId)
         {

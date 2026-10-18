@@ -4,6 +4,7 @@ using MDRNJ.Api.Exceptions;
 using MDRNJ.Api.Services.Interfaces;
 using MDRNJ.Shared.DTOs.Auth;
 using MDRNJ.Shared.DTOs.User;
+using MDRNJ.Shared.Game;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -48,6 +49,10 @@ namespace MDRNJ.Api.Services
 
             if (await _db.Users.AnyAsync(u => u.Username == dto.Username))
                 throw new InvalidOperationException("Username already taken.");
+            if (ContentFilter.IsOffensive(dto.Username))
+                throw new ArgumentException("Pick a different username.");
+            if (ContentFilter.IsOffensive(dto.DisplayName))
+                throw new ArgumentException("Pick a different display name.");
 
             var user = AddNewUser(dto.Email, dto.Username, dto.DisplayName);
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
@@ -158,7 +163,7 @@ namespace MDRNJ.Api.Services
                 {
                     var username = await GenerateUniqueUsernameAsync(email);
                     var displayName = googleUser.FindFirstValue(ClaimTypes.Name)?.Trim() ?? "";
-                    if (displayName.Length < 2) displayName = username;
+                    if (displayName.Length < 2 || ContentFilter.IsOffensive(displayName)) displayName = username;
                     if (displayName.Length > 50) displayName = displayName[..50];
 
                     user = AddNewUser(email, username, displayName);
@@ -194,7 +199,7 @@ namespace MDRNJ.Api.Services
             var baseName = new string(email.Split('@')[0]
                 .Where(c => char.IsAsciiLetterOrDigit(c) || c == '_')
                 .ToArray());
-            if (baseName.Length < 3) baseName = "user";
+            if (baseName.Length < 3 || ContentFilter.IsOffensive(baseName)) baseName = "user";
             if (baseName.Length > 24) baseName = baseName[..24];
 
             var candidate = baseName;
@@ -287,6 +292,10 @@ namespace MDRNJ.Api.Services
         /// <summary>Signs an access token and issues (and saves) a new refresh token.</summary>
         private async Task<AuthResponseDto> BuildAuthResponseAsync(UserEntity user)
         {
+            // Every way in (password, Google, email code, refresh) comes through here
+            if (user.IsBanned)
+                throw new UnauthorizedAccessException(ChatRules.SuspendedMessage);
+
             // Housekeeping: drop this user's dead tokens. Revoked ones are kept a while so reuse is still detected.
             var now = DateTime.UtcNow;
             var revokedCutoff = now.AddDays(-30);

@@ -60,6 +60,12 @@ namespace MDRNJfitness.Models.Social
         public string Body => Report.Body;
         public string ReportText => $"{Report.ReportCount} report{(Report.ReportCount == 1 ? "" : "s")}: {string.Join(", ", Report.Reasons)}"
             + (Report.IsHidden ? " · HIDDEN" : "");
+
+        /// <summary>What's already been done to the sender, if anything.</summary>
+        public string SenderStatusText => Report.SenderBanned ? $"{Report.SenderName} is BANNED"
+            : Report.SenderMutedUntil is DateTime until ? $"{Report.SenderName} is muted until {ChatTime.Short(until)}"
+            : string.Empty;
+        public bool HasSenderStatus => SenderStatusText.Length > 0;
     }
 
     public static class ChatTime

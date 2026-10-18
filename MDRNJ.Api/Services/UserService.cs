@@ -44,8 +44,10 @@ namespace MDRNJ.Api.Services
             var profile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId)
                 ?? throw new KeyNotFoundException("Profile not found.");
 
+            if (ContentFilter.IsOffensive(dto.DisplayName))
+                throw new ArgumentException("Pick a different display name.");
             profile.DisplayName = dto.DisplayName;
-            profile.Bio = dto.Bio;
+            profile.Bio = dto.Bio is null ? null : ContentFilter.Clean(dto.Bio);
             profile.WeightKg = dto.WeightKg;
             profile.HeightCm = dto.HeightCm;
 

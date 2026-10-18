@@ -69,6 +69,24 @@ namespace MDRNJ.Api.Controllers
             return NoContent();
         }
 
+        /// <summary>Admins: mute a player in chat for some hours (0 lifts it).</summary>
+        [HttpPost("users/{userId:guid}/mute")]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<IActionResult> Mute(Guid userId, [FromBody] MuteUserDto dto)
+        {
+            await _moderation.MuteAsync(UserId, userId, dto.Hours);
+            return NoContent();
+        }
+
+        /// <summary>Admins: suspend or restore a player's account.</summary>
+        [HttpPost("users/{userId:guid}/ban")]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<IActionResult> Ban(Guid userId, [FromBody] BanUserDto dto)
+        {
+            await _moderation.SetBannedAsync(UserId, userId, dto.Banned);
+            return NoContent();
+        }
+
         [HttpPost("channels/{channelId:guid}/read")]
         public async Task<IActionResult> MarkRead(Guid channelId)
         {

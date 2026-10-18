@@ -668,6 +668,9 @@ namespace MDRNJ.Api.Migrations
                     b.Property<string>("AvatarUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("ChatMutedUntil")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("DateJoined")
                         .HasColumnType("datetime2");
 
@@ -684,6 +687,9 @@ namespace MDRNJ.Api.Migrations
                         .HasColumnType("nvarchar(64)");
 
                     b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsBanned")
                         .HasColumnType("bit");
 
                     b.Property<string>("PasswordHash")

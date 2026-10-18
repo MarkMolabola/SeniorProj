@@ -13,6 +13,10 @@ namespace MDRNJ.Shared.DTOs.Chat
 
         /// <summary>Auto-hidden after ChatRules.ReportsToHide reports.</summary>
         public bool IsHidden { get; set; }
+
+        /// <summary>The sender's current chat mute, if any.</summary>
+        public DateTime? SenderMutedUntil { get; set; }
+        public bool SenderBanned { get; set; }
         public int ReportCount { get; set; }
         public List<string> Reasons { get; set; } = new();
     }

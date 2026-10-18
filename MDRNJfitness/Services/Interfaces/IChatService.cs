@@ -19,5 +19,7 @@ namespace MDRNJfitness.Services.Interfaces
         Task DeleteMessageAsync(Guid messageId);
         Task<List<ReportedMessageDto>> GetReportsAsync();
         Task DismissReportsAsync(Guid messageId);
+        Task MuteUserAsync(Guid userId, int hours);
+        Task SetBannedAsync(Guid userId, bool banned);
     }
 }

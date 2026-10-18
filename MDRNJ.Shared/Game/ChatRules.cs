@@ -20,6 +20,9 @@ namespace MDRNJ.Shared.Game
         /// <summary>A message is hidden for everyone once this many players report it (until an admin reviews it).</summary>
         public const int ReportsToHide = 3;
 
+        /// <summary>Shown to a player an admin has banned when they try to sign in or chat.</summary>
+        public const string SuspendedMessage = "This account has been suspended for breaking the community rules.";
+
         /// <summary>Reasons offered when reporting a message.</summary>
         public static readonly IReadOnlyList<string> ReportReasons = new[]
         {

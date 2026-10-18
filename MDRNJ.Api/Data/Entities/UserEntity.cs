@@ -13,6 +13,10 @@ namespace MDRNJ.Api.Data.Entities
         public DateTime DateJoined { get; set; } = DateTime.UtcNow;
         public bool IsAdmin { get; set; } = false;
 
+        // Moderation (set by admins)
+        public DateTime? ChatMutedUntil { get; set; }
+        public bool IsBanned { get; set; }
+
         // Email verification
         public bool EmailVerified { get; set; } = false;
         public string? VerificationCodeHash { get; set; }
