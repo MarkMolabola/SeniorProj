@@ -31,7 +31,11 @@
 		<ApplicationTitle>MDRNJfitness</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.mdrnjfitness</ApplicationId>
+		<ApplicationId>com.mdrnjfitness.app</ApplicationId>
+
+		<!-- Debug builds normally use the local API; UseAzureApi=true points them at Azure instead
+		     (Mac, where LocalDB can't run, or a physical phone). See Helpers/ApiConstants.cs. -->
+		<DefineConstants Condition="'$(UseAzureApi)' == 'true'">$(DefineConstants);AZURE_API</DefineConstants>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
