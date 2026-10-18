@@ -1,91 +1,91 @@
 {
   "Head/RedCap": {
     "name": "Red Cap",
-    "price": 60,
+    "price": 100,
     "rarity": "Common",
     "stat": "END"
   },
   "Top/RunnerTee": {
     "name": "Runner Tee",
-    "price": 80,
+    "price": 320,
     "rarity": "Rare",
     "stat": "END"
   },
   "Bottom/TrackShorts": {
     "name": "Track Shorts",
-    "price": 70,
+    "price": 280,
     "rarity": "Rare",
     "stat": "END"
   },
   "Shoes/RedSneakers": {
     "name": "Red Sneakers",
-    "price": 90,
+    "price": 800,
     "rarity": "Epic",
     "stat": "END"
   },
   "Accessory/Wristbands": {
     "name": "Wristbands",
-    "price": 40,
+    "price": 80,
     "rarity": "Common",
     "stat": "STR"
   },
   "Head/Hat1": {
     "name": "Black Cap",
-    "price": 60,
+    "price": 100,
     "rarity": "Common",
     "stat": "STR"
   },
   "Head/Hat2": {
     "name": "Gold Emblem Cap",
-    "price": 90,
+    "price": 750,
     "rarity": "Epic",
     "stat": "STR"
   },
   "Head/hat3": {
     "name": "Ranger Cap",
-    "price": 50,
+    "price": 90,
     "rarity": "Common",
     "stat": "FLX"
   },
   "Head/pinkHat": {
     "name": "Pink Cap",
-    "price": 70,
+    "price": 260,
     "rarity": "Rare",
     "stat": "FLX"
   },
   "Bottom/BlackShorts": {
     "name": "Black Gym Shorts",
-    "price": 60,
+    "price": 100,
     "rarity": "Common",
     "stat": "STR"
   },
   "Bottom/RedShorts": {
     "name": "Red Shorts",
-    "price": 55,
+    "price": 90,
     "rarity": "Common",
     "stat": "STR"
   },
   "Shoes/Shoes1": {
     "name": "Pink Trainers",
-    "price": 80,
+    "price": 300,
     "rarity": "Rare",
     "stat": "FLX"
   },
   "Shoes/Shoes2": {
     "name": "Blaze Sneakers",
-    "price": 120,
+    "price": 2000,
     "rarity": "Legendary",
     "stat": "END"
   },
   "Accessory/gloves": {
     "name": "Pink Boxing Gloves",
-    "price": 75,
+    "price": 280,
     "rarity": "Rare",
     "stat": "STR"
   },
   "Accessory/redGloves": {
     "name": "Red Boxing Gloves",
-    "price": 85,
+    "price": 300,
     "rarity": "Rare",
     "stat": "STR"
   }

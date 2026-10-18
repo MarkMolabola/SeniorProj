@@ -9,21 +9,21 @@ namespace MDRNJ.Shared.Game
         /// <summary>Everything the shop sells, from GearReferences/gear.json.</summary>
         public static readonly IReadOnlyList<GearItem> All = new GearItem[]
         {
-            new("hat1", "Black Cap", GearSlot.Head, 60, GearRarity.Common, StatKind.Strength),
-            new("hat2", "Gold Emblem Cap", GearSlot.Head, 90, GearRarity.Epic, StatKind.Strength),
-            new("hat3", "Ranger Cap", GearSlot.Head, 50, GearRarity.Common, StatKind.Flexibility),
-            new("pink_hat", "Pink Cap", GearSlot.Head, 70, GearRarity.Rare, StatKind.Flexibility),
-            new("red_cap", "Red Cap", GearSlot.Head, 60, GearRarity.Common, StatKind.Endurance),
-            new("runner_tee", "Runner Tee", GearSlot.Top, 80, GearRarity.Rare, StatKind.Endurance),
-            new("black_shorts", "Black Gym Shorts", GearSlot.Bottom, 60, GearRarity.Common, StatKind.Strength),
-            new("red_shorts", "Red Shorts", GearSlot.Bottom, 55, GearRarity.Common, StatKind.Strength),
-            new("track_shorts", "Track Shorts", GearSlot.Bottom, 70, GearRarity.Rare, StatKind.Endurance),
-            new("red_sneakers", "Red Sneakers", GearSlot.Shoes, 90, GearRarity.Epic, StatKind.Endurance),
-            new("shoes1", "Pink Trainers", GearSlot.Shoes, 80, GearRarity.Rare, StatKind.Flexibility),
-            new("shoes2", "Blaze Sneakers", GearSlot.Shoes, 120, GearRarity.Legendary, StatKind.Endurance),
-            new("gloves", "Pink Boxing Gloves", GearSlot.Accessory, 75, GearRarity.Rare, StatKind.Strength),
-            new("red_gloves", "Red Boxing Gloves", GearSlot.Accessory, 85, GearRarity.Rare, StatKind.Strength),
-            new("wristbands", "Wristbands", GearSlot.Accessory, 40, GearRarity.Common, StatKind.Strength),
+            new("hat1", "Black Cap", GearSlot.Head, 100, GearRarity.Common, StatKind.Strength),
+            new("hat2", "Gold Emblem Cap", GearSlot.Head, 750, GearRarity.Epic, StatKind.Strength),
+            new("hat3", "Ranger Cap", GearSlot.Head, 90, GearRarity.Common, StatKind.Flexibility),
+            new("pink_hat", "Pink Cap", GearSlot.Head, 260, GearRarity.Rare, StatKind.Flexibility),
+            new("red_cap", "Red Cap", GearSlot.Head, 100, GearRarity.Common, StatKind.Endurance),
+            new("runner_tee", "Runner Tee", GearSlot.Top, 320, GearRarity.Rare, StatKind.Endurance),
+            new("black_shorts", "Black Gym Shorts", GearSlot.Bottom, 100, GearRarity.Common, StatKind.Strength),
+            new("red_shorts", "Red Shorts", GearSlot.Bottom, 90, GearRarity.Common, StatKind.Strength),
+            new("track_shorts", "Track Shorts", GearSlot.Bottom, 280, GearRarity.Rare, StatKind.Endurance),
+            new("red_sneakers", "Red Sneakers", GearSlot.Shoes, 800, GearRarity.Epic, StatKind.Endurance),
+            new("shoes1", "Pink Trainers", GearSlot.Shoes, 300, GearRarity.Rare, StatKind.Flexibility),
+            new("shoes2", "Blaze Sneakers", GearSlot.Shoes, 2000, GearRarity.Legendary, StatKind.Endurance),
+            new("gloves", "Pink Boxing Gloves", GearSlot.Accessory, 280, GearRarity.Rare, StatKind.Strength),
+            new("red_gloves", "Red Boxing Gloves", GearSlot.Accessory, 300, GearRarity.Rare, StatKind.Strength),
+            new("wristbands", "Wristbands", GearSlot.Accessory, 80, GearRarity.Common, StatKind.Strength),
         };
     }
 }
