@@ -10,6 +10,7 @@ namespace MDRNJfitness.Services.Interfaces
         Task<AuthResponseDto> VerifyEmailAsync(VerifyEmailDto dto);
         Task ResendVerificationAsync(string email);
         Task ForgotPasswordAsync(string email);
+        Task AcceptTermsAsync();
         Task<AuthResponseDto> ResetPasswordAsync(ResetPasswordDto dto);
 
         /// <summary>Returns false if the user cancelled the Google sign-in screen.</summary>

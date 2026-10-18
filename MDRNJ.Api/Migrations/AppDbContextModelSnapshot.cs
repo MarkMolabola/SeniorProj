@@ -707,6 +707,12 @@ namespace MDRNJ.Api.Migrations
                     b.Property<DateTime?>("PasswordResetSentAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("TermsAcceptedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TermsVersion")
+                        .HasColumnType("int");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(30)

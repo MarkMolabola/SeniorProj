@@ -30,11 +30,12 @@ namespace MDRNJ.Shared.Game
         };
 
         /// <summary>Bump to show the rules again after they change.</summary>
-        public const int RulesVersion = 1;
+        public const int RulesVersion = 2;
 
         public const string RulesText =
-            "Be respectful. No harassment, hate speech, threats, sexual content or spam. " +
-            "Tap any message to report it or block its sender. Reported messages are reviewed " +
-            "by admins and removed, and players who break the rules can be banned.";
+            "Zero tolerance: no harassment, hate speech, threats, sexual content, spam or cheating. " +
+            "Tap any message to report it or block its sender. Moderators review reports and remove " +
+            "content, and players who break the rules are muted or banned. " +
+            "Full rules: Terms of Service (Profile tab).";
     }
 }

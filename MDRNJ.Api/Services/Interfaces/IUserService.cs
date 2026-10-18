@@ -10,5 +10,6 @@ namespace MDRNJ.Api.Services.Interfaces
         Task<UserProfileDto> GetProfileAsync(Guid userId);
         Task<UserProfileDto> UpdateProfileAsync(Guid userId, UpdateUserProfileDto dto);
         Task DeleteAccountAsync(Guid userId);
+        Task AcceptTermsAsync(Guid userId);
     }
 }

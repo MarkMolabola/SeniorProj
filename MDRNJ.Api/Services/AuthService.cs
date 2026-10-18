@@ -53,8 +53,13 @@ namespace MDRNJ.Api.Services
                 throw new ArgumentException("Pick a different username.");
             if (ContentFilter.IsOffensive(dto.DisplayName))
                 throw new ArgumentException("Pick a different display name.");
+            if (!dto.AcceptedTerms)
+                throw new ArgumentException(
+                    $"To sign up, confirm you're {LegalRules.MinimumAge} or older and agree to the Terms of Service and Privacy Policy.");
 
             var user = AddNewUser(dto.Email, dto.Username, dto.DisplayName);
+            user.TermsVersion = LegalRules.TermsVersion;
+            user.TermsAcceptedAt = DateTime.UtcNow;
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
             await _db.SaveChangesAsync();
@@ -408,7 +413,8 @@ namespace MDRNJ.Api.Services
                     Email = user.Email,
                     AvatarUrl = user.AvatarUrl,
                     DateJoined = user.DateJoined,
-                    IsAdmin = user.IsAdmin
+                    IsAdmin = user.IsAdmin,
+                    TermsVersion = user.TermsVersion
                 }
             };
         }

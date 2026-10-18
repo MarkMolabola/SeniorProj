@@ -29,6 +29,14 @@ namespace MDRNJ.Api.Controllers
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileDto dto) =>
             Ok(await _users.UpdateProfileAsync(UserId, dto));
 
+        /// <summary>The player agreed to the current Terms of Service and Privacy Policy.</summary>
+        [HttpPost("me/accept-terms")]
+        public async Task<IActionResult> AcceptTerms()
+        {
+            await _users.AcceptTermsAsync(UserId);
+            return NoContent();
+        }
+
         [HttpDelete("me")]
         public async Task<IActionResult> DeleteAccount()
         {

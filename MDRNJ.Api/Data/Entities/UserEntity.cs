@@ -13,6 +13,10 @@ namespace MDRNJ.Api.Data.Entities
         public DateTime DateJoined { get; set; } = DateTime.UtcNow;
         public bool IsAdmin { get; set; } = false;
 
+        // Which Terms of Service / Privacy Policy version (LegalRules.TermsVersion) the player accepted
+        public int TermsVersion { get; set; }
+        public DateTime? TermsAcceptedAt { get; set; }
+
         // Moderation (set by admins)
         public DateTime? ChatMutedUntil { get; set; }
         public bool IsBanned { get; set; }

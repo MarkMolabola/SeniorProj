@@ -26,6 +26,9 @@ namespace MDRNJ.Shared.DTOs.Auth
         [MinLength(2)]
         [MaxLength(50)]
         public required string DisplayName { get; set; }
+
+        /// <summary>The player confirmed they're 13 or older and agreed to the Terms and Privacy Policy.</summary>
+        public bool AcceptedTerms { get; set; }
     }
 
 

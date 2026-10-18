@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MDRNJ.Shared.DTOs.Game;
 using MDRNJ.Shared.DTOs.User;
+using MDRNJfitness.Helpers;
 using MDRNJfitness.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -125,6 +126,12 @@ namespace MDRNJfitness.ViewModels
                 await Shell.Current.DisplayAlertAsync("Account deleted", "Your account has been deleted. Thanks for training with us.", "OK");
                 await Shell.Current.GoToAsync("//LoginPage");
             });
+
+        [RelayCommand]
+        public Task OpenTermsAsync() => TermsGate.OpenTermsAsync();
+
+        [RelayCommand]
+        public Task OpenPrivacyAsync() => TermsGate.OpenPrivacyAsync();
 
         [RelayCommand]
         public async Task LogoutAsync() =>

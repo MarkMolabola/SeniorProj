@@ -12,5 +12,8 @@ namespace MDRNJ.Shared.DTOs.User
         public string? AvatarUrl { get; set; }
         public DateTime DateJoined { get; set; }
         public bool IsAdmin { get; set; }
+
+        /// <summary>Terms version the player accepted; below LegalRules.TermsVersion means ask again.</summary>
+        public int TermsVersion { get; set; }
     }
 }

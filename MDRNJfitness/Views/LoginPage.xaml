@@ -72,6 +72,32 @@
                                        Placeholder="What friends see"
                                        Text="{Binding DisplayName}" />
                             </Border>
+
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="6" Margin="0,4,0,0">
+                                <CheckBox IsChecked="{Binding AcceptedTerms}"
+                                          Color="{StaticResource PxGold}"
+                                          VerticalOptions="Start" />
+                                <Label Grid.Column="1" Style="{StaticResource PxMuted}" VerticalOptions="Center">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding TermsCheckboxText}" />
+                                            <Span Text=" " />
+                                            <Span Text="Terms of Service" TextColor="{StaticResource PxGold}" TextDecorations="Underline">
+                                                <Span.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding OpenTermsCommand}" />
+                                                </Span.GestureRecognizers>
+                                            </Span>
+                                            <Span Text=" and " />
+                                            <Span Text="Privacy Policy" TextColor="{StaticResource PxGold}" TextDecorations="Underline">
+                                                <Span.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding OpenPrivacyCommand}" />
+                                                </Span.GestureRecognizers>
+                                            </Span>
+                                            <Span Text="." />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </Grid>
                         </VerticalStackLayout>
                     </VerticalStackLayout>
                 </Border>

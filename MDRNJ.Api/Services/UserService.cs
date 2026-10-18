@@ -3,6 +3,7 @@ using MDRNJ.Api.Data;
 using MDRNJ.Api.Services.Interfaces;
 using MDRNJ.Shared.DTOs.User;
 using MDRNJ.Shared.Enums;
+using MDRNJ.Shared.Game;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -56,6 +57,16 @@ namespace MDRNJ.Api.Services
 
             await _db.SaveChangesAsync();
             return _mapper.Map<UserProfileDto>(profile);
+        }
+
+        /// <summary>Records that the player accepted the current Terms and Privacy Policy.</summary>
+        public async Task AcceptTermsAsync(Guid userId)
+        {
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.UserId == userId)
+                ?? throw new KeyNotFoundException("User not found.");
+            user.TermsVersion = LegalRules.TermsVersion;
+            user.TermsAcceptedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync();
         }
 
         public async Task DeleteAccountAsync(Guid userId)

@@ -1,6 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MDRNJ.Shared.DTOs.Auth;
+using MDRNJ.Shared.Game;
+using MDRNJfitness.Helpers;
 using MDRNJfitness.Services.Interfaces;
 using System.Net;
 
@@ -15,6 +17,9 @@ namespace MDRNJfitness.ViewModels
         [ObservableProperty] private string _username = string.Empty;
         [ObservableProperty] private string _displayName = string.Empty;
         [ObservableProperty] private bool _isRegisterMode;
+        [ObservableProperty] private bool _acceptedTerms;
+
+        public string TermsCheckboxText => $"I'm {LegalRules.MinimumAge} or older and agree to the";
 
         // Email verification step
         [ObservableProperty] private bool _isVerifyMode;
@@ -53,7 +58,7 @@ namespace MDRNJfitness.ViewModels
             await RunSafeAsync(async () =>
             {
                 if (await _auth.TryResumeSessionAsync())
-                    await Shell.Current.GoToAsync("//DashboardPage");
+                    await GoHomeAsync();
             });
         }
 
@@ -68,7 +73,7 @@ namespace MDRNJfitness.ViewModels
                         Email = Email,
                         Password = Password
                     });
-                    await Shell.Current.GoToAsync("//DashboardPage");
+                    await GoHomeAsync();
                 }
                 catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
                 {
@@ -81,12 +86,20 @@ namespace MDRNJfitness.ViewModels
         public async Task RegisterAsync() =>
             await RunSafeAsync(async () =>
             {
+                if (!AcceptedTerms)
+                {
+                    await Shell.Current.DisplayAlertAsync("Terms of Service",
+                        $"To create an account, confirm you're {LegalRules.MinimumAge} or older and agree to the Terms of Service and Privacy Policy.", "OK");
+                    return;
+                }
+
                 var result = await _auth.RegisterAsync(new RegisterDto
                 {
                     Email = Email,
                     Password = Password,
                     Username = Username,
-                    DisplayName = DisplayName
+                    DisplayName = DisplayName,
+                    AcceptedTerms = true
                 });
                 ShowVerifyStep(result.Message);
             });
@@ -101,7 +114,7 @@ namespace MDRNJfitness.ViewModels
                     Code = VerificationCode.Trim()
                 });
                 IsVerifyMode = false;
-                await Shell.Current.GoToAsync("//DashboardPage");
+                await GoHomeAsync();
             });
 
         [RelayCommand]
@@ -118,8 +131,26 @@ namespace MDRNJfitness.ViewModels
             await RunSafeAsync(async () =>
             {
                 if (await _auth.SignInWithGoogleAsync())
-                    await Shell.Current.GoToAsync("//DashboardPage");
+                    await GoHomeAsync();
             });
+
+        [RelayCommand]
+        public Task OpenTermsAsync() => TermsGate.OpenTermsAsync();
+
+        [RelayCommand]
+        public Task OpenPrivacyAsync() => TermsGate.OpenPrivacyAsync();
+
+        /// <summary>Into the app, once the player has accepted the current terms.</summary>
+        private async Task<bool> GoHomeAsync()
+        {
+            if (!await TermsGate.EnsureAcceptedAsync(_auth))
+            {
+                BackToSignIn();
+                return false;
+            }
+            await Shell.Current.GoToAsync("//DashboardPage");
+            return true;
+        }
 
         [RelayCommand]
         public void ForgotPassword()
@@ -166,9 +197,9 @@ namespace MDRNJfitness.ViewModels
                 });
                 BackToSignIn();
                 Password = string.Empty;
-                await Shell.Current.GoToAsync("//DashboardPage");
-                await Shell.Current.DisplayAlertAsync("Password changed",
-                    "You're signed in with your new password. Any other devices were signed out.", "OK");
+                if (await GoHomeAsync())
+                    await Shell.Current.DisplayAlertAsync("Password changed",
+                        "You're signed in with your new password. Any other devices were signed out.", "OK");
             });
 
         [RelayCommand]

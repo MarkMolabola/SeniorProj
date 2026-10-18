@@ -1,5 +1,6 @@
 using MDRNJ.Shared.DTOs.Auth;
 using MDRNJ.Shared.DTOs.User;
+using MDRNJ.Shared.Game;
 using MDRNJfitness.Data;
 using MDRNJfitness.Helpers;
 using MDRNJfitness.Helpers.Extensions;
@@ -43,6 +44,16 @@ namespace MDRNJfitness.Services
 
         public Task ResendVerificationAsync(string email) =>
             _http.PostAsync("api/auth/resend-verification", new ResendVerificationDto { Email = email });
+
+        public async Task AcceptTermsAsync()
+        {
+            await _http.PostAsync("api/users/me/accept-terms", new { });
+            if (await _userRepo.GetCachedCurrentUserAsync() is { } user)
+            {
+                user.TermsVersion = LegalRules.TermsVersion;
+                await _userRepo.CacheCurrentUserAsync(user);
+            }
+        }
 
         public Task ForgotPasswordAsync(string email) =>
             _http.PostAsync("api/auth/forgot-password", new ForgotPasswordDto { Email = email });

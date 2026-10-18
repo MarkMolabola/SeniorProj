@@ -30,4 +30,9 @@
     <ProjectReference Include="..\MDRNJ.Shared\MDRNJ.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Terms of Service / Privacy Policy pages, served by LegalController -->
+    <EmbeddedResource Include="Legal\*.html" />
+  </ItemGroup>
+
 </Project>
