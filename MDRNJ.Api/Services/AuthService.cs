@@ -141,6 +141,73 @@ namespace MDRNJ.Api.Services
             await SendVerificationCodeAsync(user);
         }
 
+        // ── Forgot password ─────────────────────────────
+
+        public async Task ForgotPasswordAsync(ForgotPasswordDto dto)
+        {
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+
+            // Same answer whether or not the account exists (or a code just went out)
+            if (user is null || user.IsBanned) return;
+            if (user.PasswordResetSentAt is { } sentAt && (DateTime.UtcNow - sentAt).TotalSeconds < ResendCooldownSeconds)
+                return;
+
+            var code = RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
+            user.PasswordResetCodeHash = Convert.ToHexString(HashVerificationCode(code));
+            user.PasswordResetExpiresAt = DateTime.UtcNow.AddMinutes(VerificationCodeLifetimeMinutes);
+            user.PasswordResetSentAt = DateTime.UtcNow;
+            user.PasswordResetAttempts = 0;
+            await _db.SaveChangesAsync();
+
+            try
+            {
+                await _email.SendPasswordResetCodeAsync(user.Email, code);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send password reset email to {Email}", user.Email);
+            }
+        }
+
+        /// <summary>
+        /// Sets a new password from an emailed code and signs in. Ends every other session,
+        /// and counts as email verification (the code proves the inbox). Also lets a
+        /// Google-only account add a password.
+        /// </summary>
+        public async Task<AuthResponseDto> ResetPasswordAsync(ResetPasswordDto dto)
+        {
+            const string invalid = "That code is invalid or has expired.";
+
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email)
+                ?? throw new ArgumentException(invalid);
+
+            if (user.PasswordResetCodeHash is null || user.PasswordResetExpiresAt < DateTime.UtcNow)
+                throw new ArgumentException(invalid);
+
+            if (user.PasswordResetAttempts >= MaxVerificationAttempts)
+                throw new ArgumentException("Too many attempts. Tap \"Resend code\" to get a new one.");
+
+            if (!CryptographicOperations.FixedTimeEquals(
+                    Convert.FromHexString(user.PasswordResetCodeHash),
+                    HashVerificationCode(dto.Code)))
+            {
+                user.PasswordResetAttempts++;
+                await _db.SaveChangesAsync();
+                throw new ArgumentException(invalid);
+            }
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            user.PasswordResetCodeHash = null;
+            user.PasswordResetExpiresAt = null;
+            user.PasswordResetAttempts = 0;
+            user.EmailVerified = true;
+            ClearVerificationCode(user);
+            await _db.SaveChangesAsync();
+
+            await RevokeAllAsync(user.UserId);
+            return await BuildAuthResponseAsync(user);
+        }
+
         public async Task<AuthResponseDto> GoogleSignInAsync(ClaimsPrincipal googleUser)
         {
             var googleId = googleUser.FindFirstValue(ClaimTypes.NameIdentifier)

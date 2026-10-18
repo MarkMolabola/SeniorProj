@@ -17,5 +17,11 @@ namespace MDRNJ.Api.Services
             _logger.LogWarning("[DEV EMAIL] Verification code for {Email}: {Code}", toEmail, code);
             return Task.CompletedTask;
         }
+
+        public Task SendPasswordResetCodeAsync(string toEmail, string code)
+        {
+            _logger.LogWarning("[DEV EMAIL] Password reset code for {Email}: {Code}", toEmail, code);
+            return Task.CompletedTask;
+        }
     }
 }

@@ -24,6 +24,12 @@ namespace MDRNJ.Api.Data.Entities
         public DateTime? VerificationCodeSentAt { get; set; }
         public int VerificationAttempts { get; set; }
 
+        // Forgot password (same 6-digit code scheme as verification)
+        public string? PasswordResetCodeHash { get; set; }
+        public DateTime? PasswordResetExpiresAt { get; set; }
+        public DateTime? PasswordResetSentAt { get; set; }
+        public int PasswordResetAttempts { get; set; }
+
         // External login
         public string? GoogleId { get; set; }
 

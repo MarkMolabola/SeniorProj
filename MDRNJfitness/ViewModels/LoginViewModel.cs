@@ -21,6 +21,18 @@ namespace MDRNJfitness.ViewModels
         [ObservableProperty] private string _verificationCode = string.Empty;
         [ObservableProperty] private string _verifyMessage = string.Empty;
 
+        // Forgot password: ask for a code, then enter it with the new password
+        [ObservableProperty] private bool _isResetMode;
+        [ObservableProperty] private bool _isResetCodeSent;
+        [ObservableProperty] private string _resetCode = string.Empty;
+        [ObservableProperty] private string _newPassword = string.Empty;
+        [ObservableProperty] private string _confirmPassword = string.Empty;
+
+        /// <summary>Sign in / register is showing (not verify or reset).</summary>
+        public bool IsMainMode => !IsVerifyMode && !IsResetMode;
+        partial void OnIsVerifyModeChanged(bool value) => OnPropertyChanged(nameof(IsMainMode));
+        partial void OnIsResetModeChanged(bool value) => OnPropertyChanged(nameof(IsMainMode));
+
         // WebAuthenticator isn't supported on Windows desktop.
         public bool IsGoogleSignInSupported => DeviceInfo.Platform != DevicePlatform.WinUI;
 
@@ -110,11 +122,63 @@ namespace MDRNJfitness.ViewModels
             });
 
         [RelayCommand]
+        public void ForgotPassword()
+        {
+            IsResetMode = true;
+            IsResetCodeSent = false;
+            Title = "Reset Password";
+        }
+
+        [RelayCommand]
+        public async Task SendResetCodeAsync() =>
+            await RunSafeAsync(async () =>
+            {
+                if (string.IsNullOrWhiteSpace(Email))
+                {
+                    await Shell.Current.DisplayAlertAsync("Email", "Enter the email you signed up with.", "OK");
+                    return;
+                }
+                Email = Email.Trim();
+                await _auth.ForgotPasswordAsync(Email);
+                ResetCode = NewPassword = ConfirmPassword = string.Empty;
+                IsResetCodeSent = true;
+            });
+
+        [RelayCommand]
+        public async Task ResetPasswordAsync() =>
+            await RunSafeAsync(async () =>
+            {
+                string? problem = ResetCode.Trim().Length != 6 ? "Enter the 6-digit code from the email."
+                    : NewPassword.Length < 8 ? "Your new password needs at least 8 characters."
+                    : NewPassword != ConfirmPassword ? "The two passwords don't match."
+                    : null;
+                if (problem is not null)
+                {
+                    await Shell.Current.DisplayAlertAsync("Reset password", problem, "OK");
+                    return;
+                }
+
+                await _auth.ResetPasswordAsync(new ResetPasswordDto
+                {
+                    Email = Email,
+                    Code = ResetCode.Trim(),
+                    NewPassword = NewPassword
+                });
+                BackToSignIn();
+                Password = string.Empty;
+                await Shell.Current.GoToAsync("//DashboardPage");
+                await Shell.Current.DisplayAlertAsync("Password changed",
+                    "You're signed in with your new password. Any other devices were signed out.", "OK");
+            });
+
+        [RelayCommand]
         public void BackToSignIn()
         {
             IsVerifyMode = false;
             IsRegisterMode = false;
-            VerificationCode = string.Empty;
+            IsResetMode = false;
+            IsResetCodeSent = false;
+            VerificationCode = ResetCode = NewPassword = ConfirmPassword = string.Empty;
             Title = "Sign In";
         }
 

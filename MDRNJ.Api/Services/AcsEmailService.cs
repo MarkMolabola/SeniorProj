@@ -39,5 +39,25 @@ namespace MDRNJ.Api.Services
             // WaitUntil.Started returns once ACS accepts the message instead of waiting for delivery.
             await _client.SendAsync(WaitUntil.Started, _sender, toEmail, subject, html, plainText);
         }
+
+        public async Task SendPasswordResetCodeAsync(string toEmail, string code)
+        {
+            var subject = $"{code} is your MDRNJ Fitness password reset code";
+            var plainText =
+                $"Your MDRNJ Fitness password reset code is {code}.\n\n" +
+                $"It expires in {AuthService.VerificationCodeLifetimeMinutes} minutes. " +
+                "If you didn't ask to reset your password, you can ignore this email; your password stays the same.";
+            var html = $"""
+                <div style="font-family:Arial,sans-serif;max-width:480px;margin:auto">
+                  <h2>Reset your password</h2>
+                  <p>Enter this code in the app to choose a new password:</p>
+                  <p style="font-size:32px;font-weight:bold;letter-spacing:8px">{code}</p>
+                  <p>It expires in {AuthService.VerificationCodeLifetimeMinutes} minutes.</p>
+                  <p style="color:#888;font-size:12px">If you didn't ask to reset your password, you can ignore this email; your password stays the same.</p>
+                </div>
+                """;
+
+            await _client.SendAsync(WaitUntil.Started, _sender, toEmail, subject, html, plainText);
+        }
     }
 }

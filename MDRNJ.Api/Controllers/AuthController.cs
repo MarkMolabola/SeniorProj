@@ -71,6 +71,18 @@ namespace MDRNJ.Api.Controllers
             return Ok(new { message = "If that account needs verification, a new code is on its way." });
         }
 
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+        {
+            await _auth.ForgotPasswordAsync(dto);
+            return Ok(new { message = "If an account uses that email, a reset code is on its way." });
+        }
+
+        /// <summary>New password from the emailed code; signs in like login does.</summary>
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto) =>
+            Ok(await _auth.ResetPasswordAsync(dto));
+
         // The app opens this URL in a browser (WebAuthenticator). First visit redirects to Google;
         // Google returns to /signin-google, which stores the result in the External cookie and sends
         // the browser back here. Second visit issues our JWT and redirects into the app.

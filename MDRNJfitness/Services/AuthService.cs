@@ -44,6 +44,17 @@ namespace MDRNJfitness.Services
         public Task ResendVerificationAsync(string email) =>
             _http.PostAsync("api/auth/resend-verification", new ResendVerificationDto { Email = email });
 
+        public Task ForgotPasswordAsync(string email) =>
+            _http.PostAsync("api/auth/forgot-password", new ForgotPasswordDto { Email = email });
+
+        // A reset signs in, like verifying an email does
+        public async Task<AuthResponseDto> ResetPasswordAsync(ResetPasswordDto dto)
+        {
+            var response = await _http.PostAsync<AuthResponseDto>("api/auth/reset-password", dto);
+            await SaveSessionAsync(response);
+            return response!;
+        }
+
         public async Task<bool> SignInWithGoogleAsync()
         {
             WebAuthenticatorResult result;

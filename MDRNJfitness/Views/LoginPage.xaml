@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- Title screen: sign in, register, and email verification. -->
+<!-- Title screen: sign in, register, email verification, and forgot password. -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -34,8 +34,7 @@
             </VerticalStackLayout>
 
             <!-- ── Sign in / Register ───────────────────────────────── -->
-            <VerticalStackLayout Spacing="16"
-                                 IsVisible="{Binding IsVerifyMode, Converter={StaticResource InvertBool}}">
+            <VerticalStackLayout Spacing="16" IsVisible="{Binding IsMainMode}">
 
                 <Border Style="{StaticResource PxPanel}">
                     <VerticalStackLayout Spacing="10">
@@ -82,6 +81,13 @@
                         Command="{Binding LoginCommand}"
                         IsEnabled="{Binding IsNotBusy}"
                         IsVisible="{Binding IsRegisterMode, Converter={StaticResource InvertBool}}" />
+
+                <Button Style="{StaticResource PxLinkButton}"
+                        Text="Forgot password?"
+                        TextColor="{StaticResource PxTextMuted}"
+                        Command="{Binding ForgotPasswordCommand}"
+                        IsVisible="{Binding IsRegisterMode, Converter={StaticResource InvertBool}}"
+                        HorizontalOptions="Center" />
 
                 <Button Style="{StaticResource PxButton}"
                         Text="CREATE HERO"
@@ -152,6 +158,93 @@
                             TextColor="{StaticResource PxTextMuted}"
                             Command="{Binding BackToSignInCommand}" />
                 </Grid>
+            </VerticalStackLayout>
+
+            <!-- ── Forgot password ──────────────────────────────────── -->
+            <VerticalStackLayout Spacing="16" IsVisible="{Binding IsResetMode}">
+
+                <!-- Step 1: where to send the code -->
+                <VerticalStackLayout Spacing="16"
+                                     IsVisible="{Binding IsResetCodeSent, Converter={StaticResource InvertBool}}">
+                    <Border Style="{StaticResource PxPanel}">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Style="{StaticResource PxHeading}" Text="FORGOT PASSWORD" />
+                            <Label Style="{StaticResource PxMuted}"
+                                   Text="Enter your account email and we'll send you a 6-digit code to choose a new password." />
+                            <Label Style="{StaticResource PxCaption}" Text="EMAIL" />
+                            <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                                <Entry Style="{StaticResource PxEntry}"
+                                       Placeholder="you@example.com"
+                                       Text="{Binding Email}"
+                                       Keyboard="Email" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Button Style="{StaticResource PxButton}"
+                            Text="SEND CODE"
+                            Command="{Binding SendResetCodeCommand}"
+                            IsEnabled="{Binding IsNotBusy}" />
+                </VerticalStackLayout>
+
+                <!-- Step 2: code + new password -->
+                <VerticalStackLayout Spacing="16" IsVisible="{Binding IsResetCodeSent}">
+                    <Border Style="{StaticResource PxPanel}">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Style="{StaticResource PxHeading}" Text="CHECK YOUR EMAIL" />
+                            <Label Style="{StaticResource PxMuted}"
+                                   Text="If an account uses this email, we sent it a code. It expires in 15 minutes." />
+                            <Label Style="{StaticResource PxBody}"
+                                   Text="{Binding Email}"
+                                   TextColor="{StaticResource PxTeal}" />
+
+                            <Border Style="{StaticResource PxSunken}" Padding="10,4">
+                                <Entry Style="{StaticResource PxEntry}"
+                                       Placeholder="000000"
+                                       Text="{Binding ResetCode}"
+                                       Keyboard="Numeric"
+                                       MaxLength="6"
+                                       FontSize="34"
+                                       CharacterSpacing="10"
+                                       TextColor="{StaticResource PxGold}"
+                                       HorizontalTextAlignment="Center" />
+                            </Border>
+
+                            <Label Style="{StaticResource PxCaption}" Text="NEW PASSWORD" />
+                            <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                                <Entry Style="{StaticResource PxEntry}"
+                                       Placeholder="At least 8 characters"
+                                       Text="{Binding NewPassword}"
+                                       IsPassword="True" />
+                            </Border>
+
+                            <Label Style="{StaticResource PxCaption}" Text="CONFIRM PASSWORD" />
+                            <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                                <Entry Style="{StaticResource PxEntry}"
+                                       Placeholder="••••••••"
+                                       Text="{Binding ConfirmPassword}"
+                                       IsPassword="True" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Button Style="{StaticResource PxButton}"
+                            Text="RESET PASSWORD"
+                            Command="{Binding ResetPasswordCommand}"
+                            IsEnabled="{Binding IsNotBusy}" />
+
+                    <Button Style="{StaticResource PxLinkButton}"
+                            Text="Resend code"
+                            Command="{Binding SendResetCodeCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <Button Style="{StaticResource PxLinkButton}"
+                        Text="Back to sign in"
+                        TextColor="{StaticResource PxTextMuted}"
+                        Command="{Binding BackToSignInCommand}"
+                        HorizontalOptions="Center" />
             </VerticalStackLayout>
 
             <ActivityIndicator IsRunning="{Binding IsBusy}"
