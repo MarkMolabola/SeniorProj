@@ -66,6 +66,11 @@ public partial class RewardPopupPage : ContentPage
             AddLine($"+{account.XPGained} XP", "PxGold");
         if (account?.GoldGained > 0)
             AddLine($"+{account.GoldGained} gold", "PxOrange");
+        if (_leveledUp)
+        {
+            AddLine($"★ +{AccountProgression.StatPointsBetween(account!.PreviousLevel, account.NewLevel)} free stat points: spend them on the Hero tab", "PxGold");
+            AddLine($"★ Dungeon gold & kills now +{(AccountProgression.DungeonBoost(account.NewLevel) - 1) * 100:0}%", "PxGold");
+        }
         foreach (var goal in completedGoals)
             AddLine($"✔ {goal.Kind}: {goal.Title} (+{goal.XPReward} XP)", "PxTeal");
 

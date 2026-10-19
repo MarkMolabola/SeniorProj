@@ -16,6 +16,9 @@ namespace MDRNJ.Shared.DTOs.Character
         public float CardioPoints { get; set; }
         public float FlexibilityPoints { get; set; }
 
+        /// <summary>Free stat points from levelling up, not yet spent.</summary>
+        public int UnspentStatPoints { get; set; }
+
         public string DominantSport { get; set; }
         public DateTime LastCalculated { get; set; }
     }

@@ -38,7 +38,7 @@ namespace MDRNJfitness.ViewModels
 
         // Floor progress: kills banked plus the ones the current run will add when collected
         public int PendingKills => Dungeon is null ? 0
-            : DungeonRules.PendingKills(Dungeon.Power, TimeSpan.FromSeconds(Dungeon.SecondsAccrued) + _sinceDungeonFetch.Elapsed);
+            : DungeonRules.PendingKills(Dungeon.Power, TimeSpan.FromSeconds(Dungeon.SecondsAccrued) + _sinceDungeonFetch.Elapsed, Dungeon.Level);
         public bool IsBottomFloor => Dungeon is { KillsToClear: 0 };
         public double FloorProgress => Dungeon is { KillsToClear: > 0 } d
             ? Math.Clamp((double)(d.FloorKills + PendingKills) / d.KillsToClear, 0, 1) : 1;
@@ -66,7 +66,8 @@ namespace MDRNJfitness.ViewModels
         public string PowerText => $"POWER {Dungeon?.Power ?? 3:0.#}";
         public string RateText => Dungeon is null ? string.Empty
             : IsDungeonFull ? "Full! Collect to keep earning."
-            : $"+{Dungeon.GoldPerHour:0.#} gold/hr · holds {Dungeon.CapHours}h";
+            : $"+{Dungeon.GoldPerHour:0.#} gold/hr · holds {Dungeon.CapHours}h"
+              + (Dungeon.LevelBoost > 1 ? $" · LV {Dungeon.Level} +{(Dungeon.LevelBoost - 1) * 100:0}%" : "");
         public string PendingText => $"{PendingGold} / {Dungeon?.CapGold ?? 0}";
         public double PendingProgress => Dungeon is { CapGold: > 0 } d ? Math.Clamp((double)PendingGold / d.CapGold, 0, 1) : 0;
         public bool IsDungeonFull => Dungeon is { CapGold: > 0 } d && PendingGold >= d.CapGold;
@@ -84,9 +85,12 @@ namespace MDRNJfitness.ViewModels
             OnPropertyChanged(nameof(BossText));
             OnPropertyChanged(nameof(PowerText));
             UpdatePendingGold();
+            RefreshRunText(); // PendingGold may not change (e.g. 0 right after a collect)
         }
 
-        partial void OnPendingGoldChanged(int value)
+        partial void OnPendingGoldChanged(int value) => RefreshRunText();
+
+        private void RefreshRunText()
         {
             OnPropertyChanged(nameof(FloorProgress));
             OnPropertyChanged(nameof(FloorText));
@@ -207,7 +211,7 @@ namespace MDRNJfitness.ViewModels
                 return;
             }
             var elapsed = TimeSpan.FromSeconds(Dungeon.SecondsAccrued) + _sinceDungeonFetch.Elapsed;
-            PendingGold = DungeonRules.PendingGold(Dungeon.Power, elapsed, Dungeon.Floor);
+            PendingGold = DungeonRules.PendingGold(Dungeon.Power, elapsed, Dungeon.Floor, Dungeon.Level);
         }
 
         private void ShowDungeon(DungeonDto dungeon)

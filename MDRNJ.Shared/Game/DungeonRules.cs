@@ -80,19 +80,21 @@ namespace MDRNJ.Shared.Game
 
         public static bool IsBottom(int floor) => floor >= Floors.Count;
 
-        public static float GoldPerHour(float power, int floor = 1) => power * GoldPerHourPerPower * Floor(floor).GoldMultiplier;
+        /// <summary><paramref name="level"/> is the account level (AccountProgression.DungeonBoost).</summary>
+        public static float GoldPerHour(float power, int floor = 1, int level = 1) =>
+            power * GoldPerHourPerPower * Floor(floor).GoldMultiplier * AccountProgression.DungeonBoost(level);
 
-        public static int CapGold(float power, int floor = 1) => (int)MathF.Floor(GoldPerHour(power, floor) * CapHours);
+        public static int CapGold(float power, int floor = 1, int level = 1) => (int)MathF.Floor(GoldPerHour(power, floor, level) * CapHours);
 
         /// <summary>Gold banked after <paramref name="elapsed"/> (capped).</summary>
-        public static int PendingGold(float power, TimeSpan elapsed, int floor = 1) =>
-            (int)Math.Floor(CappedHours(elapsed) * GoldPerHour(power, floor));
+        public static int PendingGold(float power, TimeSpan elapsed, int floor = 1, int level = 1) =>
+            (int)Math.Floor(CappedHours(elapsed) * GoldPerHour(power, floor, level));
 
-        public static float KillsPerHour(float power) => power * KillsPerHourPerPower;
+        public static float KillsPerHour(float power, int level = 1) => power * KillsPerHourPerPower * AccountProgression.DungeonBoost(level);
 
         /// <summary>Monsters slain after <paramref name="elapsed"/> (capped like gold).</summary>
-        public static int PendingKills(float power, TimeSpan elapsed) =>
-            (int)Math.Floor(CappedHours(elapsed) * KillsPerHour(power));
+        public static int PendingKills(float power, TimeSpan elapsed, int level = 1) =>
+            (int)Math.Floor(CappedHours(elapsed) * KillsPerHour(power, level));
 
         public static double DropChance(int kills, int floor) =>
             Math.Min(MaxDropChance, kills * DropChancePerKillPerFloor * Math.Max(1, floor));

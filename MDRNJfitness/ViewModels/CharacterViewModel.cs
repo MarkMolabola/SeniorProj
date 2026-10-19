@@ -43,7 +43,19 @@ namespace MDRNJfitness.ViewModels
         [ObservableProperty] private string _gearBonusText = string.Empty;
         public bool HasGearBonus => GearBonusText.Length > 0;
         partial void OnGearBonusTextChanged(string value) => OnPropertyChanged(nameof(HasGearBonus));
-        partial void OnActivityScoreChanged(ActivityScoreDto? value) => UpdateStats();
+        partial void OnActivityScoreChanged(ActivityScoreDto? value)
+        {
+            UpdateStats();
+            OnPropertyChanged(nameof(UnspentStatPoints));
+            OnPropertyChanged(nameof(HasUnspentStatPoints));
+            OnPropertyChanged(nameof(UnspentStatPointsText));
+        }
+
+        // ── Free stat points from levelling up ──
+        public int UnspentStatPoints => ActivityScore?.UnspentStatPoints ?? 0;
+        public bool HasUnspentStatPoints => UnspentStatPoints > 0;
+        public string UnspentStatPointsText =>
+            $"{UnspentStatPoints} FREE STAT POINT{(UnspentStatPoints == 1 ? "" : "S")} · TAP + TO SPEND";
         [ObservableProperty] private string _avatarId = HeroAvatars.Classic;
         [ObservableProperty] private IReadOnlyList<string> _heroGear = Array.Empty<string>();
 
@@ -145,7 +157,15 @@ namespace MDRNJfitness.ViewModels
                 : (SpecialHero is null ? "Gear: " : "Outfit: ") + string.Join(" · ", parts);
         }
 
-                /// <summary>CUSTOMIZE: pop-up grid of hero looks.</summary>
+        /// <summary>+ next to a stat: put one free point from levelling up into it.</summary>
+        [RelayCommand]
+        public async Task SpendStatPointAsync(string stat)
+        {
+            if (!HasUnspentStatPoints) return;
+            await RunSafeAsync(async () => ActivityScore = await _character.SpendStatPointsAsync(stat));
+        }
+
+        /// <summary>CUSTOMIZE: pop-up grid of hero looks.</summary>
         [RelayCommand]
         public Task OpenCustomizeAsync() =>
             Shell.Current.Navigation.PushModalAsync(new AvatarPickerPage(this));

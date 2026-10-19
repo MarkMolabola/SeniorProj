@@ -18,6 +18,10 @@ namespace MDRNJ.Shared.DTOs.Game
         /// </summary>
         public double SecondsAccrued { get; set; }
 
+        /// <summary>Account level and the dungeon boost it gives (1.18 = +18% gold and kills).</summary>
+        public int Level { get; set; } = 1;
+        public float LevelBoost { get; set; } = 1;
+
         public string MonsterId { get; set; } = "slime";
         public string MonsterName { get; set; } = "Slime";
 

@@ -32,5 +32,9 @@ namespace MDRNJ.Api.Controllers
         [HttpPost("activity-score/recalculate")]
         public async Task<IActionResult> RecalculateActivityScore() =>
             Ok(await _character.RecalculateActivityScoreAsync(UserId));
+
+        [HttpPost("stat-points")]
+        public async Task<IActionResult> SpendStatPoints([FromBody] SpendStatPointsDto dto) =>
+            Ok(await _character.SpendStatPointsAsync(UserId, dto.Stat, dto.Points));
     }
 }

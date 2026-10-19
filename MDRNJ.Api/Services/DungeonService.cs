@@ -47,8 +47,8 @@ namespace MDRNJ.Api.Services
 
             var result = new DungeonCollectDto
             {
-                Collected = DungeonRules.PendingGold(power, elapsed, floor.Number),
-                Kills = DungeonRules.PendingKills(power, elapsed)
+                Collected = DungeonRules.PendingGold(power, elapsed, floor.Number, stats.CurrentLevel),
+                Kills = DungeonRules.PendingKills(power, elapsed, stats.CurrentLevel)
             };
             _goals.GrantGold(stats, result.Collected, GoldReason.Dungeon, $"Dungeon floor {floor.Number} vs {floor.MonsterName}s");
             stats.DungeonCollectedAt = now;
@@ -148,18 +148,20 @@ namespace MDRNJ.Api.Services
             return new DungeonDto
             {
                 Power = power,
-                GoldPerHour = DungeonRules.GoldPerHour(power, floor.Number),
-                PendingGold = DungeonRules.PendingGold(power, elapsed, floor.Number),
-                CapGold = DungeonRules.CapGold(power, floor.Number),
+                GoldPerHour = DungeonRules.GoldPerHour(power, floor.Number, stats.CurrentLevel),
+                PendingGold = DungeonRules.PendingGold(power, elapsed, floor.Number, stats.CurrentLevel),
+                CapGold = DungeonRules.CapGold(power, floor.Number, stats.CurrentLevel),
                 CapHours = DungeonRules.CapHours,
                 SecondsAccrued = Math.Clamp(elapsed.TotalSeconds, 0, DungeonRules.CapHours * 3600),
+                Level = stats.CurrentLevel,
+                LevelBoost = AccountProgression.DungeonBoost(stats.CurrentLevel),
                 MonsterId = floor.MonsterId,
                 MonsterName = floor.MonsterName,
 
                 Floor = floor.Number,
                 FloorCount = DungeonRules.Floors.Count,
                 GoldMultiplier = floor.GoldMultiplier,
-                KillsPerHour = DungeonRules.KillsPerHour(power),
+                KillsPerHour = DungeonRules.KillsPerHour(power, stats.CurrentLevel),
                 FloorKills = stats.DungeonFloorKills,
                 KillsToClear = floor.KillsToClear,
                 NextFloorMinPower = next is not null && power < next.MinPower ? next.MinPower : null,

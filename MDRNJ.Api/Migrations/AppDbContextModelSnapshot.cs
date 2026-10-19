@@ -521,6 +521,9 @@ namespace MDRNJ.Api.Migrations
                     b.Property<int>("TotalXP")
                         .HasColumnType("int");
 
+                    b.Property<int>("UnspentStatPoints")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 

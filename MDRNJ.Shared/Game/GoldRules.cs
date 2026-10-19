@@ -6,7 +6,8 @@ namespace MDRNJ.Shared.Game
         /// <summary>Every new account (and every existing one, via migration) starts with this.</summary>
         public const int StartingGold = 100;
 
-        public const int PerLevelUp = 100;
+        /// <summary>Reaching a level pays level × 50 (level 2 = 100, level 10 = 500).</summary>
+        public static int ForLevelUp(int newLevel) => newLevel * 50;
 
         /// <summary>1 gold per workout minute, at least 5.</summary>
         public static int ForWorkout(int durationMins) => Math.Max(5, durationMins);

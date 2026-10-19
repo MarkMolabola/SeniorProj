@@ -8,5 +8,6 @@ namespace MDRNJfitness.Services.Interfaces
         Task<CharacterStateDto> SetAvatarAsync(string avatarId);
         Task<ActivityScoreDto> GetActivityScoreAsync();
         Task<ActivityScoreDto> RecalculateActivityScoreAsync();
+        Task<ActivityScoreDto> SpendStatPointsAsync(string stat, int points = 1);
     }
 }

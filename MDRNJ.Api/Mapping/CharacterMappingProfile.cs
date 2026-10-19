@@ -19,7 +19,8 @@ namespace MDRNJ.Api.Mapping
                 }));
 
             CreateMap<ActivityScoreEntity, ActivityScoreDto>()
-                .ForMember(d => d.DominantSport, o => o.MapFrom(s => s.DominantSport.ToString()));
+                .ForMember(d => d.DominantSport, o => o.MapFrom(s => s.DominantSport.ToString()))
+                .ForMember(d => d.UnspentStatPoints, o => o.Ignore());
         }
     }
 }

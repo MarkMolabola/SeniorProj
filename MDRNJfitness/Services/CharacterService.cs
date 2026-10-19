@@ -21,5 +21,8 @@ namespace MDRNJfitness.Services
 
         public Task<ActivityScoreDto> RecalculateActivityScoreAsync() =>
             _http.PostAsync<ActivityScoreDto>("api/character/activity-score/recalculate", new { })!;
+
+        public Task<ActivityScoreDto> SpendStatPointsAsync(string stat, int points = 1) =>
+            _http.PostAsync<ActivityScoreDto>("api/character/stat-points", new SpendStatPointsDto { Stat = stat, Points = points })!;
     }
 }

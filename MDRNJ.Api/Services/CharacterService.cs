@@ -104,7 +104,7 @@ namespace MDRNJ.Api.Services
             var score = await _db.ActivityScores.FirstOrDefaultAsync(a => a.UserId == userId)
                 ?? throw new KeyNotFoundException("Activity score not found.");
 
-            return _mapper.Map<ActivityScoreDto>(score);
+            return await ToDtoAsync(score);
         }
 
         public async Task<ActivityScoreDto> RecalculateActivityScoreAsync(Guid userId)
@@ -113,7 +113,40 @@ namespace MDRNJ.Api.Services
             await UpdateSharesAsync(score, userId);
             await _db.SaveChangesAsync();
 
-            return _mapper.Map<ActivityScoreDto>(score);
+            return await ToDtoAsync(score);
+        }
+
+        public async Task<ActivityScoreDto> SpendStatPointsAsync(Guid userId, string stat, int points)
+        {
+            if (points <= 0)
+                throw new ArgumentException("Spend at least one point.");
+            var stats = await _db.GameStats.FirstOrDefaultAsync(g => g.UserId == userId)
+                ?? throw new KeyNotFoundException("Stats not found.");
+            if (stats.UnspentStatPoints < points)
+                throw new InvalidOperationException(stats.UnspentStatPoints == 0
+                    ? "No stat points to spend. Level up to earn more."
+                    : $"You only have {stats.UnspentStatPoints} stat point{(stats.UnspentStatPoints == 1 ? "" : "s")}.");
+
+            var score = await GetOrCreateScoreAsync(userId);
+            switch (stat?.ToUpperInvariant())
+            {
+                case "STR": score.StrengthPoints += points; break;
+                case "END": score.CardioPoints += points; break;
+                case "FLX": score.FlexibilityPoints += points; break;
+                default: throw new ArgumentException($"Unknown stat: {stat} (STR, END or FLX).");
+            }
+            stats.UnspentStatPoints -= points;
+            await _db.SaveChangesAsync();
+
+            return await ToDtoAsync(score, stats.UnspentStatPoints);
+        }
+
+        private async Task<ActivityScoreDto> ToDtoAsync(ActivityScoreEntity score, int? unspent = null)
+        {
+            var dto = _mapper.Map<ActivityScoreDto>(score);
+            dto.UnspentStatPoints = unspent ?? await _db.GameStats
+                .Where(g => g.UserId == score.UserId).Select(g => g.UnspentStatPoints).FirstOrDefaultAsync();
+            return dto;
         }
 
         private async Task<ActivityScoreEntity> GetOrCreateScoreAsync(Guid userId)

@@ -67,35 +67,49 @@
             <Border Style="{StaticResource PxPanel}">
                 <VerticalStackLayout Spacing="14">
                     <Label Style="{StaticResource PxHeading}" Text="STATS" />
-                    <Grid ColumnDefinitions="52,*,64" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="12">
+                    <Label Style="{StaticResource PxCaption}" TextColor="{StaticResource PxGold}"
+                           Text="{Binding UnspentStatPointsText}" IsVisible="{Binding HasUnspentStatPoints}" />
+                    <Grid ColumnDefinitions="52,*,64,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="12">
                         <Label Grid.Row="0" Grid.Column="0" Style="{StaticResource PxHeading}" FontSize="10"
                                TextColor="{StaticResource PxStr}" Text="STR" VerticalOptions="Center" />
                         <controls:XPBarControl Grid.Row="0" Grid.Column="1" HeightRequest="16" VerticalOptions="Center"
                                                FillColor="{StaticResource PxStr}"
                                                Progress="{Binding StrengthPoints, Converter={StaticResource StatLevelProgress}}" />
-                        <Label Grid.Row="0" Grid.Column="2" Style="{StaticResource PxBody}" HorizontalTextAlignment="End"
+                        <Label Grid.Row="0" Grid.Column="2" Style="{StaticResource PxBody}" HorizontalTextAlignment="End" VerticalOptions="Center"
                                Text="{Binding StrengthPoints, Converter={StaticResource StatLevel}, StringFormat='Lv {0}'}" />
+                        <Button Grid.Row="0" Grid.Column="3" Style="{StaticResource PxButton}" Text="+"
+                                Padding="0" WidthRequest="44" HeightRequest="40" VerticalOptions="Center"
+                                IsVisible="{Binding HasUnspentStatPoints}"
+                                Command="{Binding SpendStatPointCommand}" CommandParameter="STR" />
 
                         <Label Grid.Row="1" Grid.Column="0" Style="{StaticResource PxHeading}" FontSize="10"
                                TextColor="{StaticResource PxTeal}" Text="END" VerticalOptions="Center" />
                         <controls:XPBarControl Grid.Row="1" Grid.Column="1" HeightRequest="16" VerticalOptions="Center"
                                                FillColor="{StaticResource PxTeal}"
                                                Progress="{Binding EndurancePoints, Converter={StaticResource StatLevelProgress}}" />
-                        <Label Grid.Row="1" Grid.Column="2" Style="{StaticResource PxBody}" HorizontalTextAlignment="End"
+                        <Label Grid.Row="1" Grid.Column="2" Style="{StaticResource PxBody}" HorizontalTextAlignment="End" VerticalOptions="Center"
                                Text="{Binding EndurancePoints, Converter={StaticResource StatLevel}, StringFormat='Lv {0}'}" />
+                        <Button Grid.Row="1" Grid.Column="3" Style="{StaticResource PxButton}" Text="+"
+                                Padding="0" WidthRequest="44" HeightRequest="40" VerticalOptions="Center"
+                                IsVisible="{Binding HasUnspentStatPoints}"
+                                Command="{Binding SpendStatPointCommand}" CommandParameter="END" />
 
                         <Label Grid.Row="2" Grid.Column="0" Style="{StaticResource PxHeading}" FontSize="10"
                                TextColor="{StaticResource PxFlx}" Text="FLX" VerticalOptions="Center" />
                         <controls:XPBarControl Grid.Row="2" Grid.Column="1" HeightRequest="16" VerticalOptions="Center"
                                                FillColor="{StaticResource PxFlx}"
                                                Progress="{Binding FlexibilityPoints, Converter={StaticResource StatLevelProgress}}" />
-                        <Label Grid.Row="2" Grid.Column="2" Style="{StaticResource PxBody}" HorizontalTextAlignment="End"
+                        <Label Grid.Row="2" Grid.Column="2" Style="{StaticResource PxBody}" HorizontalTextAlignment="End" VerticalOptions="Center"
                                Text="{Binding FlexibilityPoints, Converter={StaticResource StatLevel}, StringFormat='Lv {0}'}" />
+                        <Button Grid.Row="2" Grid.Column="3" Style="{StaticResource PxButton}" Text="+"
+                                Padding="0" WidthRequest="44" HeightRequest="40" VerticalOptions="Center"
+                                IsVisible="{Binding HasUnspentStatPoints}"
+                                Command="{Binding SpendStatPointCommand}" CommandParameter="FLX" />
                     </Grid>
                     <Label Style="{StaticResource PxBody}" FontSize="18" TextColor="{StaticResource PxGold}"
                            Text="{Binding GearBonusText}" IsVisible="{Binding HasGearBonus}" />
                     <Label Style="{StaticResource PxMuted}" FontSize="17"
-                           Text="STR = Strength · END = Cardio · FLX = Flexibility. Stats grow from workouts, quests and challenges; gear adds a boost." />
+                           Text="STR = Strength · END = Cardio · FLX = Flexibility. Stats grow from workouts, quests and challenges; gear adds a boost. Each account level gives free points: 5 plus the new level (10 points = 1 stat level)." />
                 </VerticalStackLayout>
             </Border>
 

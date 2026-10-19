@@ -20,5 +20,8 @@ namespace MDRNJ.Api.Services.Interfaces
 
         Task<ActivityScoreDto> GetActivityScoreAsync(Guid userId);
         Task<ActivityScoreDto> RecalculateActivityScoreAsync(Guid userId);
+
+        /// <summary>Moves free stat points from levelling up into STR, END or FLX.</summary>
+        Task<ActivityScoreDto> SpendStatPointsAsync(Guid userId, string stat, int points);
     }
 }

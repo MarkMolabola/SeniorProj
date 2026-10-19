@@ -39,9 +39,11 @@ namespace MDRNJ.Api.Services
             var levelBefore = stats.CurrentLevel;
             stats.TotalXP += amount;
             stats.CurrentLevel = AccountProgression.LevelFor(stats.TotalXP);
-            if (stats.CurrentLevel > levelBefore)
-                GrantGold(stats, (stats.CurrentLevel - levelBefore) * GoldRules.PerLevelUp,
-                    GoldReason.LevelUp, $"Reached level {stats.CurrentLevel}");
+            for (var level = levelBefore + 1; level <= stats.CurrentLevel; level++)
+            {
+                GrantGold(stats, GoldRules.ForLevelUp(level), GoldReason.LevelUp, $"Reached level {level}");
+                stats.UnspentStatPoints += AccountProgression.StatPointsFor(level);
+            }
             _db.XPTransactions.Add(new XPTransactionEntity
             {
                 UserId = stats.UserId,

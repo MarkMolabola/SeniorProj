@@ -18,7 +18,8 @@ namespace MDRNJ.Api.Services.Interfaces
 
         /// <summary>
         /// Adds XP, updates the account level and records the transaction.
-        /// Each level gained also pays <see cref="MDRNJ.Shared.Game.GoldRules.PerLevelUp"/> gold.
+        /// Each level gained also pays <see cref="MDRNJ.Shared.Game.GoldRules.ForLevelUp"/> gold
+        /// and <see cref="MDRNJ.Shared.Game.AccountProgression.StatPointsFor"/> free stat points.
         /// </summary>
         void GrantXP(GameStatsEntity stats, int amount, XPReason reason);
 
