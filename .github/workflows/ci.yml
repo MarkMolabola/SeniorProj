@@ -1,0 +1,102 @@
+# CI: builds the API and the Android app on every push and pull request.
+# CD: on a push to master, publishes the API to Azure App Service (migrations run on startup).
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: "10.0.x"
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  api:
+    name: Build API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build
+        run: dotnet build MDRNJ.Api/MDRNJ.Api.csproj -c Release
+
+      # Fails if an entity/config change was made without adding a migration.
+      # Program.cs refuses to start without a 32+ char Jwt:Key, so give it a throwaway one.
+      - name: Check for missing EF migrations
+        working-directory: MDRNJ.Api
+        env:
+          Jwt__Key: ci-placeholder-key-not-a-secret-0123456789
+        run: |
+          dotnet tool install --global dotnet-ef --version "10.*"
+          dotnet ef migrations has-pending-model-changes --no-build --configuration Release
+
+      - name: Publish
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: dotnet publish MDRNJ.Api/MDRNJ.Api.csproj -c Release --no-build -o api-publish
+
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        with:
+          name: api-publish
+          path: api-publish
+          retention-days: 7
+
+  android:
+    name: Build Android app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install MAUI Android workload
+        run: dotnet workload install maui-android
+
+      # On Linux the csproj only targets net10.0-android. Release points at the Azure API.
+      - name: Build
+        run: dotnet build MDRNJfitness/MDRNJfitness.csproj -f net10.0-android -c Release
+
+      # Signed with the debug key, so it can be sideloaded for testing but not uploaded to Play.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: MDRNJfitness/bin/Release/net10.0-android/*-Signed.apk
+          retention-days: 7
+
+  deploy-api:
+    name: Deploy API to Azure
+    needs: api
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://mdrn-j-fitness-efgabvesehgqc0fy.westus-01.azurewebsites.net
+    concurrency:
+      group: deploy-api
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: api-publish
+          path: api-publish
+
+      - uses: azure/webapps-deploy@v3
+        with:
+          app-name: mdrn-j-fitness
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: api-publish
