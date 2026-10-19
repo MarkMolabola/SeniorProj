@@ -58,7 +58,12 @@ namespace MDRNJfitness.ViewModels
         }
 
         public ObservableCollection<HeroAvatarOption> AvatarOptions { get; } =
-            new(HeroAvatars.All.Select(a => new HeroAvatarOption(a.Id, a.Name)));
+            new(HeroAvatars.All.Select(a => new HeroAvatarOption(a)));
+
+        /// <summary>The selected hero when it's a special one (comes dressed, no gear).</summary>
+        [ObservableProperty] private HeroAvatar? _specialHero;
+        public bool IsSpecialHero => SpecialHero is not null;
+        partial void OnSpecialHeroChanged(HeroAvatar? value) => OnPropertyChanged(nameof(IsSpecialHero));
 
         public ObservableCollection<GearSlotCard> GearSlots { get; } =
             new(GearCatalog.DisplayOrder.Select(s => new GearSlotCard(s)));
@@ -69,6 +74,9 @@ namespace MDRNJfitness.ViewModels
         [ObservableProperty] private string _pickerTitle = string.Empty;
         [ObservableProperty] private bool _hasSlotChoices;
         [ObservableProperty] private bool _pickerSlotHasItem;
+
+        private int _gold;
+        private bool _unlimitedGold;
 
         public CharacterViewModel(ICharacterService character, IGearService gear, IGameService game)
         {
@@ -90,6 +98,8 @@ namespace MDRNJfitness.ViewModels
         private void ShowInventory(InventoryDto inventory)
         {
             _owned = inventory.OwnedItemIds;
+            _gold = inventory.Gold;
+            _unlimitedGold = inventory.UnlimitedGold;
             Show(inventory.Character);
         }
 
@@ -98,23 +108,31 @@ namespace MDRNJfitness.ViewModels
             CharacterState = state;
             SpriteState = state?.OutfitSlot ?? "default";
             AvatarId = state?.AvatarId ?? HeroAvatars.Classic;
-            HeroGear = state?.InDrawOrder() ?? Array.Empty<string>();
+            SpecialHero = HeroAvatars.Find(AvatarId) is { IsSpecial: true } hero ? hero : null;
+
+            // Gear stays saved for the Classic Hero, but special heroes wear only their own outfit
+            var worn = state?.InDrawOrder() ?? Array.Empty<string>();
+            HeroGear = SpecialHero is null ? worn : Array.Empty<string>();
             HasHiddenGear = HeroGear.Any(id => !HeroSprites.GearFits(id, AvatarId));
             UpdateStats();
 
             foreach (var slot in GearSlots)
+            {
                 slot.ItemId = state?.Get(slot.Slot);
+                slot.Hero = SpecialHero;
+            }
             foreach (var option in AvatarOptions)
             {
                 option.IsSelected = option.Id == AvatarId;
+                option.IsLocked = option.Hero.IsSpecial && !_owned.Contains(option.Id);
                 option.PreviewOutfit = SpriteState;
-                option.PreviewGear = HeroGear;
+                option.PreviewGear = worn;
             }
         }
 
         private void UpdateStats()
         {
-            var gear = GearStats.Bonus(CharacterState);
+            var gear = GearStats.Bonus(CharacterState, CharacterState?.AvatarId);
             StrengthPoints = (ActivityScore?.StrengthPoints ?? 0) + gear.Strength;
             EndurancePoints = (ActivityScore?.CardioPoints ?? 0) + gear.Endurance;
             FlexibilityPoints = (ActivityScore?.FlexibilityPoints ?? 0) + gear.Flexibility;
@@ -123,7 +141,8 @@ namespace MDRNJfitness.ViewModels
             if (gear.Strength > 0) parts.Add($"+{gear.Strength:0} STR");
             if (gear.Endurance > 0) parts.Add($"+{gear.Endurance:0} END");
             if (gear.Flexibility > 0) parts.Add($"+{gear.Flexibility:0} FLX");
-            GearBonusText = parts.Count == 0 ? string.Empty : "Gear: " + string.Join(" · ", parts);
+            GearBonusText = parts.Count == 0 ? string.Empty
+                : (SpecialHero is null ? "Gear: " : "Outfit: ") + string.Join(" · ", parts);
         }
 
                 /// <summary>CUSTOMIZE: pop-up grid of hero looks.</summary>
@@ -134,15 +153,56 @@ namespace MDRNJfitness.ViewModels
         [RelayCommand]
         public async Task SelectAvatarAsync(HeroAvatarOption option)
         {
+            if (option.IsLocked && !await BuyHeroAsync(option.Hero))
+                return;
             if (option.Id != AvatarId)
                 await RunSafeAsync(async () => Show(await _character.SetAvatarAsync(option.Id)));
             await ClosePopupAsync();
         }
 
+        /// <summary>Locked hero tapped: offer to buy it right here. True once it's owned.</summary>
+        private async Task<bool> BuyHeroAsync(HeroAvatar hero)
+        {
+            // Asked from the CUSTOMIZE pop-up, so the dialogs go on top of it
+            Page page = Shell.Current.Navigation.ModalStack.LastOrDefault() ?? Shell.Current;
+
+            var pieces = string.Join("\n", hero.Pieces.Select(p =>
+                $"• {p.Name} (+{p.Bonus} {GearStats.ShortName(p.Stat)})"));
+            if (!_unlimitedGold && _gold < hero.Price)
+            {
+                await page.DisplayAlertAsync(hero.Name,
+                    $"{hero.Rarity} hero · {hero.Price} gold (you have {_gold}).\n\nComes dressed in:\n{pieces}\n\n" +
+                    "Train, finish quests and win duels to earn more gold!", "OK");
+                return false;
+            }
+            if (!await page.DisplayAlertAsync($"Unlock the {hero.Name}?",
+                    $"{hero.Rarity} hero · {(_unlimitedGold ? "free for admins" : $"{hero.Price} gold")}\n\nComes dressed in:\n{pieces}\n\n" +
+                    "Special heroes wear their own outfit instead of gear. Your gear stays saved for the Classic Hero.",
+                    "Unlock", "Cancel"))
+                return false;
+
+            var bought = false;
+            await RunSafeAsync(async () =>
+            {
+                ShowInventory(await _gear.BuyAsync(hero.Id));
+                bought = true;
+            });
+            return bought;
+        }
+
         /// <summary>Gear slot tapped: pop-up of the owned items for that category.</summary>
         [RelayCommand]
-        public Task ChooseGearAsync(GearSlotCard slot)
+        public async Task ChooseGearAsync(GearSlotCard slot)
         {
+            if (SpecialHero is { } hero)
+            {
+                await Shell.Current.DisplayAlertAsync(slot.Piece?.Name ?? slot.Label,
+                    (slot.Piece is { } piece ? $"Part of the {hero.Name}'s outfit: +{piece.Bonus} {GearStats.ShortName(piece.Stat)}.\n\n"
+                                             : $"The {hero.Name} has nothing here.\n\n") +
+                    "Special heroes come dressed. Switch to the Classic Hero (CUSTOMIZE) to wear your gear.", "OK");
+                return;
+            }
+
             _pickerSlot = slot;
             PickerTitle = slot.Label;
             PickerSlotHasItem = slot.ItemId is not null;
@@ -152,7 +212,7 @@ namespace MDRNJfitness.ViewModels
                 SlotChoices.Add(new CollectionCard(item) { Equipped = item.Id == slot.ItemId });
             HasSlotChoices = SlotChoices.Count > 0;
 
-            return Shell.Current.Navigation.PushModalAsync(new GearPickerPage(this));
+            await Shell.Current.Navigation.PushModalAsync(new GearPickerPage(this));
         }
 
         /// <summary>Tap an item: wear it, or take it off if it's already worn.</summary>

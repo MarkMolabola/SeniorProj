@@ -157,6 +157,9 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Load heroes.jsonc now, so a typo in the balance file stops startup with a clear message
+_ = MDRNJ.Shared.Game.HeroAvatars.All;
+
 // ── Seed database ────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- Gear shop: 3 items per row, bought with gold. -->
+<!-- Shop: special heroes, then gear, 3 per row, bought with gold. -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MDRNJfitness.Views"
@@ -8,7 +8,8 @@
              Title="{Binding Title}"
              Style="{StaticResource PxPage}">
 
-    <CollectionView ItemsSource="{Binding Items}"
+    <CollectionView ItemsSource="{Binding Groups}"
+                    IsGrouped="True"
                     SelectionMode="None"
                     Margin="14,0">
         <CollectionView.ItemsLayout>
@@ -26,12 +27,21 @@
                         </HorizontalStackLayout>
                     </Border>
                 </Grid>
-                <Label Style="{StaticResource PxMuted}" Text="Spend gold on gear for your hero. Earn gold from workouts, quests, duels and level-ups." />
+                <Label Style="{StaticResource PxMuted}" Text="Spend gold on heroes and gear. Earn gold from workouts, quests, duels, the dungeon and level-ups." />
                 <Border Style="{StaticResource PxPanel}" IsVisible="{Binding HasNothingForSale}">
                     <Label Style="{StaticResource PxMuted}" Text="The shop is restocking. Check back soon!" />
                 </Border>
             </VerticalStackLayout>
         </CollectionView.Header>
+
+        <CollectionView.GroupHeaderTemplate>
+            <DataTemplate>
+                <VerticalStackLayout Padding="6,10,6,8" Spacing="2">
+                    <Label Style="{StaticResource PxHeading}" Text="{Binding Name}" />
+                    <Label Style="{StaticResource PxMuted}" FontSize="17" Text="{Binding Hint}" />
+                </VerticalStackLayout>
+            </DataTemplate>
+        </CollectionView.GroupHeaderTemplate>
 
         <CollectionView.ItemTemplate>
             <DataTemplate>
@@ -48,12 +58,18 @@
 
                     <VerticalStackLayout Spacing="6">
                         <Border Style="{StaticResource PxSunken}" Padding="6" HeightRequest="72">
-                            <local:GearIconView ItemId="{Binding Item.Id}" />
+                            <Grid>
+                                <local:GearIconView ItemId="{Binding Id}" IsVisible="{Binding IsGear}" />
+                                <local:PixelAvatarView AvatarId="{Binding Id}" IsVisible="{Binding IsHero}"
+                                                       WidthRequest="64" HeightRequest="64"
+                                                       HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Grid>
                         </Border>
-                        <Label Style="{StaticResource PxBody}" FontSize="18" Text="{Binding Item.Name}"
+                        <Label Style="{StaticResource PxBody}" FontSize="18" Text="{Binding Name}"
                                HorizontalTextAlignment="Center" LineBreakMode="TailTruncation" MaxLines="2" />
                         <Label Style="{StaticResource PxCaption}" Text="{Binding RarityName}" TextColor="{Binding RarityColor}" HorizontalOptions="Center" />
-                        <Label Style="{StaticResource PxBody}" FontSize="17" Text="{Binding Item.BonusText}" TextColor="{StaticResource PxTeal}" HorizontalOptions="Center" />
+                        <Label Style="{StaticResource PxBody}" FontSize="17" Text="{Binding BonusText}" TextColor="{StaticResource PxTeal}"
+                               HorizontalTextAlignment="Center" HorizontalOptions="Center" MaxLines="3" />
 
                         <!-- Price / owned -->
                         <HorizontalStackLayout Spacing="4" HorizontalOptions="Center">
@@ -63,7 +79,7 @@
                                 </DataTrigger>
                             </HorizontalStackLayout.Triggers>
                             <Image Source="icon_gold.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
-                            <Label Style="{StaticResource PxBody}" FontSize="19" Text="{Binding Item.Price}"
+                            <Label Style="{StaticResource PxBody}" FontSize="19" Text="{Binding Price}"
                                    TextColor="{StaticResource PxGold}" VerticalOptions="Center">
                                 <Label.Triggers>
                                     <DataTrigger TargetType="Label" Binding="{Binding CanAfford}" Value="False">

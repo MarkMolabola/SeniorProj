@@ -10,8 +10,9 @@ namespace MDRNJ.Shared.Game
         Head = 4
     }
 
-    /// <summary>A shop item. Art lives in the app (HeroSprites.TryGetGear).</summary>
-    public sealed record GearItem(string Id, string Name, GearSlot Slot, int Price, GearRarity Rarity, StatKind Stat)
+    /// <summary>A gear item. Art lives in the app (HeroSprites.TryGetGear).</summary>
+    /// <param name="DropOnly">Never sold: only found in the dungeon (drops and the weekly boss).</param>
+    public sealed record GearItem(string Id, string Name, GearSlot Slot, int Price, GearRarity Rarity, StatKind Stat, bool DropOnly = false)
     {
         /// <summary>Stat points added to <see cref="Stat"/> while worn.</summary>
         public int Bonus => GearStats.BonusPoints(Rarity);
@@ -35,5 +36,10 @@ namespace MDRNJ.Shared.Game
 
         public static GearItem? Find(string? id) =>
             id is null ? null : All.FirstOrDefault(i => i.Id == id);
+
+        /// <summary>What the shop sells (everything but dungeon-only drops).</summary>
+        public static IEnumerable<GearItem> ForSale => All.Where(i => !i.DropOnly);
+
+        public static IEnumerable<GearItem> DungeonDrops => All.Where(i => i.DropOnly);
     }
 }

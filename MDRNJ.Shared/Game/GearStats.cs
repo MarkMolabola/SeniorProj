@@ -39,6 +39,28 @@ namespace MDRNJ.Shared.Game
             _ => "FLX"
         };
 
+        /// <summary>
+        /// Total boost per stat for the selected hero: a special hero's built-in outfit,
+        /// or else the gear the Classic Hero is wearing.
+        /// </summary>
+        public static (float Strength, float Endurance, float Flexibility) Bonus(IEquippedGear? gear, string? avatarId)
+        {
+            if (HeroAvatars.Find(avatarId) is not { IsSpecial: true } hero)
+                return Bonus(gear);
+
+            float str = 0, end = 0, flx = 0;
+            foreach (var piece in hero.Pieces)
+            {
+                switch (piece.Stat)
+                {
+                    case StatKind.Strength: str += piece.Bonus; break;
+                    case StatKind.Endurance: end += piece.Bonus; break;
+                    default: flx += piece.Bonus; break;
+                }
+            }
+            return (str, end, flx);
+        }
+
         /// <summary>Total boost per stat from everything the hero is wearing.</summary>
         public static (float Strength, float Endurance, float Flexibility) Bonus(IEquippedGear? gear)
         {

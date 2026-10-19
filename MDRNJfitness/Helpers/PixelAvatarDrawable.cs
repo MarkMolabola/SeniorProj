@@ -477,8 +477,8 @@ namespace MDRNJfitness.Helpers
             if (HeroSprites.TryGetFullBodyAvatar(AvatarId, out var fullBody, out var breathRow))
             {
                 var at = SpritePainter.Place(dirtyRect, HeroSprites.Size, HeroSprites.Size);
+                // Special heroes come dressed: gear is only drawn on the Classic Hero
                 SpritePainter.DrawLayer(canvas, fullBody, at, Frame, breathRow);
-                DrawGear(canvas, at, breathRow);
                 return;
             }
 

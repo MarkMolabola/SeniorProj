@@ -1,3 +1,5 @@
+using MDRNJ.Shared.Game;
+
 namespace MDRNJfitness.Helpers.Sprites
 {
     /// <summary>
@@ -302,6 +304,44 @@ namespace MDRNJfitness.Helpers.Sprites
 
         /// <summary>True when this item has art that fits the hero (so it shows when worn).</summary>
         public static bool GearFits(string itemId, string? avatarId) => TryGetGear(itemId, avatarId, out _);
+
+        /// <summary>
+        /// Icon for one piece of a special hero's outfit: that slot's band of the hero
+        /// (head, torso, legs, feet; the whole hero for the accessory). Stands in until
+        /// the pieces get their own art.
+        /// </summary>
+        public static bool TryGetHeroPiece(string? avatarId, GearSlot slot, out SpriteLayer piece)
+        {
+            piece = null!;
+            if (!TryGetFullBodyAvatar(avatarId, out var hero, out _))
+                return false;
+
+            int top = hero.Height, bottom = -1;
+            for (int y = 0; y < hero.Height; y++)
+                if (hero.Rows[y].Any(c => c != '.'))
+                {
+                    top = Math.Min(top, y);
+                    bottom = y;
+                }
+            if (bottom < 0) return false;
+
+            var height = bottom - top + 1;
+            var (from, to) = slot switch
+            {
+                GearSlot.Head => (0.00, 0.38),
+                GearSlot.Top => (0.33, 0.62),
+                GearSlot.Bottom => (0.58, 0.85),
+                GearSlot.Shoes => (0.82, 1.00),
+                _ => (0.00, 1.00)
+            };
+            var first = top + (int)(from * height);
+            var last = top + (int)Math.Ceiling(to * height) - 1;
+
+            var blank = new string('.', hero.Width);
+            var rows = hero.Rows.Select((row, y) => y >= first && y <= last ? row : blank).ToArray();
+            piece = new SpriteLayer(rows, hero.Palette);
+            return true;
+        }
 
         public static bool TryGetOutfit(string? outfitSlot, out SpriteLayer outfit)
             => Outfits.TryGetValue(string.IsNullOrWhiteSpace(outfitSlot) ? "default" : outfitSlot, out outfit!);

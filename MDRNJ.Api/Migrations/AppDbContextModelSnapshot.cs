@@ -484,10 +484,25 @@ namespace MDRNJ.Api.Migrations
                     b.Property<int>("CurrentStreak")
                         .HasColumnType("int");
 
+                    b.Property<int>("DungeonBossDamage")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("DungeonBossDefeated")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("DungeonBossWeek")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("DungeonCollectedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int>("DungeonFloor")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DungeonFloorKills")
+                        .HasColumnType("int");
 
                     b.Property<int>("Gold")
                         .ValueGeneratedOnAdd()

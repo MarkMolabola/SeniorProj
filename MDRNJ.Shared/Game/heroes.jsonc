@@ -1,0 +1,126 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// HERO BALANCE: prices and stats for every special hero, in one place.
+//
+// Edit the numbers, then rebuild. The API (what players are charged, their
+// stats, dungeon power) and the app (Shop, Hero tab) both read this file, so
+// publish the API and ship a new app build together after changing it.
+//
+//   id       sprite id; don't change it (players' purchases are saved by id)
+//   name     shown in the Shop and CUSTOMIZE
+//   rarity   Common, Rare, Epic or Legendary: the outline colour
+//   price    gold
+//   pieces   the outfit the hero comes dressed in, one per slot at most:
+//              slot   Head, Top, Bottom, Shoes or Accessory
+//              name   shown on the Hero tab
+//              stat   STR, END or FLX
+//              bonus  stat points added while this hero is selected
+//                     (10 points = 1 stat level)
+//
+// For reference, gear gives +2 (Common), +5 (Rare), +10 (Epic) or +20
+// (Legendary) per item, and gear prices live in
+// MDRNJfitness/Helpers/Sprites/SpriteReferences/GearReferences/gear.json.
+// The Classic Hero is free and wears gear, so it isn't listed here.
+// Heroes appear in CUSTOMIZE in this order; the Shop sorts them by price.
+// ─────────────────────────────────────────────────────────────────────────────
+[
+  {
+    "id": "starting_girl",
+    "name": "Athletic Girl",
+    "rarity": "Rare",
+    "price": 1200,
+    "pieces": [
+      { "slot": "Head",   "name": "Hair Tie",       "stat": "FLX", "bonus": 5 },
+      { "slot": "Top",    "name": "Sports Top",     "stat": "END", "bonus": 5 },
+      { "slot": "Bottom", "name": "Running Shorts", "stat": "END", "bonus": 5 },
+      { "slot": "Shoes",  "name": "Sport Sandals",  "stat": "STR", "bonus": 5 }
+    ]
+  },
+  {
+    "id": "starting_girl2",
+    "name": "Cheerleader",
+    "rarity": "Rare",
+    "price": 1500,
+    "pieces": [
+      { "slot": "Head",      "name": "Cheer Headband", "stat": "FLX", "bonus": 5 },
+      { "slot": "Top",       "name": "Cheer Top",      "stat": "FLX", "bonus": 5 },
+      { "slot": "Bottom",    "name": "Cheer Shorts",   "stat": "END", "bonus": 5 },
+      { "slot": "Shoes",     "name": "Cheer Sneakers", "stat": "END", "bonus": 5 },
+      { "slot": "Accessory", "name": "Pom-Pom",        "stat": "FLX", "bonus": 5 }
+    ]
+  },
+  {
+    "id": "starter_archer",
+    "name": "Archer",
+    "rarity": "Epic",
+    "price": 2400,
+    "pieces": [
+      { "slot": "Top",       "name": "Leather Tunic",   "stat": "END", "bonus": 10 },
+      { "slot": "Bottom",    "name": "Ranger Leggings", "stat": "FLX", "bonus": 10 },
+      { "slot": "Shoes",     "name": "Leather Boots",   "stat": "END", "bonus": 10 },
+      { "slot": "Accessory", "name": "Longbow",         "stat": "STR", "bonus": 10 }
+    ]
+  },
+  {
+    "id": "starting_ninja",
+    "name": "Ninja",
+    "rarity": "Epic",
+    "price": 3000,
+    "pieces": [
+      { "slot": "Head",      "name": "Ninja Mask",  "stat": "FLX", "bonus": 10 },
+      { "slot": "Top",       "name": "Ninja Robe",  "stat": "FLX", "bonus": 10 },
+      { "slot": "Bottom",    "name": "Ninja Pants", "stat": "END", "bonus": 10 },
+      { "slot": "Shoes",     "name": "Tabi Boots",  "stat": "END", "bonus": 10 },
+      { "slot": "Accessory", "name": "Shuriken",    "stat": "STR", "bonus": 10 }
+    ]
+  },
+  {
+    "id": "starter_archer2",
+    "name": "Archer II",
+    "rarity": "Legendary",
+    "price": 6000,
+    "pieces": [
+      { "slot": "Head",      "name": "War Headband",  "stat": "STR", "bonus": 20 },
+      { "slot": "Top",       "name": "Battle Vest",   "stat": "STR", "bonus": 20 },
+      { "slot": "Bottom",    "name": "Warrior Pants", "stat": "END", "bonus": 20 },
+      { "slot": "Shoes",     "name": "Trail Boots",   "stat": "END", "bonus": 20 },
+      { "slot": "Accessory", "name": "Blazing Arrow", "stat": "STR", "bonus": 20 }
+    ]
+  },
+  {
+    "id": "starting_buff_ninja",
+    "name": "Buff Ninja",
+    "rarity": "Legendary",
+    "price": 4800,
+    "pieces": [
+      { "slot": "Top",       "name": "Black Gi",      "stat": "STR", "bonus": 20 },
+      { "slot": "Bottom",    "name": "Gi Pants",      "stat": "STR", "bonus": 20 },
+      { "slot": "Shoes",     "name": "Dojo Sandals",  "stat": "END", "bonus": 20 },
+      { "slot": "Accessory", "name": "Master's Belt", "stat": "FLX", "bonus": 20 }
+    ]
+  },
+  {
+    "id": "tennis_avatar",
+    "name": "Tennis Pro",
+    "rarity": "Legendary",
+    "price": 6000,
+    "pieces": [
+      { "slot": "Head",      "name": "Tennis Cap",    "stat": "END", "bonus": 20 },
+      { "slot": "Top",       "name": "Pro Polo",      "stat": "END", "bonus": 20 },
+      { "slot": "Bottom",    "name": "Tennis Shorts", "stat": "FLX", "bonus": 20 },
+      { "slot": "Shoes",     "name": "Court Shoes",   "stat": "END", "bonus": 20 },
+      { "slot": "Accessory", "name": "Pro Racket",    "stat": "STR", "bonus": 20 }
+    ]
+  },
+  {
+    "id": "hot_dog_avatar",
+    "name": "Hot Dog",
+    "rarity": "Legendary",
+    "price": 4800,
+    "pieces": [
+      { "slot": "Head",   "name": "Mustard Swirl",    "stat": "FLX", "bonus": 20 },
+      { "slot": "Top",    "name": "Bun Costume",      "stat": "END", "bonus": 20 },
+      { "slot": "Bottom", "name": "Ketchup Trousers", "stat": "STR", "bonus": 20 },
+      { "slot": "Shoes",  "name": "Relish Sneakers",  "stat": "END", "bonus": 20 }
+    ]
+  }
+]

@@ -9,7 +9,7 @@ namespace MDRNJ.Api.Services
 {
     /// <summary>
     /// A hero's stat points as they count in play: trained points plus boosts from
-    /// worn gear (GearStats). Used for stat-gated achievements and dungeon power.
+    /// the selected hero's outfit or worn gear (GearStats). Used for stat-gated achievements and dungeon power.
     /// </summary>
     public static class EffectiveStats
     {
@@ -20,7 +20,7 @@ namespace MDRNJ.Api.Services
                 .Select(a => new { a.StrengthPoints, a.CardioPoints, a.FlexibilityPoints })
                 .FirstOrDefaultAsync();
             var character = await db.CharacterStates.FirstOrDefaultAsync(c => c.UserId == userId);
-            var gear = GearStats.Bonus(character);
+            var gear = GearStats.Bonus(character, character?.AvatarId);
 
             return ((trained?.StrengthPoints ?? 0) + gear.Strength,
                     (trained?.CardioPoints ?? 0) + gear.Endurance,

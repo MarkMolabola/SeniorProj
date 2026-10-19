@@ -21,6 +21,7 @@ namespace MDRNJfitness.Models.Gamification
             "Duel" => "DUEL",
             "LevelUp" => "LEVEL UP",
             "Dungeon" => "DUNGEON",
+            "Boss" => "BOSS",
             "Purchase" => "SHOP",
             _ => Dto.Reason.ToUpperInvariant()
         };

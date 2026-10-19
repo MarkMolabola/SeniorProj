@@ -119,7 +119,7 @@
                                     <Border Style="{StaticResource PxSunken}" HeightRequest="58" Padding="6"
                                             Stroke="{Binding RarityBrush}" StrokeThickness="3">
                                         <Grid>
-                                            <local:GearIconView ItemId="{Binding ItemId}" />
+                                            <local:GearIconView ItemId="{Binding ItemId}" HeroId="{Binding HeroId}" Slot="{Binding Slot}" />
                                             <Label Text="+" FontFamily="PixelBody" FontSize="28"
                                                    TextColor="{StaticResource PxTextDim}"
                                                    HorizontalOptions="Center" VerticalOptions="Center"

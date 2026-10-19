@@ -21,6 +21,8 @@ Shop gear
     Every item needs a name, price, rarity and stat in GearReferences/gear.json:
         { "Head/RedCap": { "name": "Red Cap", "price": 60,
                            "rarity": "Common", "stat": "END" } }
+    Add "dropOnly": true for gear the shop never sells: it only drops in the
+    dungeon (collect drops and the weekly boss). Its price is ignored.
     rarity: Common, Rare, Epic or Legendary (outline colour and boost size,
     see MDRNJ.Shared/Game/GearStats.cs); stat: STR, END or FLX.
     -> MDRNJfitness/Helpers/Sprites/GearSprites.g.cs (art)
@@ -154,8 +156,9 @@ def build_gear() -> list[str]:
                 fail(f"{slot}/{png.name}: id '{item_id}' is used twice")
             seen.add(item_id)
             name = str(entry["name"]).replace('"', '\\"')
+            drop_only = ", DropOnly: true" if entry.get("dropOnly") else ""
             catalog += (f'            new("{item_id}", "{name}", GearSlot.{slot}, {int(entry["price"])}, '
-                        f'GearRarity.{entry["rarity"]}, StatKind.{STATS[entry["stat"]]}),\n')
+                        f'GearRarity.{entry["rarity"]}, StatKind.{STATS[entry["stat"]]}{drop_only}),\n')
 
     for folder in GEAR_SRC.glob("*") if GEAR_SRC.exists() else []:
         if folder.is_dir() and folder.name not in SLOTS:
@@ -171,7 +174,7 @@ def build_gear() -> list[str]:
         "{\n"
         "    public static partial class GearCatalog\n"
         "    {\n"
-        "        /// <summary>Everything the shop sells, from GearReferences/gear.json.</summary>\n"
+        "        /// <summary>All gear (shop items and dungeon-only drops), from GearReferences/gear.json.</summary>\n"
         "        public static readonly IReadOnlyList<GearItem> All = new GearItem[]\n"
         "        {\n"
         f"{catalog}"

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- CUSTOMIZE pop-up: tap a hero to equip it. BindingContext is the Hero tab's CharacterViewModel. -->
+<!-- CUSTOMIZE pop-up: tap a hero to equip it (or unlock it). BindingContext is the Hero tab's CharacterViewModel. -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
@@ -20,7 +20,7 @@
                 </Grid>
 
                 <Label Grid.Row="1" Style="{StaticResource PxMuted}" FontSize="17"
-                       Text="Looks are cosmetic: stats and progress stay the same. The Classic Hero's outfit changes as you train." />
+                       Text="The Classic Hero is free, wears your gear, and its outfit changes as you train. Special heroes are unlocked with gold and come dressed in their own outfit and stat boosts." />
 
                 <CollectionView Grid.Row="2"
                                 ItemsSource="{Binding AvatarOptions}"
@@ -31,7 +31,8 @@
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource PxSunken}" Padding="6,8">
+                            <Border Style="{StaticResource PxSunken}" Padding="6,8"
+                                    Stroke="{Binding RarityBrush}" StrokeThickness="2">
                                 <Border.Triggers>
                                     <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
                                         <Setter Property="Stroke" Value="{StaticResource PxGold}" />
@@ -50,12 +51,24 @@
                                                            Gear="{Binding PreviewGear}"
                                                            WidthRequest="64"
                                                            HeightRequest="64"
-                                                           HorizontalOptions="Center" />
+                                                           HorizontalOptions="Center">
+                                        <local:PixelAvatarView.Triggers>
+                                            <DataTrigger TargetType="local:PixelAvatarView" Binding="{Binding IsLocked}" Value="True">
+                                                <Setter Property="Opacity" Value="0.45" />
+                                            </DataTrigger>
+                                        </local:PixelAvatarView.Triggers>
+                                    </local:PixelAvatarView>
                                     <Label Style="{StaticResource PxBody}" FontSize="16" Text="{Binding Name}"
                                            HorizontalTextAlignment="Center" LineBreakMode="TailTruncation" />
                                     <Label Style="{StaticResource PxCaption}" FontSize="7" Text="EQUIPPED"
                                            TextColor="{StaticResource PxGold}" HorizontalOptions="Center"
                                            IsVisible="{Binding IsSelected}" />
+                                    <HorizontalStackLayout Spacing="3" HorizontalOptions="Center" IsVisible="{Binding IsLocked}">
+                                        <Label Text="🔒" FontSize="12" VerticalOptions="Center" />
+                                        <Image Source="icon_gold.png" WidthRequest="12" HeightRequest="12" VerticalOptions="Center" />
+                                        <Label Style="{StaticResource PxBody}" FontSize="15" Text="{Binding PriceText}"
+                                               TextColor="{StaticResource PxGold}" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Border>
                         </DataTemplate>

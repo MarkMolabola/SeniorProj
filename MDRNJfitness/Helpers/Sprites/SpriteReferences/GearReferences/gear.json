@@ -88,5 +88,40 @@
     "price": 300,
     "rarity": "Rare",
     "stat": "STR"
+  },
+  "Head/PhoenixCap": {
+    "name": "Phoenix Crest",
+    "price": 0,
+    "rarity": "Legendary",
+    "stat": "FLX",
+    "dropOnly": true
+  },
+  "Top/PhoenixTee": {
+    "name": "Phoenix Tee",
+    "price": 0,
+    "rarity": "Legendary",
+    "stat": "END",
+    "dropOnly": true
+  },
+  "Bottom/PhoenixShorts": {
+    "name": "Phoenix Shorts",
+    "price": 0,
+    "rarity": "Legendary",
+    "stat": "STR",
+    "dropOnly": true
+  },
+  "Shoes/PhoenixSneakers": {
+    "name": "Phoenix Striders",
+    "price": 0,
+    "rarity": "Legendary",
+    "stat": "END",
+    "dropOnly": true
+  },
+  "Accessory/PhoenixBands": {
+    "name": "Phoenix Bands",
+    "price": 0,
+    "rarity": "Legendary",
+    "stat": "STR",
+    "dropOnly": true
   }
 }

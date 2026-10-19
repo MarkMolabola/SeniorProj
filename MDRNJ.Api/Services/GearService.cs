@@ -35,21 +35,23 @@ namespace MDRNJ.Api.Services
             return await BuildAsync(userId, stats);
         }
 
+        /// <summary>Buys a gear item, or a special hero (by its HeroAvatars id).</summary>
         public async Task<InventoryDto> BuyAsync(Guid userId, string itemId)
         {
-            var item = GearCatalog.Find(itemId)
-                ?? throw new KeyNotFoundException("That item isn't in the shop.");
+            var (id, name, listPrice) = GearCatalog.Find(itemId) is { DropOnly: false } item ? (item.Id, item.Name, item.Price)
+                : HeroAvatars.Find(itemId) is { IsSpecial: true } hero ? (hero.Id, hero.Name, hero.Price)
+                : throw new KeyNotFoundException("That item isn't in the shop.");
 
-            if (await _db.UserGear.AnyAsync(g => g.UserId == userId && g.ItemId == item.Id))
-                throw new InvalidOperationException($"You already own the {item.Name}.");
+            if (await _db.UserGear.AnyAsync(g => g.UserId == userId && g.ItemId == id))
+                throw new InvalidOperationException($"You already own the {name}.");
 
             var stats = await _goals.GetOrCreateStatsAsync(userId);
-            var price = await IsAdminAsync(userId) ? 0 : item.Price;
+            var price = await IsAdminAsync(userId) ? 0 : listPrice;
             if (stats.Gold < price)
-                throw new InvalidOperationException($"Not enough gold: the {item.Name} costs {item.Price}, you have {stats.Gold}.");
+                throw new InvalidOperationException($"Not enough gold: the {name} costs {listPrice}, you have {stats.Gold}.");
 
-            _goals.SpendGold(stats, price, GoldReason.Purchase, item.Name);
-            _db.UserGear.Add(new UserGearEntity { UserId = userId, ItemId = item.Id, PricePaid = price });
+            _goals.SpendGold(stats, price, GoldReason.Purchase, name);
+            _db.UserGear.Add(new UserGearEntity { UserId = userId, ItemId = id, PricePaid = price });
             await _db.SaveChangesAsync();
             return await BuildAsync(userId, stats);
         }
@@ -61,6 +63,11 @@ namespace MDRNJ.Api.Services
 
             var character = await _db.CharacterStates.FirstOrDefaultAsync(c => c.UserId == userId)
                 ?? throw new KeyNotFoundException("Character not found.");
+
+            // Special heroes come dressed; gear goes on the Classic Hero (and is kept for it meanwhile)
+            if (HeroAvatars.Find(character.AvatarId) is { IsSpecial: true } hero)
+                throw new InvalidOperationException(
+                    $"The {hero.Name}'s outfit comes with the hero. Switch to the Classic Hero to wear gear.");
 
             if (itemId is not null)
             {

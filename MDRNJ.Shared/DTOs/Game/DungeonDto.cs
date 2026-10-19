@@ -20,5 +20,31 @@ namespace MDRNJ.Shared.DTOs.Game
 
         public string MonsterId { get; set; } = "slime";
         public string MonsterName { get; set; } = "Slime";
+
+        // ── Floors ──
+        public int Floor { get; set; } = 1;
+        public int FloorCount { get; set; }
+        public float GoldMultiplier { get; set; } = 1;
+        public float KillsPerHour { get; set; }
+
+        /// <summary>Kills banked on this floor (not counting the pending run).</summary>
+        public int FloorKills { get; set; }
+
+        /// <summary>Kills needed to clear this floor; 0 on the bottom floor.</summary>
+        public int KillsToClear { get; set; }
+
+        /// <summary>Power needed for the floor below, when the hero doesn't have it yet.</summary>
+        public float? NextFloorMinPower { get; set; }
+
+        // ── Weekly boss ──
+        public string BossName { get; set; } = string.Empty;
+        public string BossMonsterId { get; set; } = "slime";
+        public int BossHp { get; set; }
+        public int BossDamage { get; set; }
+        public float BossMinPower { get; set; }
+        public bool BossDefeated { get; set; }
+
+        /// <summary>When this week's boss leaves (next Monday 00:00 UTC).</summary>
+        public DateTime BossEndsAt { get; set; }
     }
 }

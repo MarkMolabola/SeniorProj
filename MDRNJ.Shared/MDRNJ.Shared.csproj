@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Special hero prices and stats (HeroAvatars) -->
+    <EmbeddedResource Include="Game\heroes.jsonc" />
+  </ItemGroup>
+
 </Project>

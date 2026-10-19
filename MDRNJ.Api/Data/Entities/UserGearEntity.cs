@@ -2,7 +2,7 @@ using System;
 
 namespace MDRNJ.Api.Data.Entities
 {
-    /// <summary>A shop item a user owns (GearCatalog item id).</summary>
+    /// <summary>A shop item a user owns: a GearCatalog item id, or a special hero's HeroAvatars id.</summary>
     public class UserGearEntity
     {
         public Guid UserId { get; set; }

@@ -51,8 +51,10 @@ namespace MDRNJ.Api.Services
 
         public async Task<CharacterStateDto> SetAvatarAsync(Guid userId, string avatarId)
         {
-            if (!HeroAvatars.IsValid(avatarId))
-                throw new ArgumentException($"Unknown avatar: {avatarId}");
+            var hero = HeroAvatars.Find(avatarId)
+                ?? throw new ArgumentException($"Unknown avatar: {avatarId}");
+            if (hero.IsSpecial && !await _db.UserGear.AnyAsync(g => g.UserId == userId && g.ItemId == hero.Id))
+                throw new InvalidOperationException($"Buy the {hero.Name} in the shop first.");
 
             var character = await _db.CharacterStates.FirstOrDefaultAsync(c => c.UserId == userId)
                 ?? throw new KeyNotFoundException("Character not found.");

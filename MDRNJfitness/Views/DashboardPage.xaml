@@ -93,6 +93,21 @@
                         <Label Style="{StaticResource PxBody}" TextColor="{StaticResource PxGold}"
                                Text="{Binding CollectMessage}" HorizontalOptions="Center"
                                IsVisible="{Binding HasCollectMessage}" />
+
+                        <!-- Floor progress: kills clear the floor; power opens the next one -->
+                        <VerticalStackLayout Spacing="4">
+                            <controls:XPBarControl Progress="{Binding FloorProgress}" HeightRequest="10" />
+                            <Label Style="{StaticResource PxMuted}" FontSize="17" Text="{Binding FloorText}" />
+                        </VerticalStackLayout>
+
+                        <!-- Weekly boss -->
+                        <Border Style="{StaticResource PxSunken}" Padding="12,10">
+                            <VerticalStackLayout Spacing="6">
+                                <Label Style="{StaticResource PxCaption}" TextColor="{StaticResource PxStr}" Text="{Binding BossTitle}" />
+                                <controls:XPBarControl Progress="{Binding BossHealth}" HeightRequest="10" />
+                                <Label Style="{StaticResource PxMuted}" FontSize="17" Text="{Binding BossText}" />
+                            </VerticalStackLayout>
+                        </Border>
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </Border>

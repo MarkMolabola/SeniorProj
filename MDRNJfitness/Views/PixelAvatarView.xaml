@@ -10,7 +10,9 @@
         and the drawable picks the largest whole-number scale that fits, so
         use multiples of 32 (96, 128, 160, 192…) for an exact fit.
     -->
+    <!-- InputTransparent: taps reach whatever card the hero sits in -->
     <GraphicsView x:Name="AvatarCanvas"
+                  InputTransparent="True"
                   HorizontalOptions="Fill"
                   VerticalOptions="Fill" />
 

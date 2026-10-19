@@ -9,6 +9,7 @@ namespace MDRNJ.Shared.Enums
         Duel = 3,
         LevelUp = 4,
         Dungeon = 5,
-        Purchase = 6
+        Purchase = 6,
+        Boss = 7
     }
 }
