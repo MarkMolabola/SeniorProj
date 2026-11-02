@@ -26,12 +26,43 @@ namespace MDRNJfitness.ViewModels
             {
                 var friends = await _friends.GetFriendsAsync();
                 Friends.Clear();
-                foreach (var f in friends) Friends.Add(f);
+                // Working out first, then online, then offline
+                foreach (var f in friends.OrderBy(f => PresenceRank(f.Presence)).ThenBy(f => f.Username))
+                    Friends.Add(f);
 
                 var pending = await _friends.GetPendingRequestsAsync();
                 PendingRequests.Clear();
                 foreach (var p in pending) PendingRequests.Add(p);
             });
+
+        /// <summary>A friend's light changed live: swap in an updated card (stays in place, no reorder).</summary>
+        public void ApplyPresence(PresenceDto presence)
+        {
+            for (var i = 0; i < Friends.Count; i++)
+            {
+                var friend = Friends[i];
+                if (friend.UserId != presence.UserId) continue;
+                Friends[i] = new FriendDto
+                {
+                    FriendshipId = friend.FriendshipId,
+                    UserId = friend.UserId,
+                    Username = friend.Username,
+                    AvatarUrl = friend.AvatarUrl,
+                    Status = friend.Status,
+                    CreatedAt = friend.CreatedAt,
+                    Presence = presence.Presence,
+                    PresenceWorkoutType = presence.WorkoutType
+                };
+                return;
+            }
+        }
+
+        private static int PresenceRank(string presence) => presence switch
+        {
+            "WorkingOut" => 0,
+            "Online" => 1,
+            _ => 2
+        };
 
         [RelayCommand]
         public async Task SendRequestAsync() =>

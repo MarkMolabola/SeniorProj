@@ -2,29 +2,37 @@
 using CommunityToolkit.Mvvm.Input;
 using MDRNJ.Shared.DTOs.Workout;
 using MDRNJfitness.Services.Interfaces;
-using System.Collections.ObjectModel;
+using MDRNJfitness.Views;
+using WorkoutTypes = MDRNJ.Shared.Game.WorkoutTypes;
 
 namespace MDRNJfitness.ViewModels
 {
     public partial class WorkoutViewModel : BaseViewModel
     {
+        private const string LastTypeKey = "last_workout_type";
+
         private readonly IWorkoutService _workout;
         private readonly ICharacterProgressPresenter _progress;
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(TracksDistance))]
+        [NotifyPropertyChangedFor(nameof(TracksDistance), nameof(ShownType), nameof(ShownTypeName), nameof(ShownCategory))]
         private WorkoutDto? _activeWorkout;
-        [ObservableProperty] private string _workoutType = "Running";
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ShownType), nameof(ShownTypeName), nameof(ShownCategory))]
+        private string _workoutType = "Running";
+
         [ObservableProperty] private bool _hasActiveWorkout;
         [ObservableProperty] private string _elapsedTime = "0:00:00";
         [ObservableProperty] private string _distanceKm = string.Empty;
 
         /// <summary>Running, cycling, ...: ask for the distance when finishing.</summary>
-        public bool TracksDistance => MDRNJ.Shared.Game.WorkoutTypes.TracksDistance(ActiveWorkout?.WorkoutType);
+        public bool TracksDistance => WorkoutTypes.TracksDistance(ActiveWorkout?.WorkoutType);
 
-        public ObservableCollection<WorkoutDto> History { get; } = new();
-
-        public IReadOnlyList<string> WorkoutTypes { get; } = MDRNJ.Shared.Game.WorkoutTypes.SelectableNames;
+        /// <summary>The type in the box above the button: the running workout's, else the one picked.</summary>
+        public string ShownType => ActiveWorkout?.WorkoutType ?? WorkoutType;
+        public string ShownTypeName => WorkoutTypes.DisplayName(ShownType).ToUpperInvariant();
+        public string ShownCategory => WorkoutTypes.CategoryOf(ShownType)?.Name ?? "Other";
 
         private IDispatcherTimer? _stopwatchTimer;
         private DateTime _workoutStartedAt;
@@ -34,16 +42,39 @@ namespace MDRNJfitness.ViewModels
             _workout = workout;
             _progress = progress;
             Title = "Workout";
+
+            // Start on whatever they trained last time
+            var last = Preferences.Default.Get(LastTypeKey, WorkoutType);
+            if (WorkoutTypes.SelectableNames.Contains(last))
+                WorkoutType = last;
         }
 
         [RelayCommand]
-        public async Task LoadAsync() =>
-            await RunSafeAsync(async () =>
+        public async Task ChangeTypeAsync()
+        {
+            if (HasActiveWorkout) return;
+            if (await WorkoutTypePickerPage.PickAsync(WorkoutType) is { } picked)
             {
-                var history = await _workout.GetHistoryAsync(1, 10);
-                History.Clear();
-                foreach (var w in history) History.Add(w);
-            });
+                WorkoutType = picked.ToString();
+                Preferences.Default.Set(LastTypeKey, WorkoutType);
+            }
+        }
+
+        /// <summary>The big circle: START when idle, FINISH (after a confirm) mid-workout.</summary>
+        [RelayCommand]
+        public async Task PrimaryActionAsync()
+        {
+            if (!HasActiveWorkout)
+            {
+                await StartWorkoutAsync();
+                return;
+            }
+
+            if (await Shell.Current.DisplayAlertAsync("Finish workout?",
+                    $"End your {WorkoutTypes.DisplayName(ShownType)} session at {ElapsedTime} and collect your rewards?",
+                    "FINISH", "KEEP GOING"))
+                await CompleteWorkoutAsync();
+        }
 
         [RelayCommand]
         public async Task StartWorkoutAsync() =>
@@ -71,8 +102,6 @@ namespace MDRNJfitness.ViewModels
                 StopStopwatch();
 
                 var completed = await _workout.CompleteAsync(ActiveWorkout.SessionId, distance);
-                if (completed is not null)
-                    History.Insert(0, completed);
                 ActiveWorkout = null;
                 HasActiveWorkout = false;
                 ElapsedTime = "0:00:00";

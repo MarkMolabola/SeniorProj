@@ -21,10 +21,12 @@ namespace MDRNJ.Api.Services
         private readonly IAchievementService _achievements;
         private readonly ICharacterService _character;
         private readonly IGoalProgressService _goals;
+        private readonly IPresenceService _presence;
 
         public WorkoutService(AppDbContext db, IMapper mapper, IAchievementService achievements,
-            ICharacterService character, IGoalProgressService goals)
+            ICharacterService character, IGoalProgressService goals, IPresenceService presence)
         {
+            _presence = presence;
             _db = db;
             _mapper = mapper;
             _achievements = achievements;
@@ -48,6 +50,7 @@ namespace MDRNJ.Api.Services
 
             _db.WorkoutSessions.Add(session);
             await _db.SaveChangesAsync();
+            await _presence.BroadcastAsync(userId); // friends' light turns green
             return _mapper.Map<WorkoutDto>(session);
         }
 
@@ -67,7 +70,9 @@ namespace MDRNJ.Api.Services
             session.XPAwarded = Math.Max(10, session.DurationMins * 2);
             AddDistance(session, distanceKm);
 
-            return await RecordCompletedAsync(userId, session);
+            var completed = await RecordCompletedAsync(userId, session);
+            await _presence.BroadcastAsync(userId); // back to yellow
+            return completed;
         }
 
         public async Task<WorkoutDto> BacklogWorkoutAsync(Guid userId, BacklogWorkoutDto dto)

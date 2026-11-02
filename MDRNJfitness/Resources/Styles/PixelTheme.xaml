@@ -15,6 +15,10 @@
     <conv:BodyTypeNameConverter x:Key="BodyTypeName" />
     <conv:GearListConverter x:Key="GearList" />
     <conv:GearSlotColumnConverter x:Key="GearSlotColumn" />
+    <conv:WorkoutTypeNameConverter x:Key="WorkoutTypeName" />
+    <conv:WorkoutCategoryColorConverter x:Key="WorkoutCategoryColor" />
+    <conv:PresenceColorConverter x:Key="PresenceColor" />
+    <conv:PresenceTextConverter x:Key="PresenceText" />
 
     <!-- ── Pages ─────────────────────────────────────────────────────────── -->
     <Style x:Key="PxPage" TargetType="ContentPage">

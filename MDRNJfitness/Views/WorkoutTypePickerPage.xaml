@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Pixel-styled workout type picker: four category tiles (Cardio, Flexibility,
+    Strength, Sports), then that category's workouts. Opened from the Workout
+    tab and the Calendar's LOG A SESSION form.
+-->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             x:Class="MDRNJfitness.Views.WorkoutTypePickerPage"
+             ios:Page.ModalPresentationStyle="OverFullScreen"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#E60B0918">
+
+    <Grid Padding="20,24">
+        <Border Style="{StaticResource PxPanel}"
+                Padding="16,18,16,16"
+                VerticalOptions="Center">
+            <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="14">
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Style="{StaticResource PxHeading}"
+                           Text="CHOOSE TRAINING"
+                           TextColor="{StaticResource PxGold}"
+                           VerticalOptions="Center" />
+                    <Button Grid.Column="1"
+                            Style="{StaticResource PxButtonSecondary}"
+                            Text="✕"
+                            Padding="0"
+                            WidthRequest="44"
+                            Clicked="OnCloseClicked" />
+                </Grid>
+
+                <!-- Category tiles, 2 × 2 -->
+                <Grid x:Name="CategoryGrid"
+                      Grid.Row="1"
+                      ColumnDefinitions="*,*"
+                      RowDefinitions="Auto,Auto"
+                      ColumnSpacing="10"
+                      RowSpacing="10" />
+
+                <Label x:Name="CategoryHint"
+                       Grid.Row="2"
+                       Style="{StaticResource PxMuted}"
+                       FontSize="18" />
+
+                <ScrollView Grid.Row="3" MaximumHeightRequest="340">
+                    <Grid x:Name="TypeGrid"
+                          ColumnDefinitions="*,*"
+                          ColumnSpacing="10"
+                          RowSpacing="10" />
+                </ScrollView>
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>

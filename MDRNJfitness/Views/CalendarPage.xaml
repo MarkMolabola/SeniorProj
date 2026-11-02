@@ -145,14 +145,14 @@
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                                 <VerticalStackLayout Grid.Column="0" Spacing="2">
                                     <Label Style="{StaticResource PxBody}"
-                                           Text="{Binding WorkoutType}"
-                                           TextColor="{StaticResource PxTeal}" />
+                                           Text="{Binding WorkoutType, Converter={StaticResource WorkoutTypeName}}"
+                                           TextColor="{Binding WorkoutType, Converter={StaticResource WorkoutCategoryColor}}" />
                                     <Label Style="{StaticResource PxMuted}">
                                         <Label.FormattedText>
                                             <FormattedString>
-                                                <Span Text="{Binding StartTime, Converter={StaticResource UtcToLocal}, StringFormat='{0:h:mm tt}'}" />
-                                                <Span Text=" · " />
-                                                <Span Text="{Binding DurationMins, StringFormat='{0} min'}" />
+                                                <Span FontFamily="PixelBody" Text="{Binding StartTime, Converter={StaticResource UtcToLocal}, StringFormat='{0:h:mm tt}'}" />
+                                                <Span FontFamily="PixelBody" Text=" · " />
+                                                <Span FontFamily="PixelBody" Text="{Binding DurationMins, StringFormat='{0} min'}" />
                                             </FormattedString>
                                         </Label.FormattedText>
                                     </Label>
@@ -172,10 +172,34 @@
                     <Label Style="{StaticResource PxHeading}" Text="LOG A SESSION" />
 
                     <Label Style="{StaticResource PxCaption}" Text="TYPE" />
-                    <Border Style="{StaticResource PxSunken}" Padding="10,0">
-                        <Picker Style="{StaticResource PxPicker}"
-                                ItemsSource="{Binding WorkoutTypes}"
-                                SelectedItem="{Binding BacklogWorkoutType}" />
+                    <Border Style="{StaticResource PxSunken}"
+                            Stroke="{Binding BacklogCategory, Converter={StaticResource WorkoutCategoryColor}}"
+                            Padding="12,10">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ChangeBacklogTypeCommand}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <Label Style="{StaticResource PxBody}"
+                                   VerticalOptions="Center">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span FontFamily="PixelBody" Text="{Binding BacklogCategory}"
+                                              TextColor="{Binding BacklogCategory, Converter={StaticResource WorkoutCategoryColor}}" />
+                                        <Span FontFamily="PixelBody" Text="  ·  " />
+                                        <Span FontFamily="PixelBody" Text="{Binding BacklogTypeName}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                                <Label Style="{StaticResource PxCaption}"
+                                       Text="CHANGE"
+                                       TextColor="{StaticResource PxGold}"
+                                       VerticalOptions="Center" />
+                                <Polygon Points="0,0 10,0 5,6"
+                                         Fill="{StaticResource PxGold}"
+                                         VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Grid>
                     </Border>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="12" RowDefinitions="Auto,Auto" RowSpacing="10">

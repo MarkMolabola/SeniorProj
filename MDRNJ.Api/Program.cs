@@ -144,6 +144,8 @@ builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IDungeonService, DungeonService>();
 builder.Services.AddScoped<IModerationService, ModerationService>();
 builder.Services.AddSingleton<INotifier, Notifier>();
+builder.Services.AddSingleton<PresenceTracker>();
+builder.Services.AddScoped<IPresenceService, PresenceService>();
 builder.Services.AddSingleton<CharacterClassifierService>();
 
 // ── CORS (allows MAUI app to call the API) ─────────

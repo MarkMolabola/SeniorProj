@@ -59,6 +59,7 @@
                     <Border Style="{StaticResource PxSunken}" Padding="10,0">
                         <Picker Style="{StaticResource PxPicker}"
                                 ItemsSource="{Binding WorkoutTypes}"
+                                ItemDisplayBinding="{Binding ., Converter={StaticResource WorkoutTypeName}}"
                                 SelectedItem="{Binding FormWorkoutType}" />
                     </Border>
                     <Label Style="{StaticResource PxMuted}" FontSize="17"
@@ -133,7 +134,7 @@
                                             <FormattedString>
                                                 <Span Text="{Binding QuestType}" />
                                                 <Span Text=" · " />
-                                                <Span Text="{Binding WorkoutType}" />
+                                                <Span Text="{Binding WorkoutType, Converter={StaticResource WorkoutTypeName}}" />
                                                 <Span Text=" · target " />
                                                 <Span Text="{Binding TargetValue, StringFormat='{0:0.#}'}" />
                                                 <Span Text=" · " />

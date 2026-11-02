@@ -17,11 +17,13 @@ namespace MDRNJ.Api.Services
         private readonly AppDbContext _db;
 
         private readonly INotifier _notifier;
+        private readonly IPresenceService _presence;
 
-        public FriendService(AppDbContext db, INotifier notifier)
+        public FriendService(AppDbContext db, INotifier notifier, IPresenceService presence)
         {
             _db = db;
             _notifier = notifier;
+            _presence = presence;
         }
 
         public async Task<FriendDto> SendFriendRequestAsync(Guid requesterId, SendFriendRequestDto dto)
@@ -130,7 +132,14 @@ namespace MDRNJ.Api.Services
                             && f.Status == FriendshipStatus.Accepted)
                 .ToListAsync();
 
-            return friendships.Select(f => BuildFriendDtoFromEntity(f, userId)).ToList();
+            var friends = friendships.Select(f => BuildFriendDtoFromEntity(f, userId)).ToList();
+            var presence = await _presence.GetAsync(friends.Select(f => f.UserId).ToList());
+            foreach (var friend in friends)
+            {
+                friend.Presence = presence[friend.UserId].Presence;
+                friend.PresenceWorkoutType = presence[friend.UserId].WorkoutType;
+            }
+            return friends;
         }
 
         public async Task<List<FriendDto>> GetPendingRequestsAsync(Guid userId)

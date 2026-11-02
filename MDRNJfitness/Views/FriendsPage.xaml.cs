@@ -23,6 +23,8 @@ public partial class FriendsPage : ContentPage
             if (m.IsAboutFriends && BindingContext is FriendsViewModel open)
                 open.LoadCommand.Execute(null);
         });
+        WeakReferenceMessenger.Default.Register<PresenceChangedMessage>(this, (_, m) =>
+            (BindingContext as FriendsViewModel)?.ApplyPresence(m.Presence));
     }
 
     // Live notifications: refresh when one about friends arrives while this page is open
@@ -30,5 +32,6 @@ public partial class FriendsPage : ContentPage
     {
         base.OnDisappearing();
         WeakReferenceMessenger.Default.Unregister<NotificationMessage>(this);
+        WeakReferenceMessenger.Default.Unregister<PresenceChangedMessage>(this);
     }
 }
