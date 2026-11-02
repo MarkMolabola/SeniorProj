@@ -12,6 +12,12 @@ namespace MDRNJ.Shared.Game
         /// <summary>Quest filter value meaning "any workout counts" (stored as null).</summary>
         public const string Any = "Any";
 
+        /// <summary>
+        /// Longest workout that earns rewards. A live session left running is capped
+        /// here when it ends, and backlogged workouts can't claim more.
+        /// </summary>
+        public const int MaxDurationMins = 240;
+
         public static readonly IReadOnlyList<WorkoutType> Selectable = new[]
         {
             WorkoutType.Running, WorkoutType.Weightlifting, WorkoutType.Cycling, WorkoutType.Swimming,

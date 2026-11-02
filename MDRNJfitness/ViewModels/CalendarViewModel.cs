@@ -107,6 +107,12 @@ namespace MDRNJfitness.ViewModels
                 await Shell.Current.DisplayAlertAsync("Distance", "Enter a distance in km, like 5 or 3.2, or leave it blank.", "OK");
                 return;
             }
+            if (BacklogDuration is < 1 or > MDRNJ.Shared.Game.WorkoutTypes.MaxDurationMins)
+            {
+                await Shell.Current.DisplayAlertAsync("Duration",
+                    $"Enter a duration from 1 to {MDRNJ.Shared.Game.WorkoutTypes.MaxDurationMins} minutes.", "OK");
+                return;
+            }
 
             await RunSafeAsync(async () =>
             {
