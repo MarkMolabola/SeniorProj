@@ -1,3 +1,5 @@
+using MDRNJfitness.Helpers;
+
 namespace MDRNJfitness.Views;
 
 public partial class DuelResultPage : ContentPage
@@ -11,7 +13,6 @@ public partial class DuelResultPage : ContentPage
     }
 
     private readonly string _outcome;
-    private readonly TaskCompletionSource _closed = new();
     private bool _played;
 
     private DuelResultPage(Fighter me, Fighter them, string outcome, string title, string myScore, string theirScore)
@@ -39,9 +40,7 @@ public partial class DuelResultPage : ContentPage
     /// <summary>Plays the fight and waits until the player closes it.</summary>
     public static async Task ShowAsync(Fighter me, Fighter them, string outcome, string title, string myScore, string theirScore)
     {
-        var page = new DuelResultPage(me, them, outcome, title, myScore, theirScore);
-        await Shell.Current.Navigation.PushModalAsync(page);
-        await page._closed.Task;
+        await ModalPages.PushAndWaitAsync(new DuelResultPage(me, them, outcome, title, myScore, theirScore));
     }
 
     private static void Dress(PixelAvatarView hero, Fighter fighter)
@@ -66,12 +65,6 @@ public partial class DuelResultPage : ContentPage
             ContinueButton.IsEnabled = true;
             await ResultPanel.FadeToAsync(1, 250);
         }
-    }
-
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        _closed.TrySetResult(); // also covers the Android back button
     }
 
     // ── The fight ───────────────────────────────────────────────────────
@@ -198,6 +191,7 @@ public partial class DuelResultPage : ContentPage
 
     private async void OnContinueClicked(object? sender, EventArgs e)
     {
+        ContinueButton.IsEnabled = false; // a double tap would pop the page underneath too
         await Navigation.PopModalAsync();
     }
 }
