@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Profile ▸ SEND FEEDBACK: bug reports and ideas from testers. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MDRNJfitness.Views.FeedbackPage"
+             Title="{Binding Title}"
+             Style="{StaticResource PxPage}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,16,20,32" Spacing="16">
+
+            <Button Style="{StaticResource PxButtonSecondary}"
+                    Text="◀ BACK"
+                    HorizontalOptions="Start"
+                    Clicked="OnBackClicked" />
+
+            <Label Style="{StaticResource PxTitle}" Text="SEND FEEDBACK" />
+            <Label Style="{StaticResource PxMuted}"
+                   Text="Found a bug or have an idea? It goes straight to the dev team." />
+
+            <!-- BUG / IDEA toggle: the selected one is the gold button -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <Button Grid.Column="0" Style="{StaticResource PxButton}" Text="BUG"
+                        IsVisible="{Binding IsBug}" Command="{Binding PickBugCommand}" />
+                <Button Grid.Column="0" Style="{StaticResource PxButtonSecondary}" Text="BUG"
+                        IsVisible="{Binding IsSuggestion}" Command="{Binding PickBugCommand}" />
+                <Button Grid.Column="1" Style="{StaticResource PxButton}" Text="IDEA"
+                        IsVisible="{Binding IsSuggestion}" Command="{Binding PickSuggestionCommand}" />
+                <Button Grid.Column="1" Style="{StaticResource PxButtonSecondary}" Text="IDEA"
+                        IsVisible="{Binding IsBug}" Command="{Binding PickSuggestionCommand}" />
+            </Grid>
+
+            <Border Style="{StaticResource PxPanel}" Padding="14,12">
+                <VerticalStackLayout Spacing="8">
+                    <Label Style="{StaticResource PxBody}" Text="{Binding Prompt}" LineBreakMode="WordWrap" />
+                    <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                        <Editor Placeholder="{Binding Placeholder}"
+                                Text="{Binding Message}"
+                                MaxLength="{Binding MaxLength}"
+                                AutoSize="TextChanges"
+                                MinimumHeightRequest="160"
+                                FontFamily="PixelBody"
+                                FontSize="22"
+                                TextColor="{StaticResource PxText}"
+                                PlaceholderColor="{StaticResource PxTextDim}"
+                                BackgroundColor="Transparent" />
+                    </Border>
+                    <Label Style="{StaticResource PxMuted}" Text="{Binding CountText}" HorizontalOptions="End" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Button Style="{StaticResource PxButton}"
+                    Text="SEND"
+                    Command="{Binding SendCommand}"
+                    IsEnabled="{Binding IsNotBusy}" />
+
+            <Label Style="{StaticResource PxMuted}"
+                   TextColor="{StaticResource PxTextDim}"
+                   Text="{Binding DeviceText}"
+                   LineBreakMode="WordWrap" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

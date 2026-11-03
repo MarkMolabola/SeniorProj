@@ -51,11 +51,18 @@
                         </Border>
 
                         <Label Style="{StaticResource PxCaption}" Text="PASSWORD" />
-                        <Border Style="{StaticResource PxSunken}" Padding="10,0">
-                            <Entry Style="{StaticResource PxEntry}"
-                                   Placeholder="••••••••"
-                                   Text="{Binding Password}"
-                                   IsPassword="True" />
+                        <Border Style="{StaticResource PxSunken}" Padding="10,0,4,0">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Entry Style="{StaticResource PxEntry}"
+                                       Placeholder="••••••••"
+                                       Text="{Binding Password}"
+                                       IsPassword="True" />
+                                <Button Grid.Column="1"
+                                        Style="{StaticResource PxLinkButton}"
+                                        Text="SHOW"
+                                        VerticalOptions="Center"
+                                        Clicked="OnTogglePasswordClicked" />
+                            </Grid>
                         </Border>
 
                         <VerticalStackLayout Spacing="10" IsVisible="{Binding IsRegisterMode}">
@@ -237,19 +244,33 @@
                             </Border>
 
                             <Label Style="{StaticResource PxCaption}" Text="NEW PASSWORD" />
-                            <Border Style="{StaticResource PxSunken}" Padding="10,0">
-                                <Entry Style="{StaticResource PxEntry}"
-                                       Placeholder="At least 8 characters"
-                                       Text="{Binding NewPassword}"
-                                       IsPassword="True" />
+                            <Border Style="{StaticResource PxSunken}" Padding="10,0,4,0">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Entry Style="{StaticResource PxEntry}"
+                                           Placeholder="At least 8 characters"
+                                           Text="{Binding NewPassword}"
+                                           IsPassword="True" />
+                                    <Button Grid.Column="1"
+                                            Style="{StaticResource PxLinkButton}"
+                                            Text="SHOW"
+                                            VerticalOptions="Center"
+                                            Clicked="OnTogglePasswordClicked" />
+                                </Grid>
                             </Border>
 
                             <Label Style="{StaticResource PxCaption}" Text="CONFIRM PASSWORD" />
-                            <Border Style="{StaticResource PxSunken}" Padding="10,0">
-                                <Entry Style="{StaticResource PxEntry}"
-                                       Placeholder="••••••••"
-                                       Text="{Binding ConfirmPassword}"
-                                       IsPassword="True" />
+                            <Border Style="{StaticResource PxSunken}" Padding="10,0,4,0">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Entry Style="{StaticResource PxEntry}"
+                                           Placeholder="••••••••"
+                                           Text="{Binding ConfirmPassword}"
+                                           IsPassword="True" />
+                                    <Button Grid.Column="1"
+                                            Style="{StaticResource PxLinkButton}"
+                                            Text="SHOW"
+                                            VerticalOptions="Center"
+                                            Clicked="OnTogglePasswordClicked" />
+                                </Grid>
                             </Border>
                         </VerticalStackLayout>
                     </Border>

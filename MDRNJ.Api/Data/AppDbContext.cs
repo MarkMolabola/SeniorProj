@@ -30,6 +30,7 @@ namespace MDRNJ.Api.Data
         public DbSet<ChatMessageEntity> ChatMessages => Set<ChatMessageEntity>();
         public DbSet<ChatReportEntity> ChatReports => Set<ChatReportEntity>();
         public DbSet<UserBlockEntity> UserBlocks => Set<UserBlockEntity>();
+        public DbSet<FeedbackEntity> Feedback => Set<FeedbackEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -320,6 +321,22 @@ namespace MDRNJ.Api.Data
                  .HasForeignKey(r => r.ReporterId)
                  .OnDelete(DeleteBehavior.Restrict);
                 e.HasIndex(r => new { r.MessageId, r.ReporterId }).IsUnique();
+            });
+
+            // FeedbackEntity — deleted with the account
+            modelBuilder.Entity<FeedbackEntity>(e =>
+            {
+                e.HasKey(f => f.FeedbackId);
+                e.Property(f => f.Message).HasMaxLength(MDRNJ.Shared.Game.FeedbackRules.MaxLength).IsRequired();
+                e.Property(f => f.AppVersion).HasMaxLength(40);
+                e.Property(f => f.Platform).HasMaxLength(40);
+                e.Property(f => f.DeviceModel).HasMaxLength(100);
+                e.HasOne(f => f.User)
+                 .WithMany()
+                 .HasForeignKey(f => f.UserId)
+                 .OnDelete(DeleteBehavior.Cascade);
+                e.HasIndex(f => new { f.IsResolved, f.CreatedAt });
+                e.HasIndex(f => new { f.UserId, f.CreatedAt });
             });
 
             // UserBlockEntity — two links to Users, so both Restrict (like friendships)

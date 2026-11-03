@@ -97,6 +97,11 @@ namespace MDRNJfitness
                 .AddHttpMessageHandler<AuthHeaderHandler>()
                 .AddHttpMessageHandler<TransientRetryHandler>();
 
+            builder.Services.AddHttpClient<IFeedbackService, FeedbackService>(
+                c => c.BaseAddress = new Uri(ApiConstants.BaseUrl))
+                .AddHttpMessageHandler<AuthHeaderHandler>()
+                .AddHttpMessageHandler<TransientRetryHandler>();
+
             // Reward / evolution popup after workouts
             builder.Services.AddSingleton<ICharacterProgressPresenter, CharacterProgressPresenter>();
 
@@ -128,6 +133,8 @@ namespace MDRNJfitness
             builder.Services.AddTransient<ChatRoomViewModel>();
             builder.Services.AddTransient<AdminReportsViewModel>();
             builder.Services.AddTransient<GoldHistoryViewModel>();
+            builder.Services.AddTransient<FeedbackViewModel>();
+            builder.Services.AddTransient<AdminFeedbackViewModel>();
 
             // Pages
             builder.Services.AddTransient<LoginPage>();
@@ -149,6 +156,8 @@ namespace MDRNJfitness
             builder.Services.AddTransient<ChatRoomPage>();
             builder.Services.AddTransient<AdminReportsPage>();
             builder.Services.AddTransient<GoldHistoryPage>();
+            builder.Services.AddTransient<FeedbackPage>();
+            builder.Services.AddTransient<AdminFeedbackPage>();
 
             return builder.Build();
         }
