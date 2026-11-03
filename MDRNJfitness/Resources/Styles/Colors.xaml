@@ -44,6 +44,7 @@
     <Color x:Key="PxOrange">#FF9D57</Color>
     <Color x:Key="PxStr">#FF6B6B</Color>
     <Color x:Key="PxFlx">#B79CFF</Color>
+    <Color x:Key="PxGreen">#5BE37D</Color>
 
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource Secondary}"/>

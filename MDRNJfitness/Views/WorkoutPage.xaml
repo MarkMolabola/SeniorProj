@@ -1,121 +1,153 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- Start / finish a live workout, plus recent history. -->
+<!--
+    Start / finish a live workout: the training type in a box up top, then one
+    big round button that starts the session and, once running, shows the
+    timer and finishes it. Past sessions live on the History tab.
+-->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             xmlns:conv="clr-namespace:MDRNJfitness.Helpers.Converters"
              x:Class="MDRNJfitness.Views.WorkoutPage"
              Title="{Binding Title}"
              Style="{StaticResource PxPage}">
 
     <ContentPage.Resources>
         <toolkit:InvertedBoolConverter x:Key="InvertBool" />
-        <conv:UtcToLocalConverter x:Key="UtcToLocal" />
     </ContentPage.Resources>
 
     <ScrollView>
-        <VerticalStackLayout Padding="20,24,20,32" Spacing="24">
+        <VerticalStackLayout Padding="20,24,20,32" Spacing="26">
 
             <Label Style="{StaticResource PxTitle}" Text="TRAINING" />
 
-            <!-- ── Start a workout ─────────────────────────────────── -->
+            <!-- ── Training type box ───────────────────────────────── -->
             <Border Style="{StaticResource PxPanel}"
-                    IsVisible="{Binding HasActiveWorkout, Converter={StaticResource InvertBool}}">
-                <VerticalStackLayout Spacing="12">
-                    <Label Style="{StaticResource PxHeading}" Text="NEW SESSION" />
-                    <Label Style="{StaticResource PxMuted}" Text="Pick your training, then hit START. XP and stat points are awarded when you finish." />
-
-                    <Label Style="{StaticResource PxCaption}" Text="TRAINING TYPE" />
-                    <Border Style="{StaticResource PxSunken}" Padding="10,0">
-                        <Picker Style="{StaticResource PxPicker}"
-                                Title="Workout type"
-                                ItemsSource="{Binding WorkoutTypes}"
-                                SelectedItem="{Binding WorkoutType}" />
+                    Stroke="{Binding ShownCategory, Converter={StaticResource WorkoutCategoryColor}}"
+                    Padding="16,14">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ChangeTypeCommand}" />
+                </Border.GestureRecognizers>
+                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="8" ColumnSpacing="10">
+                    <Border Style="{StaticResource PxChip}"
+                            BackgroundColor="{Binding ShownCategory, Converter={StaticResource WorkoutCategoryColor}}">
+                        <Label Style="{StaticResource PxCaption}"
+                               Text="{Binding ShownCategory}"
+                               TextTransform="Uppercase"
+                               TextColor="{StaticResource PxInk}" />
                     </Border>
+                    <Label Grid.Row="1"
+                           Style="{StaticResource PxTitle}"
+                           FontSize="16"
+                           Text="{Binding ShownTypeName}" />
 
-                    <Button Style="{StaticResource PxButton}"
-                            Text="▶ START"
-                            Command="{Binding StartWorkoutCommand}"
-                            IsEnabled="{Binding IsNotBusy}" />
-                </VerticalStackLayout>
+                    <HorizontalStackLayout Grid.Column="1" Grid.RowSpan="2"
+                                           Spacing="8"
+                                           VerticalOptions="Center"
+                                           IsVisible="{Binding HasActiveWorkout, Converter={StaticResource InvertBool}}">
+                        <Label Style="{StaticResource PxCaption}"
+                               Text="CHANGE"
+                               TextColor="{StaticResource PxGold}"
+                               VerticalOptions="Center" />
+                        <Polygon Points="0,0 10,0 5,6"
+                                 Fill="{StaticResource PxGold}"
+                                 VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    <Label Grid.Column="1" Grid.RowSpan="2"
+                           Style="{StaticResource PxCaption}"
+                           Text="IN PROGRESS"
+                           TextColor="{StaticResource PxTeal}"
+                           VerticalOptions="Center"
+                           IsVisible="{Binding HasActiveWorkout}" />
+                </Grid>
             </Border>
 
-            <!-- ── Active workout ──────────────────────────────────── -->
-            <Border Style="{StaticResource PxPanelHighlight}" IsVisible="{Binding HasActiveWorkout}">
-                <VerticalStackLayout Spacing="14">
-                    <Grid ColumnDefinitions="*,Auto">
-                        <Label Grid.Column="0"
-                               Style="{StaticResource PxHeading}"
-                               Text="{Binding ActiveWorkout.WorkoutType}"
-                               TextTransform="Uppercase" />
-                        <Border Grid.Column="1" Style="{StaticResource PxChip}">
-                            <Label Style="{StaticResource PxCaption}" Text="IN PROGRESS" TextColor="{StaticResource PxGoldInk}" />
-                        </Border>
+            <!-- ── The big button ──────────────────────────────────── -->
+            <Grid HorizontalOptions="Center" WidthRequest="236" HeightRequest="236">
+                <!-- Outer ring -->
+                <Border StrokeShape="Ellipse"
+                        StrokeThickness="4"
+                        Stroke="{StaticResource PxInk}"
+                        BackgroundColor="{StaticResource PxPanelSunken}">
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Offset="0,8" Radius="0" Opacity="0.45" />
+                    </Border.Shadow>
+                </Border>
+
+                <Border x:Name="Circle"
+                        StrokeShape="Ellipse"
+                        StrokeThickness="4"
+                        Stroke="{StaticResource PxInk}"
+                        Margin="16"
+                        BackgroundColor="{StaticResource PxGold}">
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding HasActiveWorkout}" Value="True">
+                            <Setter Property="BackgroundColor" Value="{StaticResource PxPanelRaised}" />
+                            <Setter Property="Stroke" Value="{StaticResource PxTeal}" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Border" Binding="{Binding IsBusy}" Value="True">
+                            <Setter Property="Opacity" Value="0.6" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCircleTapped" />
+                    </Border.GestureRecognizers>
+
+                    <Grid>
+                        <!-- Idle -->
+                        <VerticalStackLayout Spacing="12"
+                                             VerticalOptions="Center"
+                                             IsVisible="{Binding HasActiveWorkout, Converter={StaticResource InvertBool}}">
+                            <Polygon Points="0,0 34,20 0,40"
+                                     Fill="{StaticResource PxGoldInk}"
+                                     HorizontalOptions="Center"
+                                     Margin="8,0,0,0" />
+                            <Label Style="{StaticResource PxTitle}"
+                                   Text="START"
+                                   FontSize="18"
+                                   TextColor="{StaticResource PxGoldInk}"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+
+                        <!-- Running -->
+                        <VerticalStackLayout Spacing="14"
+                                             VerticalOptions="Center"
+                                             IsVisible="{Binding HasActiveWorkout}">
+                            <Label Style="{StaticResource PxTitle}"
+                                   Text="{Binding ElapsedTime}"
+                                   FontSize="22"
+                                   TextColor="{StaticResource PxTeal}"
+                                   HorizontalOptions="Center" />
+                            <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                                <BoxView Color="{StaticResource PxStr}"
+                                         WidthRequest="10" HeightRequest="10"
+                                         VerticalOptions="Center" />
+                                <Label Style="{StaticResource PxCaption}"
+                                       Text="TAP TO FINISH"
+                                       TextColor="{StaticResource PxText}"
+                                       VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
                     </Grid>
+                </Border>
+            </Grid>
 
-                    <Border Style="{StaticResource PxSunken}" Padding="16,22">
-                        <Label Style="{StaticResource PxTitle}"
-                               Text="{Binding ElapsedTime}"
-                               FontSize="34"
-                               TextColor="{StaticResource PxTeal}"
-                               HorizontalOptions="Center" />
+            <Label Style="{StaticResource PxMuted}"
+                   HorizontalTextAlignment="Center"
+                   Text="XP, gold and stat points are awarded when you finish."
+                   IsVisible="{Binding HasActiveWorkout, Converter={StaticResource InvertBool}}" />
+
+            <!-- ── Distance, for running / cycling / ... ───────────── -->
+            <Border Style="{StaticResource PxPanel}" IsVisible="{Binding TracksDistance}">
+                <VerticalStackLayout Spacing="6">
+                    <Label Style="{StaticResource PxCaption}" Text="DISTANCE (KM) · OPTIONAL" />
+                    <Border Style="{StaticResource PxSunken}" Padding="10,0">
+                        <Entry Style="{StaticResource PxEntry}"
+                               Text="{Binding DistanceKm}"
+                               Keyboard="Numeric"
+                               Placeholder="e.g. 5.0" />
                     </Border>
-
-                    <VerticalStackLayout Spacing="6" IsVisible="{Binding TracksDistance}">
-                        <Label Style="{StaticResource PxCaption}" Text="DISTANCE (KM) · OPTIONAL" />
-                        <Border Style="{StaticResource PxSunken}" Padding="10,0">
-                            <Entry Style="{StaticResource PxEntry}"
-                                   Text="{Binding DistanceKm}"
-                                   Keyboard="Numeric"
-                                   Placeholder="e.g. 5.0" />
-                        </Border>
-                    </VerticalStackLayout>
-
-                    <Button Style="{StaticResource PxButton}"
-                            Text="■ FINISH"
-                            Command="{Binding CompleteWorkoutCommand}"
-                            IsEnabled="{Binding IsNotBusy}" />
                 </VerticalStackLayout>
             </Border>
-
-            <!-- ── History ─────────────────────────────────────────── -->
-            <VerticalStackLayout Spacing="14">
-                <Label Style="{StaticResource PxCaption}" Text="RECENT SESSIONS" />
-
-                <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding History}">
-                    <BindableLayout.EmptyView>
-                        <Border Style="{StaticResource PxPanel}">
-                            <Label Style="{StaticResource PxMuted}" Text="No sessions yet. Start one above!" />
-                        </Border>
-                    </BindableLayout.EmptyView>
-                    <BindableLayout.ItemTemplate>
-                        <DataTemplate>
-                            <Border Style="{StaticResource PxPanel}" Padding="16,12">
-                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
-                                    <VerticalStackLayout Grid.Column="0" Spacing="2">
-                                        <Label Style="{StaticResource PxBody}"
-                                               Text="{Binding WorkoutType}"
-                                               TextColor="{StaticResource PxTeal}" />
-                                        <Label Style="{StaticResource PxMuted}"
-                                               Text="{Binding StartTime, Converter={StaticResource UtcToLocal}, StringFormat='{0:MMM d · h:mm tt}'}" />
-                                        <Label Style="{StaticResource PxMuted}">
-                                            <Label.FormattedText>
-                                                <FormattedString>
-                                                    <Span Text="{Binding DurationMins, StringFormat='{0} min'}" />
-                                                    <Span Text="{Binding DistanceKm, StringFormat=' · {0:0.##} km', TargetNullValue=''}" />
-                                                </FormattedString>
-                                            </Label.FormattedText>
-                                        </Label>
-                                    </VerticalStackLayout>
-                                    <Label Grid.Column="1"
-                                           Style="{StaticResource PxXp}"
-                                           Text="{Binding XPAwarded, StringFormat='+{0} XP'}" />
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </BindableLayout.ItemTemplate>
-                </VerticalStackLayout>
-            </VerticalStackLayout>
 
         </VerticalStackLayout>
     </ScrollView>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Every finished session, newest first, grouped by day. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:conv="clr-namespace:MDRNJfitness.Helpers.Converters"
+             x:Class="MDRNJfitness.Views.HistoryPage"
+             Title="{Binding Title}"
+             Style="{StaticResource PxPage}">
+
+    <ContentPage.Resources>
+        <conv:UtcToLocalConverter x:Key="UtcToLocal" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,24,20,32" Spacing="22">
+
+            <Label Style="{StaticResource PxTitle}" Text="HISTORY" />
+
+            <Border Style="{StaticResource PxPanel}" IsVisible="{Binding HasNothing}">
+                <Label Style="{StaticResource PxMuted}" Text="No sessions yet. Start one on the Workout tab!" />
+            </Border>
+
+            <VerticalStackLayout Spacing="22" BindableLayout.ItemsSource="{Binding Days}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <VerticalStackLayout Spacing="10">
+                            <Label Style="{StaticResource PxCaption}" Text="{Binding Header}" />
+
+                            <VerticalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding Sessions}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource PxPanel}" Padding="0">
+                                            <Grid ColumnDefinitions="6,*,Auto" ColumnSpacing="12">
+                                                <!-- Category stripe -->
+                                                <BoxView Color="{Binding WorkoutType, Converter={StaticResource WorkoutCategoryColor}}" />
+
+                                                <VerticalStackLayout Grid.Column="1" Spacing="2" Padding="0,12">
+                                                    <Label Style="{StaticResource PxBody}"
+                                                           Text="{Binding WorkoutType, Converter={StaticResource WorkoutTypeName}}"
+                                                           TextColor="{Binding WorkoutType, Converter={StaticResource WorkoutCategoryColor}}" />
+                                                    <Label Style="{StaticResource PxMuted}">
+                                                        <Label.FormattedText>
+                                                            <FormattedString>
+                                                                <Span FontFamily="PixelBody" Text="{Binding StartTime, Converter={StaticResource UtcToLocal}, StringFormat='{0:h:mm tt}'}" />
+                                                                <Span FontFamily="PixelBody" Text="{Binding DurationMins, StringFormat=' · {0} min'}" />
+                                                                <Span FontFamily="PixelBody" Text="{Binding DistanceKm, StringFormat=' · {0:0.##} km', TargetNullValue=''}" />
+                                                            </FormattedString>
+                                                        </Label.FormattedText>
+                                                    </Label>
+                                                </VerticalStackLayout>
+
+                                                <Label Grid.Column="2"
+                                                       Style="{StaticResource PxXp}"
+                                                       Margin="0,0,14,0"
+                                                       Text="{Binding XPAwarded, StringFormat='+{0} XP'}" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+
+            <Button Style="{StaticResource PxButtonSecondary}"
+                    Text="LOAD MORE"
+                    Command="{Binding LoadMoreCommand}"
+                    IsVisible="{Binding CanLoadMore}"
+                    IsEnabled="{Binding IsNotBusy}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,6 +1,7 @@
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Mvvm.Messaging;
+using MDRNJ.Shared.DTOs.Friend;
 using MDRNJ.Shared.DTOs.Notification;
 using MDRNJfitness.Helpers;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -9,8 +10,10 @@ namespace MDRNJfitness.SignalR
 {
     /// <summary>
     /// Live notifications (friend requests, duel invites and results): shows a toast and
-    /// broadcasts a <see cref="NotificationMessage"/> so open pages can refresh.
-    /// Connected from Home after sign-in; stopped on logout so it never outlives the session.
+    /// broadcasts a <see cref="NotificationMessage"/> so open pages can refresh. Friends'
+    /// status lights arrive here too, as a <see cref="PresenceChangedMessage"/>.
+    /// Being connected is what shows this user as online, so it's connected from Home after
+    /// sign-in and on resume, and stopped on logout and when the app goes to the background.
     /// </summary>
     public class NotificationHubClient : IAsyncDisposable
     {
@@ -34,6 +37,9 @@ namespace MDRNJfitness.SignalR
                     .Build();
 
                 _connection.On<NotificationDto>("Notify", OnNotified);
+                _connection.On<PresenceDto>("PresenceChanged", presence =>
+                    MainThread.BeginInvokeOnMainThread(() =>
+                        WeakReferenceMessenger.Default.Send(new PresenceChangedMessage(presence))));
                 await _connection.StartAsync();
             }
             catch

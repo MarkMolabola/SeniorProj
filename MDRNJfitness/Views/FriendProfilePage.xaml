@@ -84,14 +84,14 @@
                                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                                     <VerticalStackLayout Grid.Column="0" Spacing="2">
                                         <Label Style="{StaticResource PxBody}"
-                                               Text="{Binding WorkoutType}"
+                                               Text="{Binding WorkoutType, Converter={StaticResource WorkoutTypeName}}"
                                                TextColor="{StaticResource PxTeal}" />
                                         <Label Style="{StaticResource PxMuted}">
                                             <Label.FormattedText>
                                                 <FormattedString>
-                                                    <Span Text="{Binding StartTime, StringFormat='{0:MMM d}'}" />
-                                                    <Span Text=" · " />
-                                                    <Span Text="{Binding DurationMins, StringFormat='{0} min'}" />
+                                                    <Span FontFamily="PixelBody" Text="{Binding StartTime, StringFormat='{0:MMM d}'}" />
+                                                    <Span FontFamily="PixelBody" Text=" · " />
+                                                    <Span FontFamily="PixelBody" Text="{Binding DurationMins, StringFormat='{0} min'}" />
                                                 </FormattedString>
                                             </Label.FormattedText>
                                         </Label>

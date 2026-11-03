@@ -23,15 +23,22 @@ namespace MDRNJfitness.ViewModels
 
         // Backlog form fields
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(BacklogTracksDistance))]
+        [NotifyPropertyChangedFor(nameof(BacklogTracksDistance), nameof(BacklogTypeName), nameof(BacklogCategory))]
         private string _backlogWorkoutType = "Running";
         [ObservableProperty] private TimeSpan _backlogTime = TimeSpan.FromHours(8);
         [ObservableProperty] private int _backlogDuration = 30;
         [ObservableProperty] private string _backlogDistanceKm = string.Empty;
 
         public bool BacklogTracksDistance => MDRNJ.Shared.Game.WorkoutTypes.TracksDistance(BacklogWorkoutType);
+        public string BacklogTypeName => MDRNJ.Shared.Game.WorkoutTypes.DisplayName(BacklogWorkoutType);
+        public string BacklogCategory => MDRNJ.Shared.Game.WorkoutTypes.CategoryOf(BacklogWorkoutType)?.Name ?? "Other";
 
-        public IReadOnlyList<string> WorkoutTypes { get; } = MDRNJ.Shared.Game.WorkoutTypes.SelectableNames;
+        [RelayCommand]
+        public async Task ChangeBacklogTypeAsync()
+        {
+            if (await Views.WorkoutTypePickerPage.PickAsync(BacklogWorkoutType) is { } picked)
+                BacklogWorkoutType = picked.ToString();
+        }
 
         // Badge state — recalculated after every load
         [ObservableProperty]
@@ -105,6 +112,12 @@ namespace MDRNJfitness.ViewModels
             if (!WorkoutViewModel.TryReadDistance(BacklogTracksDistance, BacklogDistanceKm, out var distance))
             {
                 await Shell.Current.DisplayAlertAsync("Distance", "Enter a distance in km, like 5 or 3.2, or leave it blank.", "OK");
+                return;
+            }
+            if (BacklogDuration is < 1 or > MDRNJ.Shared.Game.WorkoutTypes.MaxDurationMins)
+            {
+                await Shell.Current.DisplayAlertAsync("Duration",
+                    $"Enter a duration from 1 to {MDRNJ.Shared.Game.WorkoutTypes.MaxDurationMins} minutes.", "OK");
                 return;
             }
 

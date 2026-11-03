@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Laid over the MAUI theme in MainActivity.OnCreate so Android's own dialogs
+        (DisplayAlert, action sheets, Picker lists, date / time pickers) match the
+        pixel UI instead of showing up white.
+    -->
+    <style name="PxDialogOverlay">
+        <item name="alertDialogTheme">@style/PxAlertDialog</item>
+        <item name="android:alertDialogTheme">@style/PxAlertDialog</item>
+        <item name="materialAlertDialogTheme">@style/PxAlertDialog</item>
+        <item name="android:datePickerDialogTheme">@style/PxPickerDialog</item>
+        <item name="android:timePickerDialogTheme">@style/PxPickerDialog</item>
+    </style>
+
+    <style name="PxAlertDialog" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/px_dialog_bg</item>
+        <item name="android:colorBackground">@color/pxPanel</item>
+        <item name="colorSurface">@color/pxPanel</item>
+        <item name="colorOnSurface">@color/pxText</item>
+        <item name="colorPrimary">@color/colorAccent</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/pxText</item>
+        <item name="android:textColorSecondary">@color/pxTextMuted</item>
+        <item name="android:textColorAlertDialogListItem">@color/pxText</item>
+        <item name="android:fontFamily">@font/px_body</item>
+        <item name="fontFamily">@font/px_body</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:windowTitleStyle">@style/PxDialogTitle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PxDialogButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/PxDialogButton</item>
+        <item name="buttonBarNeutralButtonStyle">@style/PxDialogButton</item>
+    </style>
+
+    <style name="PxDialogTitle" parent="RtlOverlay.DialogWindowTitle.AppCompat">
+        <item name="android:textAppearance">@style/PxDialogTitleText</item>
+    </style>
+
+    <style name="PxDialogTitleText" parent="TextAppearance.AppCompat.Title">
+        <item name="android:fontFamily">@font/px_heading</item>
+        <item name="fontFamily">@font/px_heading</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
+    <style name="PxDialogButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:fontFamily">@font/px_heading</item>
+        <item name="fontFamily">@font/px_heading</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <!-- Framework DatePickerDialog / TimePickerDialog -->
+    <style name="PxPickerDialog" parent="@android:style/Theme.Material.Dialog">
+        <item name="android:windowBackground">@drawable/px_dialog_bg</item>
+        <item name="android:colorBackground">@color/pxPanel</item>
+        <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/pxText</item>
+        <item name="android:textColorSecondary">@color/pxTextMuted</item>
+        <item name="android:textColorPrimaryInverse">@color/pxInk</item>
+        <item name="android:fontFamily">@font/px_body</item>
+        <item name="android:buttonBarButtonStyle">@style/PxPickerButton</item>
+        <item name="android:timePickerStyle">@style/PxTimePicker</item>
+        <item name="android:datePickerStyle">@style/PxDatePicker</item>
+    </style>
+
+    <style name="PxTimePicker" parent="@android:style/Widget.Material.TimePicker">
+        <item name="android:headerBackground">@color/pxPanelRaised</item>
+        <item name="android:numbersBackgroundColor">@color/pxInk</item>
+        <item name="android:numbersTextColor">@color/pxText</item>
+        <item name="android:numbersSelectorColor">@color/colorAccent</item>
+    </style>
+
+    <style name="PxDatePicker" parent="@android:style/Widget.Material.DatePicker">
+        <item name="android:headerBackground">@color/pxPanelRaised</item>
+    </style>
+
+    <style name="PxPickerButton" parent="@android:style/Widget.Material.Button.Borderless.Colored">
+        <item name="android:fontFamily">@font/px_heading</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+</resources>

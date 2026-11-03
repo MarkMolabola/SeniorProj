@@ -17,7 +17,7 @@ namespace MDRNJfitness.Services
             if (progress is { Evolved: true, Character: not null })
                 WeakReferenceMessenger.Default.Send(new CharacterEvolvedMessage(progress.Character));
 
-            await Shell.Current.Navigation.PushModalAsync(new RewardPopupPage(progress, account, headline));
+            await ModalPages.PushAndWaitAsync(new RewardPopupPage(progress, account, headline));
         }
     }
 }

@@ -3,4 +3,11 @@
     <color name="colorPrimary">#15122B</color>
     <color name="colorPrimaryDark">#0B0918</color>
     <color name="colorAccent">#FFC94A</color>
+
+    <!-- Pixel palette for native dialogs (mirrors Resources/Styles/Colors.xaml) -->
+    <color name="pxPanel">#24204A</color>
+    <color name="pxPanelRaised">#322C62</color>
+    <color name="pxText">#F4F1FF</color>
+    <color name="pxTextMuted">#B9B2DE</color>
+    <color name="pxInk">#0B0918</color>
 </resources>

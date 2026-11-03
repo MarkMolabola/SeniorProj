@@ -34,6 +34,10 @@
                 Route="WorkoutPage"
                 ContentTemplate="{DataTemplate views:WorkoutPage}" />
             <ShellContent
+                Title="History"
+                Route="HistoryPage"
+                ContentTemplate="{DataTemplate views:HistoryPage}" />
+            <ShellContent
                 Title="Calendar"
                 Route="CalendarPage"
                 ContentTemplate="{DataTemplate views:CalendarPage}" />

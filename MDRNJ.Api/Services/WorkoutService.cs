@@ -21,10 +21,12 @@ namespace MDRNJ.Api.Services
         private readonly IAchievementService _achievements;
         private readonly ICharacterService _character;
         private readonly IGoalProgressService _goals;
+        private readonly IPresenceService _presence;
 
         public WorkoutService(AppDbContext db, IMapper mapper, IAchievementService achievements,
-            ICharacterService character, IGoalProgressService goals)
+            ICharacterService character, IGoalProgressService goals, IPresenceService presence)
         {
+            _presence = presence;
             _db = db;
             _mapper = mapper;
             _achievements = achievements;
@@ -37,16 +39,18 @@ namespace MDRNJ.Api.Services
             if (!Enum.TryParse<WorkoutType>(dto.WorkoutType, true, out var workoutType))
                 throw new ArgumentException($"Unknown workout type: {dto.WorkoutType}");
 
+            // Server clock, not the client's: a backdated start would inflate the reward
             var session = new WorkoutSessionEntity
             {
                 UserId = userId,
                 WorkoutType = workoutType,
-                StartTime = dto.StartTime,
+                StartTime = DateTime.UtcNow,
                 Notes = dto.Notes
             };
 
             _db.WorkoutSessions.Add(session);
             await _db.SaveChangesAsync();
+            await _presence.BroadcastAsync(userId); // friends' light turns green
             return _mapper.Map<WorkoutDto>(session);
         }
 
@@ -61,11 +65,14 @@ namespace MDRNJ.Api.Services
                 throw new InvalidOperationException("Workout already ended.");
 
             session.EndTime = DateTime.UtcNow;
-            session.DurationMins = (int)(session.EndTime.Value - session.StartTime).TotalMinutes;
+            session.DurationMins = Math.Min(WorkoutTypes.MaxDurationMins,
+                (int)(session.EndTime.Value - session.StartTime).TotalMinutes);
             session.XPAwarded = Math.Max(10, session.DurationMins * 2);
             AddDistance(session, distanceKm);
 
-            return await RecordCompletedAsync(userId, session);
+            var completed = await RecordCompletedAsync(userId, session);
+            await _presence.BroadcastAsync(userId); // back to yellow
+            return completed;
         }
 
         public async Task<WorkoutDto> BacklogWorkoutAsync(Guid userId, BacklogWorkoutDto dto)
@@ -76,6 +83,10 @@ namespace MDRNJ.Api.Services
             var startUtc = dto.StartTime.Kind == DateTimeKind.Utc
                 ? dto.StartTime
                 : dto.StartTime.ToUniversalTime();
+
+            // A few minutes of slack for clock drift between phone and server
+            if (startUtc.AddMinutes(dto.DurationMins) > DateTime.UtcNow.AddMinutes(5))
+                throw new ArgumentException("You can only log a workout that has already finished.");
 
             var session = new WorkoutSessionEntity
             {

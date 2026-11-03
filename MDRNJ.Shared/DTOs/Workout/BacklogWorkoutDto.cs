@@ -11,7 +11,7 @@ namespace MDRNJ.Shared.DTOs.Workout
         [Required]
         public required DateTime StartTime { get; set; }
 
-        [Range(1, 1440)]
+        [Range(1, MDRNJ.Shared.Game.WorkoutTypes.MaxDurationMins)]
         public int DurationMins { get; set; } = 30;
 
         /// <summary>Distance covered, for types where <see cref="MDRNJ.Shared.Game.WorkoutTypes.TracksDistance"/>.</summary>

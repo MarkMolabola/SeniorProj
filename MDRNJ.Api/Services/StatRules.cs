@@ -43,6 +43,35 @@ namespace MDRNJ.Api.Services
             WorkoutType.Football      => (0.2f, 0.7f, 0.1f),
             WorkoutType.Hiking        => (0.2f, 0.8f, 0.0f),
             WorkoutType.Golf          => (0.2f, 0.4f, 0.4f),
+
+            WorkoutType.Walking       => (0.0f, 1.0f, 0.0f),
+            WorkoutType.Jogging       => (0.0f, 1.0f, 0.0f),
+            WorkoutType.JumpRope      => (0.1f, 0.9f, 0.0f),
+            WorkoutType.Elliptical    => (0.0f, 1.0f, 0.0f),
+            WorkoutType.StairClimber  => (0.2f, 0.8f, 0.0f),
+            WorkoutType.Dance         => (0.0f, 0.7f, 0.3f),
+            WorkoutType.OtherCardio   => (0.1f, 0.9f, 0.0f),
+
+            WorkoutType.Stretching    => (0.0f, 0.0f, 1.0f),
+            WorkoutType.Pilates       => (0.3f, 0.0f, 0.7f),
+            WorkoutType.Mobility      => (0.0f, 0.0f, 1.0f),
+            WorkoutType.TaiChi        => (0.1f, 0.1f, 0.8f),
+            WorkoutType.OtherFlexibility => (0.0f, 0.0f, 1.0f),
+
+            WorkoutType.Calisthenics  => (0.8f, 0.1f, 0.1f),
+            WorkoutType.Powerlifting  => (1.0f, 0.0f, 0.0f),
+            WorkoutType.CircuitTraining => (0.5f, 0.5f, 0.0f),
+            WorkoutType.Kettlebell    => (0.6f, 0.4f, 0.0f),
+            WorkoutType.OtherStrength => (1.0f, 0.0f, 0.0f),
+
+            WorkoutType.Soccer        => (0.2f, 0.7f, 0.1f),
+            WorkoutType.Volleyball    => (0.3f, 0.5f, 0.2f),
+            WorkoutType.Baseball      => (0.4f, 0.4f, 0.2f),
+            WorkoutType.Badminton     => (0.1f, 0.7f, 0.2f),
+            WorkoutType.Pickleball    => (0.1f, 0.7f, 0.2f),
+            WorkoutType.MartialArts   => (0.4f, 0.4f, 0.2f),
+            WorkoutType.OtherSport    => (0.2f, 0.6f, 0.2f),
+
             _                         => (0.3f, 0.5f, 0.2f),
         };
 

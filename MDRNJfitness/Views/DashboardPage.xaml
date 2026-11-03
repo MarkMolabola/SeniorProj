@@ -187,13 +187,13 @@
                                     <Grid ColumnDefinitions="*,Auto" Padding="0,10">
                                         <VerticalStackLayout Grid.Column="0">
                                             <Label Style="{StaticResource PxBody}" TextColor="{StaticResource PxTeal}"
-                                                   Text="{Binding WorkoutType}" />
+                                                   Text="{Binding WorkoutType, Converter={StaticResource WorkoutTypeName}}" />
                                             <Label Style="{StaticResource PxMuted}" FontSize="18">
                                                 <Label.FormattedText>
                                                     <FormattedString>
-                                                        <Span Text="{Binding StartTime, Converter={StaticResource UtcToLocal}, StringFormat='{0:MMM d}'}" />
-                                                        <Span Text=" · " />
-                                                        <Span Text="{Binding DurationMins, StringFormat='{0} min'}" />
+                                                        <Span FontFamily="PixelBody" Text="{Binding StartTime, Converter={StaticResource UtcToLocal}, StringFormat='{0:MMM d}'}" />
+                                                        <Span FontFamily="PixelBody" Text=" · " />
+                                                        <Span FontFamily="PixelBody" Text="{Binding DurationMins, StringFormat='{0} min'}" />
                                                     </FormattedString>
                                                 </Label.FormattedText>
                                             </Label>

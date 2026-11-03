@@ -119,6 +119,7 @@ namespace MDRNJfitness
             builder.Services.AddTransient<ProfileViewModel>();
             builder.Services.AddTransient<FriendProfileViewModel>();
             builder.Services.AddTransient<CalendarViewModel>();
+            builder.Services.AddTransient<HistoryViewModel>();
             builder.Services.AddTransient<QuestViewModel>();
             builder.Services.AddTransient<AdminQuestViewModel>();
             builder.Services.AddTransient<ShopViewModel>();
@@ -139,6 +140,7 @@ namespace MDRNJfitness
             builder.Services.AddTransient<ProfilePage>();
             builder.Services.AddTransient<FriendProfilePage>();
             builder.Services.AddTransient<CalendarPage>();
+            builder.Services.AddTransient<HistoryPage>();
             builder.Services.AddTransient<QuestPage>();
             builder.Services.AddTransient<AdminQuestPage>();
             builder.Services.AddTransient<ShopPage>();

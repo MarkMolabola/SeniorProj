@@ -127,6 +127,7 @@ public partial class RewardPopupPage : ContentPage
 
     private async void OnContinueClicked(object? sender, EventArgs e)
     {
+        if (sender is Button button) button.IsEnabled = false; // a double tap would pop the page underneath too
         await Navigation.PopModalAsync();
     }
 }
