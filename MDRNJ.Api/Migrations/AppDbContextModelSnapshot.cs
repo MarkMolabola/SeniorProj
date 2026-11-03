@@ -444,6 +444,50 @@ namespace MDRNJ.Api.Migrations
                     b.ToTable("Exercises");
                 });
 
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.FeedbackEntity", b =>
+                {
+                    b.Property<Guid>("FeedbackId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AppVersion")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeviceModel")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsResolved")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("Platform")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("FeedbackId");
+
+                    b.HasIndex("IsResolved", "CreatedAt");
+
+                    b.HasIndex("UserId", "CreatedAt");
+
+                    b.ToTable("Feedback");
+                });
+
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.FriendshipEntity", b =>
                 {
                     b.Property<Guid>("FriendshipId")
@@ -1029,6 +1073,17 @@ namespace MDRNJ.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Session");
+                });
+
+            modelBuilder.Entity("MDRNJ.Api.Data.Entities.FeedbackEntity", b =>
+                {
+                    b.HasOne("MDRNJ.Api.Data.Entities.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MDRNJ.Api.Data.Entities.FriendshipEntity", b =>

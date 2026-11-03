@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Admins: bug reports and ideas from players. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MDRNJfitness.Views.AdminFeedbackPage"
+             Title="{Binding Title}"
+             Style="{StaticResource PxPage}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,16,20,32" Spacing="16">
+
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button Style="{StaticResource PxButtonSecondary}"
+                        Text="◀ BACK"
+                        Clicked="OnBackClicked" />
+                <Button Grid.Column="2"
+                        Style="{StaticResource PxLinkButton}"
+                        Text="{Binding ToggleResolvedText}"
+                        Command="{Binding ToggleResolvedCommand}" />
+            </Grid>
+
+            <Label Style="{StaticResource PxTitle}" Text="FEEDBACK" />
+            <Label Style="{StaticResource PxMuted}"
+                   Text="Bug reports and ideas from players, newest first. RESOLVE hides one once it's handled. Tap a name to open their profile." />
+
+            <Border Style="{StaticResource PxPanel}" IsVisible="{Binding IsEmpty}">
+                <Label Style="{StaticResource PxMuted}" Text="Inbox zero. Nothing new from the players." />
+            </Border>
+
+            <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding Items}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource PxPanel}" Padding="14,12">
+                            <VerticalStackLayout Spacing="8">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                    <Border Style="{StaticResource PxChip}">
+                                        <Label Style="{StaticResource PxCaption}" Text="{Binding KindText}">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsBug}" Value="True">
+                                                    <Setter Property="TextColor" Value="{StaticResource PxStr}" />
+                                                </DataTrigger>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsBug}" Value="False">
+                                                    <Setter Property="TextColor" Value="{StaticResource PxGreen}" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </Border>
+                                    <Label Grid.Column="1"
+                                           Style="{StaticResource PxCaption}"
+                                           Text="{Binding Header}"
+                                           TextColor="{StaticResource PxTeal}"
+                                           VerticalOptions="Center">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.OpenSenderCommand}"
+                                                CommandParameter="{Binding .}" />
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                </Grid>
+                                <Border Style="{StaticResource PxSunken}" Padding="10,8">
+                                    <Label Style="{StaticResource PxBody}" Text="{Binding Feedback.Message}" LineBreakMode="WordWrap" />
+                                </Border>
+                                <Label Style="{StaticResource PxMuted}" TextColor="{StaticResource PxTextDim}"
+                                       Text="{Binding DeviceText}" LineBreakMode="WordWrap" />
+                                <Button Style="{StaticResource PxButtonSecondary}"
+                                        Text="{Binding ActionText}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleItemCommand}"
+                                        CommandParameter="{Binding .}" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

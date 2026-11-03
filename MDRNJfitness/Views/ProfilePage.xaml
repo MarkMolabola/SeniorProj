@@ -112,6 +112,15 @@
             </Border>
 
             <Button Style="{StaticResource PxButtonSecondary}"
+                    Text="SEND FEEDBACK"
+                    Command="{Binding OpenFeedbackCommand}" />
+
+            <Button Style="{StaticResource PxButtonSecondary}"
+                    Text="FEEDBACK INBOX"
+                    IsVisible="{Binding CurrentUser.IsAdmin, FallbackValue=False}"
+                    Command="{Binding OpenFeedbackInboxCommand}" />
+
+            <Button Style="{StaticResource PxButtonSecondary}"
                     Text="BLOCKED PLAYERS"
                     Command="{Binding ManageBlockedCommand}"
                     IsEnabled="{Binding IsNotBusy}" />
