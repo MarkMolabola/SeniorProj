@@ -369,3 +369,7 @@ FodyWeavers.xsd
 
 # Challenge proof uploads (local dev storage)
 MDRNJ.Api/App_Data/
+
+# Android signing keys never go in the repo
+*.keystore
+*.jks
