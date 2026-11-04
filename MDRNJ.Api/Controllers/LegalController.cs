@@ -25,6 +25,9 @@ namespace MDRNJ.Api.Controllers
         [HttpGet(LegalRules.PrivacyPath)]
         public IActionResult Privacy() => Page("privacy.html");
 
+        [HttpGet(LegalRules.DeleteAccountPath)]
+        public IActionResult DeleteAccount() => Page("delete-account.html");
+
         private IActionResult Page(string file)
         {
             using var stream = typeof(LegalController).Assembly.GetManifestResourceStream($"MDRNJ.Api.Legal.{file}")!;
