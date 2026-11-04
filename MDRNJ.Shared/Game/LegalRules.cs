@@ -14,5 +14,7 @@ namespace MDRNJ.Shared.Game
 
         public const string TermsPath = "terms";
         public const string PrivacyPath = "privacy";
+        /// <summary>Public "how to delete your account" page (linked from the Play Store listing).</summary>
+        public const string DeleteAccountPath = "delete-account";
     }
 }

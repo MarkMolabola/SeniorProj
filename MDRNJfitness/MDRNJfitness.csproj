@@ -46,9 +46,29 @@
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+	</PropertyGroup>
+
+	<!--
+		Google Play upload signing (Release, Android only). The keystore lives OUTSIDE the repo,
+		by default at %USERPROFILE%\keystores\mdrnjfitness-upload.keystore (override with
+		-p:MdrnjKeystore=...). The password is read from the MDRNJ_UPLOAD_PASS environment
+		variable and is never committed. Without the keystore (CI, teammates) Release builds
+		fall back to the normal debug signing, so nothing else breaks.
+		Each Play upload needs a higher ApplicationVersion above.
+	-->
+	<PropertyGroup>
+		<MdrnjKeystore Condition="'$(MdrnjKeystore)' == ''">$(USERPROFILE)\keystores\mdrnjfitness-upload.keystore</MdrnjKeystore>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)' == 'Release' and $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android' and Exists('$(MdrnjKeystore)')">
+		<AndroidPackageFormats>aab;apk</AndroidPackageFormats>
+		<AndroidKeyStore>true</AndroidKeyStore>
+		<AndroidSigningKeyStore>$(MdrnjKeystore)</AndroidSigningKeyStore>
+		<AndroidSigningKeyAlias>mdrnj-upload</AndroidSigningKeyAlias>
+		<AndroidSigningStorePass>env:MDRNJ_UPLOAD_PASS</AndroidSigningStorePass>
+		<AndroidSigningKeyPass>env:MDRNJ_UPLOAD_PASS</AndroidSigningKeyPass>
 	</PropertyGroup>
 
 	<ItemGroup>
