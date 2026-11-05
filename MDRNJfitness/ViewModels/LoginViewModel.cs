@@ -150,6 +150,7 @@ namespace MDRNJfitness.ViewModels
                 return false;
             }
             await Shell.Current.GoToAsync("//DashboardPage");
+            await TutorialGate.ShowIfNewAsync();
             return true;
         }
 

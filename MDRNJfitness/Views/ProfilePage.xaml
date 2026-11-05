@@ -112,6 +112,10 @@
             </Border>
 
             <Button Style="{StaticResource PxButtonSecondary}"
+                    Text="HOW TO PLAY"
+                    Command="{Binding OpenTutorialCommand}" />
+
+            <Button Style="{StaticResource PxButtonSecondary}"
                     Text="SEND FEEDBACK"
                     Command="{Binding OpenFeedbackCommand}" />
 
