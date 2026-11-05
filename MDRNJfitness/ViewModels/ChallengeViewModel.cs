@@ -256,6 +256,7 @@ namespace MDRNJfitness.ViewModels
             {
                 proof = await PickProofAsync(card);
                 if (proof is null) return;
+                await WaitForPickerToCloseAsync();
             }
 
             var value = await AskForResultAsync(card, allowStopwatch: proof is null);
@@ -298,6 +299,24 @@ namespace MDRNJfitness.ViewModels
                             : $"Locked in! Waiting for {card.Dto.OpponentUsername}.",
                         "OK");
             });
+        }
+
+        /// <summary>
+        /// iOS silently drops an alert shown while the picker or camera is still closing, and its
+        /// task never finishes, so wait for the sheet to go before asking for the result.
+        /// </summary>
+        internal static async Task WaitForPickerToCloseAsync()
+        {
+#if IOS
+            for (var i = 0; i < 60; i++)
+            {
+                var top = Platform.GetCurrentUIViewController();
+                if (top is null || top.PresentingViewController is null) break;
+                await Task.Delay(50);
+            }
+#else
+            await Task.CompletedTask;
+#endif
         }
 
         /// <summary>Video challenges: record now or pick a clip. Run challenges: photo or screenshot of the summary.</summary>
