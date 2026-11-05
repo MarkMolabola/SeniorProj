@@ -71,6 +71,31 @@
 		<AndroidSigningKeyPass>env:MDRNJ_UPLOAD_PASS</AndroidSigningKeyPass>
 	</PropertyGroup>
 
+	<!--
+		Google Play requires Android Release builds to shrink and obfuscate their Java code.
+		R8 does the work, but the SDK's generated rules always include -dontobfuscate, so
+		ObfuscateAndroidJava replaces that file with our copy. It also writes mapping.txt,
+		which the AAB carries so Play can make crash reports readable.
+	-->
+	<PropertyGroup Condition="'$(Configuration)' == 'Release' and $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<AndroidLinkTool>r8</AndroidLinkTool>
+	</PropertyGroup>
+	<Target Name="ObfuscateAndroidJava"
+	        AfterTargets="_CalculateProguardConfigurationFiles"
+	        Condition="'$(AndroidLinkTool)' == 'r8'">
+		<PropertyGroup>
+			<_MdrnjMappingRule>$(IntermediateOutputPath)proguard\proguard_mapping.cfg</_MdrnjMappingRule>
+		</PropertyGroup>
+		<WriteLinesToFile File="$(_MdrnjMappingRule)"
+		                  Lines="-printmapping &quot;$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(OutputPath),'mapping.txt'))&quot;"
+		                  Overwrite="true" />
+		<ItemGroup>
+			<_ProguardConfiguration Remove="$(IntermediateOutputPath)proguard\proguard_xamarin.cfg" />
+			<_ProguardConfiguration Include="Platforms\Android\proguard-obfuscated.cfg" />
+			<_ProguardConfiguration Include="$(_MdrnjMappingRule)" />
+		</ItemGroup>
+	</Target>
+
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.png" Color="#15122B" />
