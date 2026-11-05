@@ -27,6 +27,8 @@
         <Setter Property="Shell.ForegroundColor" Value="{StaticResource PxText}" />
         <Setter Property="Shell.TitleColor" Value="{StaticResource PxText}" />
         <Setter Property="Shell.NavBarIsVisible" Value="False" />
+        <!-- iOS: keep scrolling content out from behind the clock and the sub-tab strip -->
+        <Setter Property="SafeAreaEdges" Value="{OnPlatform iOS=Container, Default=Default}" />
     </Style>
 
     <!-- ── Panels ────────────────────────────────────────────────────────── -->
