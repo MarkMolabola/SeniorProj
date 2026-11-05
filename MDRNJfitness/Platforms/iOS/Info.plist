@@ -45,6 +45,8 @@
 	<string>Record sound with your challenge proof video.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Choose a video or screenshot as proof for a friend challenge.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Save the video or photo you record as proof for a friend challenge.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>UIUserInterfaceStyle</key>

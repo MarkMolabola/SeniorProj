@@ -113,7 +113,9 @@
                         <Label Grid.Column="6" Style="{StaticResource WeekdayLabel}" Text="SA" />
                     </Grid>
 
+                    <!-- Fixed height: iOS collapses a CollectionView inside a ScrollView. 6 rows x 48 (44 cell + margin) -->
                     <CollectionView x:Name="DaysGrid"
+                                    HeightRequest="288"
                                     ItemsSource="{Binding Days}"
                                     ItemTemplate="{StaticResource DayTemplate}"
                                     SelectionMode="Single"
