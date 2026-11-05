@@ -30,6 +30,16 @@ namespace MDRNJfitness
             builder.Logging.AddDebug();
 #endif
 
+#if IOS
+            // Inputs sit inside pixel-styled Borders, so drop the native rounded outline
+            Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoNativeBorder",
+                (handler, _) => handler.PlatformView.BorderStyle = UIKit.UITextBorderStyle.None);
+            Microsoft.Maui.Handlers.PickerHandler.Mapper.AppendToMapping("NoNativeBorder",
+                (handler, _) => handler.PlatformView.BorderStyle = UIKit.UITextBorderStyle.None);
+            Microsoft.Maui.Handlers.DatePickerHandler.Mapper.AppendToMapping("NoNativeBorder",
+                (handler, _) => handler.PlatformView.BorderStyle = UIKit.UITextBorderStyle.None);
+#endif
+
             // Data layer
             builder.Services.AddSingleton<LocalDatabase>();
             builder.Services.AddSingleton<WorkoutRepo>();
