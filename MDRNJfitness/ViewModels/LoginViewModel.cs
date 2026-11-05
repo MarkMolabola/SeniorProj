@@ -38,8 +38,9 @@ namespace MDRNJfitness.ViewModels
         partial void OnIsVerifyModeChanged(bool value) => OnPropertyChanged(nameof(IsMainMode));
         partial void OnIsResetModeChanged(bool value) => OnPropertyChanged(nameof(IsMainMode));
 
-        // WebAuthenticator isn't supported on Windows desktop.
-        public bool IsGoogleSignInSupported => DeviceInfo.Platform != DevicePlatform.WinUI;
+        // Android only. WebAuthenticator isn't supported on Windows desktop, and on iOS the
+        // App Store (guideline 4.8) would also require Sign in with Apple alongside Google.
+        public bool IsGoogleSignInSupported => DeviceInfo.Platform == DevicePlatform.Android;
 
         public LoginViewModel(IAuthService auth)
         {
