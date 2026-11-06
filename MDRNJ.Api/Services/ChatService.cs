@@ -338,9 +338,11 @@ namespace MDRNJ.Api.Services
         {
             var memberIds = await _db.ChatMembers
                 .Where(m => m.ChannelId == channelId)
-                .Select(m => m.UserId.ToString())
+                .Select(m => m.UserId)
                 .ToListAsync();
-            await _hub.Clients.Users(memberIds).SendAsync("ChannelActivity", channelId);
+
+            // Convert here, not in the query: SQL Server returns uppercase and hub user IDs are case-sensitive
+            await _hub.Clients.Users(memberIds.Select(id => id.ToString())).SendAsync("ChannelActivity", channelId);
         }
 
         /// <summary>Chat list preview of a message (first 120 characters).</summary>

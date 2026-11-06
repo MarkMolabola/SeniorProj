@@ -4,6 +4,7 @@ using MDRNJ.Shared.DTOs.Chat;
 using MDRNJ.Shared.Game;
 using MDRNJfitness.Helpers;
 using MDRNJfitness.Models.Social;
+using MDRNJfitness.Services;
 using MDRNJfitness.Services.Interfaces;
 using MDRNJfitness.SignalR;
 using System.Collections.ObjectModel;
@@ -17,6 +18,7 @@ namespace MDRNJfitness.ViewModels
         private readonly IFriendService _friends;
         private readonly IAuthService _auth;
         private readonly ChatHubClient _hub;
+        private readonly NotificationBadges _badges;
         private Guid _myId;
         private bool _isAdmin;
 
@@ -46,12 +48,14 @@ namespace MDRNJfitness.ViewModels
         /// <summary>Raised after messages load or arrive, so the page can scroll to the newest.</summary>
         public event Action? ScrollToEndRequested;
 
-        public ChatRoomViewModel(IChatService chat, IFriendService friends, IAuthService auth, ChatHubClient hub)
+        public ChatRoomViewModel(IChatService chat, IFriendService friends, IAuthService auth, ChatHubClient hub,
+            NotificationBadges badges)
         {
             _chat = chat;
             _friends = friends;
             _auth = auth;
             _hub = hub;
+            _badges = badges;
         }
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -86,6 +90,7 @@ namespace MDRNJfitness.ViewModels
                 HasOlder = page.Count >= ChatRules.PageSize;
             });
             ScrollToEndRequested?.Invoke();
+            _badges.Refresh(); // loading the chat marked it read
 
             try { await _hub.JoinChannelAsync(Channel.ChannelId); }
             catch (Exception ex)
@@ -300,7 +305,11 @@ namespace MDRNJfitness.ViewModels
 
         private async Task MarkReadQuietlyAsync()
         {
-            try { await _chat.MarkReadAsync(Channel!.ChannelId); }
+            try
+            {
+                await _chat.MarkReadAsync(Channel!.ChannelId);
+                _badges.Refresh();
+            }
             catch { /* unread badge just stays until next open */ }
         }
 

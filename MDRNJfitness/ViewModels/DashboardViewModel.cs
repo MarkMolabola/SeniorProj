@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using MDRNJ.Shared.DTOs.Game;
 using MDRNJ.Shared.DTOs.Workout;
 using MDRNJ.Shared.Game;
+using MDRNJfitness.Services;
 using MDRNJfitness.Services.Interfaces;
 using MDRNJfitness.SignalR;
 using System.Collections.ObjectModel;
@@ -109,14 +110,16 @@ namespace MDRNJfitness.ViewModels
         [ObservableProperty] private bool _hasNoAchievements = true;
 
         private readonly NotificationHubClient _notifications;
+        private readonly NotificationBadges _badges;
 
         public DashboardViewModel(IGameService game, IWorkoutService workout, ICharacterService character,
-            NotificationHubClient notifications)
+            NotificationHubClient notifications, NotificationBadges badges)
         {
             _game = game;
             _workout = workout;
             _character = character;
             _notifications = notifications;
+            _badges = badges;
             Title = "Dashboard";
         }
 
@@ -147,6 +150,7 @@ namespace MDRNJfitness.ViewModels
 
                 // Signed in and the token is fresh: start live notifications (no-op if already on)
                 _ = _notifications.ConnectAsync();
+                _ = _badges.StartAsync();
             });
 
         [RelayCommand]
