@@ -128,6 +128,9 @@ namespace MDRNJfitness.ViewModels
             });
 
         [RelayCommand]
+        public Task OpenTutorialAsync() => TutorialGate.ShowAsync();
+
+        [RelayCommand]
         public Task OpenFeedbackAsync() => Shell.Current.GoToAsync("FeedbackPage");
 
         /// <summary>Admins only (button hidden otherwise; the API also checks).</summary>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- How-to-play slides: shown once after first sign-in, and from Profile ▶ HOW TO PLAY. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:MDRNJfitness.Views"
+             x:Class="MDRNJfitness.Views.TutorialPage"
+             Style="{StaticResource PxPage}">
+
+    <Grid RowDefinitions="Auto,*,Auto,Auto" Padding="20,16,20,24" RowSpacing="16">
+        <Grid.GestureRecognizers>
+            <SwipeGestureRecognizer Direction="Left" Swiped="OnSwipedLeft" />
+            <SwipeGestureRecognizer Direction="Right" Swiped="OnSwipedRight" />
+        </Grid.GestureRecognizers>
+
+        <Button x:Name="SkipButton"
+                Grid.Row="0"
+                Style="{StaticResource PxLinkButton}"
+                Text="SKIP"
+                HorizontalOptions="End"
+                Clicked="OnDoneClicked" />
+
+        <!-- Scrolls only when the system font size is large or the screen is small -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="18">
+                <VerticalStackLayout.GestureRecognizers>
+                    <SwipeGestureRecognizer Direction="Left" Swiped="OnSwipedLeft" />
+                    <SwipeGestureRecognizer Direction="Right" Swiped="OnSwipedRight" />
+                </VerticalStackLayout.GestureRecognizers>
+
+                <Border Style="{StaticResource PxSunken}" Padding="0" HeightRequest="190">
+                    <Grid>
+                        <local:PixelAvatarView x:Name="Hero"
+                                               WidthRequest="160"
+                                               HeightRequest="160"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                        <local:DungeonView x:Name="Dungeon" IsVisible="False" />
+                    </Grid>
+                </Border>
+
+                <Border x:Name="PlaceChip"
+                        Style="{StaticResource PxSunken}"
+                        Padding="12,8"
+                        HorizontalOptions="Center">
+                    <HorizontalStackLayout Spacing="8">
+                        <Image x:Name="PlaceIcon" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                        <Label x:Name="PlaceLabel" Style="{StaticResource PxCaption}" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+
+                <Label x:Name="TitleLabel"
+                       Style="{StaticResource PxTitle}"
+                       TextColor="{StaticResource PxGold}"
+                       HorizontalTextAlignment="Center" />
+
+                <Label x:Name="BodyLabel"
+                       Style="{StaticResource PxBody}"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <HorizontalStackLayout x:Name="Dots" Grid.Row="2" Spacing="8" HorizontalOptions="Center" />
+
+        <Grid Grid.Row="3" ColumnDefinitions="*,*" ColumnSpacing="12">
+            <Button x:Name="BackButton"
+                    Grid.Column="0"
+                    Style="{StaticResource PxButtonSecondary}"
+                    Text="BACK"
+                    Clicked="OnBackClicked" />
+            <Button x:Name="NextButton"
+                    Grid.Column="1"
+                    Style="{StaticResource PxButton}"
+                    Clicked="OnNextClicked" />
+        </Grid>
+    </Grid>
+</ContentPage>
