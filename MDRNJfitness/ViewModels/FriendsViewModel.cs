@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MDRNJ.Shared.DTOs.Friend;
+using MDRNJfitness.Services;
 using MDRNJfitness.Services.Interfaces;
 using System.Collections.ObjectModel;
 
@@ -9,14 +10,16 @@ namespace MDRNJfitness.ViewModels
     public partial class FriendsViewModel : BaseViewModel
     {
         private readonly IFriendService _friends;
+        private readonly NotificationBadges _badges;
 
         [ObservableProperty] private string _searchUsername = string.Empty;
         public ObservableCollection<FriendDto> Friends { get; } = new();
         public ObservableCollection<FriendDto> PendingRequests { get; } = new();
 
-        public FriendsViewModel(IFriendService friends)
+        public FriendsViewModel(IFriendService friends, NotificationBadges badges)
         {
             _friends = friends;
+            _badges = badges;
             Title = "Friends";
         }
 
@@ -33,6 +36,7 @@ namespace MDRNJfitness.ViewModels
                 var pending = await _friends.GetPendingRequestsAsync();
                 PendingRequests.Clear();
                 foreach (var p in pending) PendingRequests.Add(p);
+                _badges.Refresh();
             });
 
         /// <summary>A friend's light changed live: swap in an updated card (stays in place, no reorder).</summary>
@@ -81,6 +85,7 @@ namespace MDRNJfitness.ViewModels
                 var accepted = await _friends.AcceptRequestAsync(friend.FriendshipId);
                 PendingRequests.Remove(friend);
                 Friends.Add(accepted);
+                _badges.Refresh();
             });
 
         [RelayCommand]
@@ -93,6 +98,7 @@ namespace MDRNJfitness.ViewModels
             {
                 await _friends.DeclineRequestAsync(friend.FriendshipId);
                 PendingRequests.Remove(friend);
+                _badges.Refresh();
             });
     }
 }

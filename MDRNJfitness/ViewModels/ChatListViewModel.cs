@@ -4,6 +4,7 @@ using MDRNJ.Shared.DTOs.Chat;
 using MDRNJ.Shared.Game;
 using MDRNJfitness.Helpers;
 using MDRNJfitness.Models.Social;
+using MDRNJfitness.Services;
 using MDRNJfitness.Services.Interfaces;
 using MDRNJfitness.SignalR;
 using System.Collections.ObjectModel;
@@ -17,6 +18,7 @@ namespace MDRNJfitness.ViewModels
         private readonly IFriendService _friends;
         private readonly ChatHubClient _hub;
         private readonly IAuthService _auth;
+        private readonly NotificationBadges _badges;
         private bool _visible;
 
         /// <summary>Admins get a REPORTS button for the moderation queue.</summary>
@@ -24,12 +26,14 @@ namespace MDRNJfitness.ViewModels
 
         public ObservableCollection<ChatChannelCard> Channels { get; } = new();
 
-        public ChatListViewModel(IChatService chat, IFriendService friends, ChatHubClient hub, IAuthService auth)
+        public ChatListViewModel(IChatService chat, IFriendService friends, ChatHubClient hub, IAuthService auth,
+            NotificationBadges badges)
         {
             _chat = chat;
             _friends = friends;
             _hub = hub;
             _auth = auth;
+            _badges = badges;
             _hub.ChannelActivity += OnChannelActivity;
             Title = "Chat";
         }
@@ -63,6 +67,7 @@ namespace MDRNJfitness.ViewModels
                 Channels.Clear();
                 foreach (var c in channels)
                     Channels.Add(new ChatChannelCard(c));
+                _badges.Refresh();
             });
 
         [RelayCommand]

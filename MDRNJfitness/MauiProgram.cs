@@ -30,6 +30,12 @@ namespace MDRNJfitness
             builder.Logging.AddDebug();
 #endif
 
+#if ANDROID
+            builder.ConfigureMauiHandlers(h => h.AddHandler<Shell, Platforms.Android.BadgeShellRenderer>());
+#elif IOS
+            builder.ConfigureMauiHandlers(h => h.AddHandler<Shell, Platforms.iOS.BadgeShellRenderer>());
+#endif
+
 #if IOS
             // Inputs sit inside pixel-styled Borders, so drop the native rounded outline
             Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoNativeBorder",
@@ -122,6 +128,7 @@ namespace MDRNJfitness
             builder.Services.AddSingleton<LeaderboardHubClient>();
             builder.Services.AddSingleton<ChatHubClient>();
             builder.Services.AddSingleton<NotificationHubClient>();
+            builder.Services.AddSingleton<NotificationBadges>();
 
             // ViewModels
             builder.Services.AddTransient<LoginViewModel>();

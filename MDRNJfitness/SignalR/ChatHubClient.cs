@@ -58,6 +58,23 @@ namespace MDRNJfitness.SignalR
             }
         }
 
+        /// <summary>Signing out: the next account needs a connection with its own token.</summary>
+        public async Task StopAsync()
+        {
+            await _gate.WaitAsync();
+            try
+            {
+                _joinedChannel = null;
+                if (_connection is null) return;
+                await _connection.DisposeAsync();
+                _connection = null;
+            }
+            finally
+            {
+                _gate.Release();
+            }
+        }
+
         public async Task JoinChannelAsync(Guid channelId)
         {
             await ConnectAsync();

@@ -6,6 +6,7 @@ using MDRNJ.Shared.DTOs.Game;
 using MDRNJ.Shared.Enums;
 using MDRNJ.Shared.Game;
 using MDRNJfitness.Models.Social;
+using MDRNJfitness.Services;
 using MDRNJfitness.Services.Interfaces;
 using MDRNJfitness.Views;
 using System.Collections.ObjectModel;
@@ -25,6 +26,7 @@ namespace MDRNJfitness.ViewModels
         private readonly IFriendService _friends;
         private readonly ICharacterProgressPresenter _progress;
         private readonly ICharacterService _character;
+        private readonly NotificationBadges _badges;
 
         public ObservableCollection<ChallengeCard> Incoming { get; } = new();
         public ObservableCollection<ChallengeCard> Active { get; } = new();
@@ -76,12 +78,13 @@ namespace MDRNJfitness.ViewModels
         }
 
         public ChallengeViewModel(IChallengeService challenges, IFriendService friends, ICharacterProgressPresenter progress,
-            ICharacterService character)
+            ICharacterService character, NotificationBadges badges)
         {
             _challenges = challenges;
             _friends = friends;
             _progress = progress;
             _character = character;
+            _badges = badges;
             Title = "Challenges";
             UpdateFormRules();
         }
@@ -116,6 +119,7 @@ namespace MDRNJfitness.ViewModels
                 var all = await _challenges.GetMyChallengesAsync();
                 Show(all);
                 await ShowUnseenResultsAsync(all);
+                _badges.Refresh();
 
                 if (_pendingOpponent is Guid opponent)
                 {

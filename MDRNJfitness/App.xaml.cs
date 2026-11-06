@@ -1,4 +1,5 @@
 ﻿using MDRNJfitness.Helpers;
+using MDRNJfitness.Services;
 using MDRNJfitness.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,12 +27,19 @@ namespace MDRNJfitness
             window.Resumed += async (_, _) =>
             {
                 if (Notifications is { } hub && !string.IsNullOrEmpty(await TokenStore.GetAccessTokenAsync()))
+                {
                     await hub.ConnectAsync();
+                    if (Badges is { } badges)
+                        await badges.StartAsync();
+                }
             };
             return window;
         }
 
         private static NotificationHubClient? Notifications =>
             IPlatformApplication.Current?.Services.GetService<NotificationHubClient>();
+
+        private static NotificationBadges? Badges =>
+            IPlatformApplication.Current?.Services.GetService<NotificationBadges>();
     }
 }

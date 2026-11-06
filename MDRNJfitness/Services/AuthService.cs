@@ -15,13 +15,16 @@ namespace MDRNJfitness.Services
         private readonly UserRepo _userRepo;
         private readonly TokenRefresher _refresher;
         private readonly NotificationHubClient _notifications;
+        private readonly NotificationBadges _badges;
 
-        public AuthService(HttpClient http, UserRepo userRepo, TokenRefresher refresher, NotificationHubClient notifications)
+        public AuthService(HttpClient http, UserRepo userRepo, TokenRefresher refresher, NotificationHubClient notifications,
+            NotificationBadges badges)
         {
             _http = http;
             _userRepo = userRepo;
             _refresher = refresher;
             _notifications = notifications;
+            _badges = badges;
         }
 
         public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
@@ -113,6 +116,7 @@ namespace MDRNJfitness.Services
             }
 
             await _notifications.StopAsync();
+            await _badges.ResetAsync();
             TokenStore.Clear();
             await _userRepo.ClearAsync();
         }
@@ -121,6 +125,7 @@ namespace MDRNJfitness.Services
         {
             await _http.DeleteAsync("api/users/me");
             await _notifications.StopAsync();
+            await _badges.ResetAsync();
             TokenStore.Clear();
             await _userRepo.ClearAsync();
         }
